@@ -428,9 +428,9 @@ class OdooWebsiteBuilder {
 
     if (key === 'avatar') {
       el.style.position = 'absolute';
-      el.style.bottom = posY + 'px';
+      el.style.bottom = '0px';
       el.style.left = '50%';
-      el.style.transform = `translateX(calc(-50% + ${posX}px)) scale(${scaleVal})`;
+      el.style.transform = `translateX(calc(-50% + ${posX}px)) translateY(${posY}px) scale(${scaleVal})`;
       el.style.display = (l.visible !== false) ? 'flex' : 'none';
     } else if (key === 'logo' || key === 'badges') {
       el.style.top = posY + 'px';
@@ -1178,7 +1178,7 @@ class OdooWebsiteBuilder {
 
       if (this.dragCandidate === 'avatar') {
         l.x = this.initialPos.x + dx;
-        l.y = this.initialPos.y - dy;
+        l.y = this.initialPos.y + dy;
       } else if (this.dragCandidate === 'chat') {
         l.x = 0;
         l.y = Math.max(10, Math.min(180, this.initialPos.y - dy));
