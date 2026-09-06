@@ -2375,10 +2375,9 @@ body.odoo-studio-active #home-bottom-chat-pill {
   transform: translateX(0);
 }
 
-/* Push page content slightly when sidebar is open */
+/* Sidebar operates as a floating overlay with zero canvas distortion */
 body.odoo-studio-active {
-  margin-right: 350px;
-  transition: margin-right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-right: 0 !important;
 }
 
 /* ?? 3. Sidebar Header ?????????????????????????????? */
@@ -3041,7 +3040,7 @@ body.odoo-studio-active .stage-center-avatar {
 
 #center-mina-img {
   pointer-events: auto !important;
-  max-width: 400px;
+  max-width: none !important;
 }
 
 .stage-column-right,
