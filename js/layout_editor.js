@@ -250,26 +250,6 @@ class OdooWebsiteBuilder {
     this.createFloatingTextToolbar();
     this.createDockHandle();
     this.createPasswordModal();
-
-    window.addEventListener('resize', () => {
-      if (window.innerWidth > 768) {
-        this.applyAllLayers();
-      } else {
-        Object.keys(this.layers).forEach(k => {
-          const el = document.querySelector(this.layers[k]?.selector);
-          if (el) {
-            el.style.transform = '';
-            el.style.left = '';
-            el.style.right = '';
-            el.style.top = '';
-            el.style.bottom = '';
-            el.style.width = '';
-            el.style.maxWidth = '';
-            el.style.height = '';
-          }
-        });
-      }
-    });
   }
 
   applyAllLayers() {
@@ -437,11 +417,6 @@ class OdooWebsiteBuilder {
     if (!l) return;
     const el = document.querySelector(l.selector);
     if (!el) return;
-
-    if (window.innerWidth <= 768) {
-      el.style.display = (l.visible !== false) ? '' : 'none';
-      return;
-    }
 
     let posX = Number(l.x) || 0;
     let posY = Number(l.y) || 0;
