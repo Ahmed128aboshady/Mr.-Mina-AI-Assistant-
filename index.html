@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مستر مينا نظام تعليمي ذكي للمرحلة الإعدادية</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css?v=410.0" />
+</head>
+<body>
+
+  <!-- ── Stars Background ───────────────────── -->
+  <div class="stars"></div>
+
+  <!-- ── Transition Overlay ────────────────── -->
+  <div class="transition-overlay" id="transition-overlay"></div>
+
+  <!-- ── Loading Screen ────────────────────── -->
+  <div id="loading-screen">
+    <div class="loading-logo">
+      <img src="assets/logo.png" alt="الكيميائي" style="width:140px;object-fit:contain;" onerror="this.textContent='👨‍🏫'" />
+    </div>
+    <div class="loading-text">الكيميائي في العلوم</div>
+    <div class="loading-sub">جاري تحميل المنصة التعليمية...</div>
+    <div class="loading-bar-wrap">
+      <div class="loading-bar"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       HEADER: اللوجو + أزرار 1 2 3
+  ═══════════════════════════════════════════ -->
+  <header class="home-header">
+
+    <!-- Grade Badges (1 2 3) — يسار اللوجو -->
+    <div class="grade-badges-col" id="grade-badges-col">
+      <button class="grade-badge-btn active" data-grade="1"
+        onclick="window.appController?.selectGrade(1)"
+        title="الصف الأول الإعدادي">
+        <img src="assets/1_active.png" alt="1" />
+      </button>
+      <button class="grade-badge-btn" data-grade="2"
+        onclick="window.appController?.selectGrade(2)"
+        title="الصف الثاني الإعدادي">
+        <img src="assets/2.png" alt="2" />
+      </button>
+      <button class="grade-badge-btn" data-grade="3"
+        onclick="window.appController?.selectGrade(3)"
+        title="الصف الثالث الإعدادي">
+        <img src="assets/3.png" alt="3" />
+      </button>
+    </div>
+
+    <!-- اللوجو في المنتصف -->
+    <div class="header-logo-wrap">
+      <img src="assets/logo.png" alt="الكيميائي في العلوم" class="header-logo-img"
+        onerror="this.style.display='none'; document.getElementById('logo-text-fallback').style.display='flex'" />
+      <div id="logo-text-fallback" class="logo-text-fallback" style="display:none;">
+        <div class="brand-sub">في العلوم</div>
+        <div class="brand-main">الكيميائي</div>
+        <div class="brand-teacher">أ. مينا جرجس</div>
+      </div>
+    </div>
+
+  </header>
+
+  <!-- ══════════════════════════════════════════
+       HERO STAGES & CHARACTER LAYOUT
+  ═══════════════════════════════════════════ -->
+  <main class="home-hero-layout" id="home-hero-layout">
+
+    <!-- ── RIGHT: المرحلة الأولى + الثانية (تظهر يمين في RTL) ── -->
+    <div class="stage-column stage-column-right">
+      <!-- المرحلة الأولى -->
+      <div class="stage-card-item" id="stage-card-1" onclick="window.appController?.toggleStageDropdown(1, 'right')">
+        <img src="assets/slides-01.png?v=9.0" alt="المرحلة الأولى" class="stage-card-img" />
+      </div>
+      <!-- المرحلة الثانية -->
+      <div class="stage-card-item" id="stage-card-2" onclick="window.appController?.toggleStageDropdown(2, 'right')">
+        <img src="assets/slides-02.png?v=9.0" alt="المرحلة الثانية" class="stage-card-img" />
+      </div>
+    </div>
+
+    <!-- ── DEDICATED AVATAR LAYER (مستر مينا في لاير مستقل) ── -->
+    <div class="stage-center-avatar" id="stage-center-avatar">
+      <img src="assets/mina.png?v=9.0" alt="مستر مينا" class="center-mina-img" id="center-mina-img" />
+      <div class="character-panel mini-3d-panel" id="character-panel" style="display:none;">
+        <canvas id="character-canvas"></canvas>
+      </div>
+    </div>
+
+    <!-- ── LEFT: المرحلة الثالثة + الرابعة (تظهر يسار في RTL) ── -->
+    <div class="stage-column stage-column-left">
+      <!-- المرحلة الثالثة -->
+      <div class="stage-card-item" id="stage-card-3" onclick="window.appController?.toggleStageDropdown(3, 'left')">
+        <img src="assets/slides-03.png?v=9.0" alt="المرحلة الثالثة" class="stage-card-img" />
+      </div>
+      <!-- المرحلة الرابعة -->
+      <div class="stage-card-item" id="stage-card-4" onclick="window.appController?.toggleStageDropdown(4, 'left')">
+        <img src="assets/slides-04.png?v=9.0" alt="المرحلة الرابعة" class="stage-card-img" />
+      </div>
+    </div>
+
+  </main><!-- /home-hero-layout -->
+  <div id="odoo-custom-blocks-layer" class="odoo-custom-blocks-layer"></div>
+
+  <!-- ── LEFT FLYOUT DROPDOWN DRAWER ── -->
+  <div class="stage-drawer stage-drawer-left" id="stage-drawer-left">
+    <div class="drawer-header">
+      <div class="drawer-title" id="drawer-title-left">الوحدة الثالثة: الكائنات والتكيف</div>
+      <button class="drawer-close-btn" onclick="window.appController?.closeStageDrawers()">✕</button>
+    </div>
+    <div class="drawer-content" id="drawer-content-left">
+      <!-- Rendered dynamically -->
+    </div>
+  </div>
+
+  <!-- ── RIGHT FLYOUT DROPDOWN DRAWER ── -->
+  <div class="stage-drawer stage-drawer-right" id="stage-drawer-right">
+    <div class="drawer-header">
+      <div class="drawer-title" id="drawer-title-right">الوحدة الأولى: المادة وتركيبها</div>
+      <button class="drawer-close-btn" onclick="window.appController?.closeStageDrawers()">✕</button>
+    </div>
+    <div class="drawer-content" id="drawer-content-right">
+      <!-- Rendered dynamically -->
+    </div>
+  </div>
+
+  <!-- ── BOTTOM FLOATING CHAT PILL ── -->
+  <div class="home-bottom-chat-pill" id="home-bottom-chat-pill">
+    <input
+      type="text"
+      class="home-chat-input"
+      id="home-chat-input"
+      placeholder="اسألني أي سؤال في العلوم..."
+      onkeydown="if(event.key==='Enter') window.appController?.submitHomeChat()"
+    />
+    <div class="home-chat-buttons">
+      <button class="chat-pill-btn btn-mic" id="home-mic-btn" onclick="window.appController?.toggleHomeMic()" title="تحدث بالصوت">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+        </svg>
+      </button>
+      <button class="chat-pill-btn btn-send" id="home-send-btn" onclick="window.appController?.submitHomeChat()" title="إرسال">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       EXPLANATION SECTION (يظهر بعد الترانزيشن)
+  ═══════════════════════════════════════════ -->
+  <section class="explanation-section" id="explanation-section">
+
+    <!-- Header -->
+    <div class="explanation-header">
+      <!-- Back Button -->
+      <button class="back-btn" id="back-btn">
+        ← رجوع للشات
+      </button>
+
+      <!-- Title -->
+      <h1 class="explanation-title" id="explanation-title">📚 الموضوع</h1>
+
+      <!-- Sessions Switcher (الحصة 1 / الحصة 2) -->
+      <div class="header-session-tabs" id="header-session-tabs" style="display:none;"></div>
+
+      <!-- Action Tabs -->
+      <div class="header-action-tabs" id="header-action-tabs">
+        <button onclick="window.appController?.toggleLabVideoView()" id="lab-video-tab-btn" class="header-tab-btn tab-video" title="مشاهدة فيديو الشرح">
+          <span>فيديو شرح الدرس 🎬</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="explanation-body">
+      <div class="explanation-layout-wrap">
+        <!-- 📚 Explanation & 3D Lab Content (واخد العرض المناسب والشاشة كاملة) -->
+        <div class="explanation-content" id="explanation-content">
+          <!-- Rendered by app.js & interactive_lab.js -->
+        </div>
+      </div>
+    </div><!-- /explanation-body -->
+
+  </section><!-- /explanation-section -->
+
+
+
+  <!-- ══════════════════════════════════════════
+       ODOO-STYLE VISUAL BUILDER STUDIO
+  ═══════════════════════════════════════════ -->
+  <!-- Top Corner Trigger Ribbon Button (Blue Odoo Studio) -->
+  <button
+    id="odoo-edit-trigger"
+    class="odoo-edit-trigger"
+    onclick="toggleOdooStudio()"
+    style="position:fixed; top:14px; left:18px; z-index:99999999; background:linear-gradient(135deg, #0284c7, #0369a1); color:#ffffff; border:2px solid #38bdf8; border-radius:24px; padding:8px 20px; font-family:'Cairo',sans-serif; font-size:0.95rem; font-weight:800; cursor:pointer; box-shadow:0 4px 18px rgba(2,132,199,0.5), 0 0 15px rgba(56,189,248,0.4); display:flex; align-items:center; gap:8px;"
+    title="Odoo Studio (Alt+E)"
+  >
+    <div class="odoo-ribbon-tag">
+      <span class="odoo-label">Edit Studio</span>
+    </div>
+  </button>
+
+  <script>
+    function toggleOdooStudio(forceState) {
+      var sidebar = document.getElementById('odoo-studio-sidebar');
+      var trigger = document.getElementById('odoo-edit-trigger');
+      if (!sidebar) return;
+      
+      var isOpening = (forceState !== undefined) ? forceState : (sidebar.style.display !== 'flex');
+      
+      if (isOpening) {
+        sidebar.style.display = 'flex';
+        sidebar.classList.add('open');
+        document.body.classList.add('odoo-studio-active');
+        if (trigger) trigger.style.background = 'linear-gradient(135deg, #008784, #005f5d)';
+        if (window.layoutEditor) {
+          window.layoutEditor.isActive = true;
+          window.layoutEditor.selectElement('avatar');
+        }
+      } else {
+        sidebar.style.display = 'none';
+        sidebar.classList.remove('open');
+        document.body.classList.remove('odoo-studio-active');
+        if (trigger) trigger.style.background = 'linear-gradient(135deg, #0284c7, #0369a1)';
+        if (window.layoutEditor) {
+          window.layoutEditor.isActive = false;
+        }
+      }
+    }
+  </script>
+
+  <!-- Odoo Sidebar Panel -->
+  <aside
+    id="odoo-studio-sidebar"
+    class="odoo-studio-sidebar"
+    style="position:fixed; top:0; right:0; bottom:0; width:350px; max-width:90vw; background:#191c28; color:#f1f5f9; z-index:99999999; box-shadow:-8px 0 35px rgba(0,0,0,0.8); display:none; flex-direction:column; border-left:1.5px solid #2b3044; direction:ltr;"
+  >
+    <!-- Top Actions Bar -->
+    <div class="odoo-sidebar-header">
+      <div class="odoo-history-btns">
+        <button onclick="window.layoutEditor?.undo()" title="Undo">↶</button>
+        <button onclick="window.layoutEditor?.redo()" title="Redo">↷</button>
+        <button onclick="window.layoutEditor?.toggleMobilePreview()" title="Mobile Preview">📱</button>
+      </div>
+      <div class="odoo-header-actions">
+        <button onclick="window.layoutEditor?.discardChanges()" class="odoo-btn-discard">Discard</button>
+        <button onclick="window.layoutEditor?.saveLayout()" class="odoo-btn-save">Save</button>
+        <button onclick="toggleOdooStudio(false)" class="odoo-btn-close" title="Close">✕</button>
+      </div>
+    </div>
+
+    <!-- 3 Tabs (Blocks | Style | Theme) -->
+    <div class="odoo-tabs-bar">
+      <button class="odoo-tab-btn active" data-tab="blocks" onclick="window.layoutEditor?.switchTab('blocks')">
+        <span class="tab-icon">▦</span> Blocks
+      </button>
+      <button class="odoo-tab-btn" data-tab="style" onclick="window.layoutEditor?.switchTab('style')">
+        <span class="tab-icon">🖌️</span> Style
+      </button>
+      <button class="odoo-tab-btn" data-tab="theme" onclick="window.layoutEditor?.switchTab('theme')">
+        <span class="tab-icon">⚙️</span> Theme
+      </button>
+    </div>
+
+    <!-- Tab 1: BLOCKS (Odoo Snippets Library) -->
+    <div class="odoo-tab-pane active" id="odoo-pane-blocks">
+      <div class="odoo-pane-subtitle">🧩 Draggable Building Blocks (اسحب لداخل الصفحة)</div>
+      <div class="odoo-blocks-grid" id="odoo-snippets-drag-grid">
+        <div class="odoo-block-card add-card" draggable="true" ondragstart="window.odooBuilder?.startDragSnippet(event, 'banner')" ondragend="window.odooBuilder?.endDragSnippet()" onclick="window.odooBuilder?.insertSnippetDirectly('banner')">
+          <div class="block-preview-icon">📢</div>
+          <div class="block-label">Announcement Banner</div>
+          <span class="add-badge">Drag ⠿</span>
+        </div>
+        <div class="odoo-block-card add-card" draggable="true" ondragstart="window.odooBuilder?.startDragSnippet(event, 'social')" ondragend="window.odooBuilder?.endDragSnippet()" onclick="window.odooBuilder?.insertSnippetDirectly('social')">
+          <div class="block-preview-icon">💬</div>
+          <div class="block-label">WhatsApp & Social</div>
+          <span class="add-badge">Drag ⠿</span>
+        </div>
+        <div class="odoo-block-card add-card" draggable="true" ondragstart="window.odooBuilder?.startDragSnippet(event, 'video')" ondragend="window.odooBuilder?.endDragSnippet()" onclick="window.odooBuilder?.insertSnippetDirectly('video')">
+          <div class="block-preview-icon">🎬</div>
+          <div class="block-label">YouTube Video</div>
+          <span class="add-badge">Drag ⠿</span>
+        </div>
+        <div class="odoo-block-card add-card" draggable="true" ondragstart="window.odooBuilder?.startDragSnippet(event, 'features')" ondragend="window.odooBuilder?.endDragSnippet()" onclick="window.odooBuilder?.insertSnippetDirectly('features')">
+          <div class="block-preview-icon">📑</div>
+          <div class="block-label">3 Columns Features</div>
+          <span class="add-badge">Drag ⠿</span>
+        </div>
+        <div class="odoo-block-card add-card" draggable="true" ondragstart="window.odooBuilder?.startDragSnippet(event, 'quote')" ondragend="window.odooBuilder?.endDragSnippet()" onclick="window.odooBuilder?.insertSnippetDirectly('quote')">
+          <div class="block-preview-icon">💡</div>
+          <div class="block-label">Science Tip / Quote</div>
+          <span class="add-badge">Drag ⠿</span>
+        </div>
+        <div class="odoo-block-card add-card" draggable="true" ondragstart="window.odooBuilder?.startDragSnippet(event, 'faq')" ondragend="window.odooBuilder?.endDragSnippet()" onclick="window.odooBuilder?.insertSnippetDirectly('faq')">
+          <div class="block-preview-icon">❓</div>
+          <div class="block-label">FAQ Accordion</div>
+          <span class="add-badge">Drag ⠿</span>
+        </div>
+      </div>
+
+      <div class="odoo-pane-subtitle" style="margin-top:18px;">🗂️ Layers Management (طبقات الصفحة المستقلة)</div>
+      <div id="odoo-layers-list" class="odoo-layers-list">
+        <!-- Rendered dynamically with Lock 🔒 and Visibility 👁️ per layer -->
+      </div>
+    </div>
+
+    <!-- Tab 2: STYLE -->
+    <div class="odoo-tab-pane" id="odoo-pane-style">
+      <div class="odoo-inspector-header">
+        <span class="odoo-label-dim">Selected Element:</span>
+        <select id="odoo-inspector-select" class="odoo-select" onchange="window.layoutEditor?.selectElement(this.value)">
+          <option value="avatar">👤 Avatar (Mr. Mina)</option>
+          <option value="logo">🏷️ Logo & Brand</option>
+          <option value="badges">🔢 Grade Badges (1, 2, 3)</option>
+          <option value="rightCol">📑 Right Cards (1 & 2)</option>
+          <option value="leftCol">📑 Left Cards (3 & 4)</option>
+          <option value="chat">💬 Bottom Chat Bar</option>
+        </select>
+      </div>
+
+      <!-- Position Nudge Pad -->
+      <div class="odoo-control-group">
+        <div class="odoo-group-title">📍 Position & Offset</div>
+        <div class="odoo-nudge-pad">
+          <button class="odoo-pad-btn" onclick="window.layoutEditor?.nudge(0, 8)">⬆️ Up</button>
+          <div class="odoo-pad-mid">
+            <button class="odoo-pad-btn" onclick="window.layoutEditor?.nudge(-8, 0)">⬅️ Left</button>
+            <span id="odoo-coords-disp" class="odoo-coords-tag">X: 0 | Y: 0</span>
+            <button class="odoo-pad-btn" onclick="window.layoutEditor?.nudge(8, 0)">➡️ Right</button>
+          </div>
+          <button class="odoo-pad-btn" onclick="window.layoutEditor?.nudge(0, -8)">⬇️ Down</button>
+        </div>
+      </div>
+
+      <!-- Dimensions -->
+      <div class="odoo-control-group">
+        <div class="odoo-group-title">🔍 Dimensions</div>
+        <div class="odoo-slider-row">
+          <label>Scale / Size:</label>
+          <input type="range" id="odoo-scale-slider" min="0.4" max="2.0" step="0.02" value="1" oninput="window.layoutEditor?.onScaleChange(this.value)">
+          <span id="odoo-scale-val" class="slider-badge">1.00x</span>
+        </div>
+        <div class="odoo-slider-row" id="odoo-height-row">
+          <label>Thickness / Height:</label>
+          <input type="range" id="odoo-height-slider" min="45" max="140" step="2" value="72" oninput="window.layoutEditor?.onHeightChange(this.value)">
+          <span id="odoo-height-val" class="slider-badge">72px</span>
+        </div>
+      </div>
+
+      <!-- 3D Tilt -->
+      <div class="odoo-control-group">
+        <div class="odoo-group-title">🔄 3D Perspective & Tilt</div>
+        <div class="odoo-slider-row">
+          <label>Y-Axis Tilt:</label>
+          <input type="range" id="odoo-tilt-slider" min="-45" max="45" step="1" value="0" oninput="window.layoutEditor?.onTiltChange(this.value)">
+          <span id="odoo-tilt-val" class="slider-badge orange">0°</span>
+        </div>
+      </div>
+
+      <!-- Visibility -->
+      <div class="odoo-control-group">
+        <div class="odoo-group-title">👁️ Visibility</div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span>Display on page:</span>
+          <input type="checkbox" id="odoo-vis-toggle" checked onchange="window.layoutEditor?.onVisibilityChange(this.checked)" style="width:20px; height:20px; cursor:pointer; accent-color:#00d084;">
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: THEME -->
+    <div class="odoo-tab-pane" id="odoo-pane-theme">
+      <div class="odoo-pane-subtitle">Theme & Atmosphere</div>
+      
+      <div class="odoo-control-group">
+        <div class="odoo-group-title">🎨 Color Palette</div>
+        <div class="odoo-color-presets">
+          <button class="color-preset-btn active" onclick="window.layoutEditor?.setAccent('#38bdf8')" style="background:#38bdf8;" title="Cyan Electric"></button>
+          <button class="color-preset-btn" onclick="window.layoutEditor?.setAccent('#0284c7')" style="background:#0284c7;" title="Royal Blue"></button>
+          <button class="color-preset-btn" onclick="window.layoutEditor?.setAccent('#f59e0b')" style="background:#f59e0b;" title="Amber Orange"></button>
+          <button class="color-preset-btn" onclick="window.layoutEditor?.setAccent('#10b981')" style="background:#10b981;" title="Emerald Green"></button>
+          <button class="color-preset-btn" onclick="window.layoutEditor?.setAccent('#8b5cf6')" style="background:#8b5cf6;" title="Purple Studio"></button>
+        </div>
+      </div>
+
+      <div class="odoo-control-group">
+        <div class="odoo-group-title">🔄 Factory Reset</div>
+        <button onclick="window.layoutEditor?.factoryReset()" class="odoo-btn-danger">Restore All Default Settings</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════════════════════════
+       SCRIPTS
+  ═══════════════════════════════════════════ -->
+
+  <!-- Three.js Core -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Three.js FBX Loader (needs fflate for compression) -->
+  <script src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"></script>
+  <script>
+    // Expose fflate to Three.js scope
+    window.fflate = fflate;
+  </script>
+
+  <!-- FBXLoader & GLTFLoader from Three.js -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FBXLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+  <!-- App Modules -->
+  <script src="js/curriculum_data.js?v=495.0"></script>
+  <script src="js/character.js?v=495.0"></script>
+  <script src="js/chat.js?v=495.0"></script>
+  <script src="js/interactive_lab.js?v=495.0"></script>
+  <script src="js/app.js?v=495.0"></script>
+  <script src="js/layout_editor.js?v=495.0"></script>
+
+</body>
+</html>
