@@ -190,24 +190,24 @@ body {
 .home-hero-layout {
   position: relative;
   width: 100%;
+  min-height: 100vh;
   height: 100vh;
-  min-height: 600px;
-  overflow: hidden;
-  perspective: 1200px;
+  overflow: visible;
+  perspective: 1400px;
   perspective-origin: 50% 45%;
 }
 
 /* RIGHT CARDS (المرحلة 1 و 2) — Visually on Right in RTL */
 .stage-column-right {
   position: absolute;
-  left: calc(50% + 105px);
-  top: 44%;
+  left: calc(50% + 90px);
+  top: 48%;
   transform: translateY(-50%) rotateY(-17deg) rotateX(1deg);
   transform-style: preserve-3d;
-  width: clamp(260px, 32vw, 440px);
+  width: clamp(240px, 30vw, 420px);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   z-index: 10;
   transform-origin: left center;
 }
@@ -215,14 +215,14 @@ body {
 /* LEFT CARDS (المرحلة 3 و 4) — Visually on Left in RTL */
 .stage-column-left {
   position: absolute;
-  right: calc(50% + 105px);
-  top: 44%;
+  right: calc(50% + 90px);
+  top: 48%;
   transform: translateY(-50%) rotateY(17deg) rotateX(1deg);
   transform-style: preserve-3d;
-  width: clamp(260px, 32vw, 440px);
+  width: clamp(240px, 30vw, 420px);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   z-index: 10;
   transform-origin: right center;
 }

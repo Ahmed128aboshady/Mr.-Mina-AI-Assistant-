@@ -21,8 +21,8 @@ class OdooWebsiteBuilder {
       stage2: { id: 'stage2', name: 'كارت المرحلة الثانية', icon: '📗', selector: '#stage-card-2', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 30, visible: true, locked: false },
       stage3: { id: 'stage3', name: 'كارت المرحلة الثالثة', icon: '📙', selector: '#stage-card-3', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 30, visible: true, locked: false },
       stage4: { id: 'stage4', name: 'كارت المرحلة الرابعة', icon: '📕', selector: '#stage-card-4', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 30, visible: true, locked: false },
-      rightCol: { id: 'rightCol', name: 'عمود الكروت الأيمن (1 و 2)', icon: '📑', selector: '.stage-column-right', x: 105, y: 0, scale: 1, rotY: -17, zIndex: 20, visible: true, locked: false },
-      leftCol: { id: 'leftCol', name: 'عمود الكروت الأيسر (3 و 4)', icon: '📑', selector: '.stage-column-left', x: 105, y: 0, scale: 1, rotY: 17, zIndex: 20, visible: true, locked: false },
+      rightCol: { id: 'rightCol', name: 'عمود الكروت الأيمن (1 و 2)', icon: '📑', selector: '.stage-column-right', x: 90, y: 0, scale: 1, rotY: -17, zIndex: 20, visible: true, locked: false },
+      leftCol: { id: 'leftCol', name: 'عمود الكروت الأيسر (3 و 4)', icon: '📑', selector: '.stage-column-left', x: 90, y: 0, scale: 1, rotY: 17, zIndex: 20, visible: true, locked: false },
       chat: { id: 'chat', name: 'شريط الشات والمايك السفلي', icon: '💬', selector: '#home-bottom-chat-pill', x: 0, y: 20, scale: 1, height: 68, rotY: 0, zIndex: 60, visible: true, locked: false },
       lessonAvatar: { id: 'lessonAvatar', name: 'أفاتار مستر مينا في الدرس', icon: '👨‍🏫', selector: '#lesson-character-stage', x: 0, y: 0, scale: 1, width: 320, rotY: 0, zIndex: 25, visible: true, locked: false },
       lessonBubble: { id: 'lessonBubble', name: 'كتابة وبوب اب الشرح (الدرس)', icon: '💬', selector: '#lesson-avatar-bubble', x: 0, y: 0, scale: 1, fontSize: 16, width: 340, zIndex: 26, visible: true, locked: false }
@@ -437,14 +437,14 @@ class OdooWebsiteBuilder {
       el.style.left = '50%';
       el.style.transform = `translateX(calc(-50% + ${posX}px)) scale(${scaleVal})`;
     } else if (key === 'rightCol') {
-      if (posX < -50 || posX > 250) posX = 105;
+      if (posX < -150 || posX > 400) posX = 90;
       el.style.left = `calc(50% + ${posX}px)`;
-      el.style.top = '44%';
+      el.style.top = '48%';
       el.style.transform = `translateY(calc(-50% + ${posY}px)) rotateY(${rotVal}deg) scale(${scaleVal})`;
     } else if (key === 'leftCol') {
-      if (posX < -50 || posX > 250) posX = 105;
+      if (posX < -150 || posX > 400) posX = 90;
       el.style.right = `calc(50% + ${posX}px)`;
-      el.style.top = '44%';
+      el.style.top = '48%';
       el.style.transform = `translateY(calc(-50% + ${posY}px)) rotateY(${rotVal}deg) scale(${scaleVal})`;
     } else if (key === 'lessonAvatar') {
       el.style.setProperty('transform', `translate(${posX}px, ${posY}px) scale(${scaleVal}) rotateY(${rotVal}deg)`, 'important');
