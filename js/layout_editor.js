@@ -208,18 +208,38 @@ class OdooWebsiteBuilder {
 
   loadSavedLayout() {
     try {
-      const saved = localStorage.getItem('odoo_layout_layers');
+      const saved = localStorage.getItem('mena_admin_layout');
       if (saved) {
         const parsed = JSON.parse(saved);
-        this.layers = Object.assign({}, this.defaultLayers, parsed);
+        if (parsed.layers) {
+          this.layers = Object.assign({}, this.defaultLayers, parsed.layers);
+        }
       }
     } catch (e) {}
   }
 
   autoSaveLayout() {
     try {
-      localStorage.setItem('odoo_layout_layers', JSON.stringify(this.layers));
-    } catch (e) {}
+      const saved = localStorage.getItem('mena_admin_layout');
+      let customBlocksHtml = '';
+      if (saved) {
+        try { customBlocksHtml = JSON.parse(saved).customHtml || ''; } catch(e){}
+      }
+      const data = {
+        layers: this.layers,
+        customHtml: customBlocksHtml
+      };
+      localStorage.setItem('mena_admin_layout', JSON.stringify(data));
+    } catch(e) {}
+  }
+
+  copyLayoutCode() {
+    const jsonStr = JSON.stringify(this.layers, null, 2);
+    navigator.clipboard.writeText(jsonStr).then(() => {
+      this.showToast('📋 تم نسخ كود التخطيط للحافظة! الصقه هنا لتثبيته دائماً في الكود.');
+    }).catch(() => {
+      prompt('انسخ كود التخطيط:', jsonStr);
+    });
   }
 
   init() {
