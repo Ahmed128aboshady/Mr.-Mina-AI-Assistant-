@@ -1407,8 +1407,8 @@ class OdooWebsiteBuilder {
           this.layers.chat.scale = 1;
         }
 
-        if (this.layers.rightCol.x < 0 || this.layers.rightCol.x > 250) this.layers.rightCol.x = 105;
-        if (this.layers.leftCol.x < 0 || this.layers.leftCol.x > 250) this.layers.leftCol.x = 105;
+        if (this.layers.rightCol && (this.layers.rightCol.x < -150 || this.layers.rightCol.x > 400)) this.layers.rightCol.x = 90;
+        if (this.layers.leftCol && (this.layers.leftCol.x < -150 || this.layers.leftCol.x > 400)) this.layers.leftCol.x = 90;
         this.layers.rightCol.visible = true;
         this.layers.leftCol.visible = true;
         this.layers.avatar.visible = true;
