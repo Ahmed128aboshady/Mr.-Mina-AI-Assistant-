@@ -437,14 +437,14 @@ class OdooWebsiteBuilder {
       el.style.left = '50%';
       el.style.transform = `translateX(calc(-50% + ${posX}px)) scale(${scaleVal})`;
     } else if (key === 'rightCol') {
-      if (posX < -150 || posX > 400) posX = 90;
+      if (posX < 0 || posX > 300) posX = 105;
       el.style.left = `calc(50% + ${posX}px)`;
-      el.style.top = '48%';
+      el.style.top = '46%';
       el.style.transform = `translateY(calc(-50% + ${posY}px)) rotateY(${rotVal}deg) scale(${scaleVal})`;
     } else if (key === 'leftCol') {
-      if (posX < -150 || posX > 400) posX = 90;
+      if (posX < 0 || posX > 300) posX = 105;
       el.style.right = `calc(50% + ${posX}px)`;
-      el.style.top = '48%';
+      el.style.top = '46%';
       el.style.transform = `translateY(calc(-50% + ${posY}px)) rotateY(${rotVal}deg) scale(${scaleVal})`;
     } else if (key === 'lessonAvatar') {
       el.style.setProperty('transform', `translate(${posX}px, ${posY}px) scale(${scaleVal}) rotateY(${rotVal}deg)`, 'important');
@@ -1401,14 +1401,25 @@ class OdooWebsiteBuilder {
             }
           });
         }
+        // Auto-sanitize corrupt / extreme values from old versions
+        if (this.layers.avatar && (this.layers.avatar.y < -120 || this.layers.avatar.y > 120)) {
+          this.layers.avatar.x = 0;
+          this.layers.avatar.y = 0;
+          this.layers.avatar.scale = 1;
+        }
+        if (this.layers.stage1 && Math.abs(this.layers.stage1.x) > 60) this.layers.stage1.x = 0;
+        if (this.layers.stage2 && Math.abs(this.layers.stage2.x) > 60) this.layers.stage2.x = 0;
+        if (this.layers.stage3 && Math.abs(this.layers.stage3.x) > 60) this.layers.stage3.x = 0;
+        if (this.layers.stage4 && Math.abs(this.layers.stage4.x) > 60) this.layers.stage4.x = 0;
+
         if (this.layers.chat) {
           this.layers.chat.x = 0;
-          if (this.layers.chat.y < 0 || this.layers.chat.y > 180) this.layers.chat.y = 20;
+          if (this.layers.chat.y < 0 || this.layers.chat.y > 180) this.layers.chat.y = 24;
           this.layers.chat.scale = 1;
         }
 
-        if (this.layers.rightCol && (this.layers.rightCol.x < -150 || this.layers.rightCol.x > 400)) this.layers.rightCol.x = 90;
-        if (this.layers.leftCol && (this.layers.leftCol.x < -150 || this.layers.leftCol.x > 400)) this.layers.leftCol.x = 90;
+        if (this.layers.rightCol && (this.layers.rightCol.x < 0 || this.layers.rightCol.x > 300)) this.layers.rightCol.x = 105;
+        if (this.layers.leftCol && (this.layers.leftCol.x < 0 || this.layers.leftCol.x > 300)) this.layers.leftCol.x = 105;
         this.layers.rightCol.visible = true;
         this.layers.leftCol.visible = true;
         this.layers.avatar.visible = true;
