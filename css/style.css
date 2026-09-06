@@ -4428,6 +4428,162 @@ body.odoo-studio-active .lesson-avatar-speech-bubble {
   .stage-drawer.active {
     transform: translateY(0) !important;
   }
+
+  /* ═══════════════════════════════════════════════════
+     📚 LESSON SCREEN & INTERACTIVE LAB ON MOBILE (< 768px)
+     ═══════════════════════════════════════════════════ */
+  .odoo-edit-trigger {
+    top: 8px !important;
+    left: 8px !important;
+    padding: 3px 10px !important;
+    font-size: 0.72rem !important;
+    border-radius: 14px !important;
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3) !important;
+  }
+
+  .explanation-header {
+    padding: 10px 12px !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+  }
+
+  .back-btn {
+    padding: 5px 12px !important;
+    font-size: 0.8rem !important;
+    border-radius: 16px !important;
+  }
+
+  .explanation-title {
+    font-size: 1rem !important;
+    width: 100% !important;
+    text-align: center !important;
+    order: -1 !important;
+    margin-bottom: 4px !important;
+    line-height: 1.4 !important;
+  }
+
+  .header-session-tabs {
+    padding: 2px 6px !important;
+    border-radius: 18px !important;
+    gap: 4px !important;
+  }
+
+  .header-session-btn {
+    padding: 4px 8px !important;
+    font-size: 0.78rem !important;
+    border-radius: 14px !important;
+  }
+
+  .header-tab-btn {
+    padding: 5px 10px !important;
+    font-size: 0.78rem !important;
+    border-radius: 16px !important;
+  }
+
+  .explanation-body {
+    padding: 8px 6px 80px 6px !important;
+    height: calc(100vh - 110px) !important;
+  }
+
+  .explanation-layout-wrap {
+    width: 100% !important;
+  }
+
+  .interactive-lab-container {
+    padding: 6px !important;
+    border-radius: 14px !important;
+    margin-bottom: 12px !important;
+    gap: 8px !important;
+  }
+
+  .lab-canvas-wrap {
+    height: 360px !important;
+    min-height: 360px !important;
+    border-radius: 12px !important;
+  }
+
+  #lab-3d-canvas {
+    height: 360px !important;
+    min-height: 360px !important;
+  }
+
+  .lab-overlay-controls {
+    top: 6px !important;
+    right: 4px !important;
+    left: 4px !important;
+  }
+
+  .lab-pill-group {
+    padding: 3px 6px !important;
+    gap: 3px !important;
+    border-radius: 14px !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    max-width: 100% !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+  }
+
+  .lab-pill-btn {
+    padding: 3px 7px !important;
+    font-size: 0.72rem !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+  }
+
+  .lab-info-bar {
+    padding: 6px 8px !important;
+    gap: 6px !important;
+    font-size: 0.74rem !important;
+    border-radius: 10px !important;
+  }
+
+  .lab-stat {
+    font-size: 0.72rem !important;
+    gap: 3px !important;
+  }
+
+  .lesson-character-stage {
+    position: absolute !important;
+    bottom: 0 !important;
+    right: 4px !important;
+    left: auto !important;
+    top: auto !important;
+    width: 130px !important;
+    max-width: 150px !important;
+    transform: none !important;
+    z-index: 20 !important;
+  }
+
+  .lesson-mina-img {
+    max-width: 110px !important;
+    height: 140px !important;
+    object-fit: contain !important;
+  }
+
+  .lesson-avatar-speech-bubble {
+    font-size: 0.7rem !important;
+    padding: 5px 8px !important;
+    border-radius: 10px !important;
+    margin-bottom: 3px !important;
+    width: 100% !important;
+    max-width: 150px !important;
+    transform: none !important;
+  }
+
+  .bubble-speaker-name {
+    font-size: 0.72rem !important;
+  }
+
+  #bubble-status-text {
+    font-size: 0.65rem !important;
+  }
+
+  .bubble-text-content {
+    font-size: 0.7rem !important;
+    line-height: 1.35 !important;
+  }
 }
 
 /* ── Extra Small Smartphones (< 400px) ───────────── */
