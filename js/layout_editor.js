@@ -12,18 +12,18 @@ class OdooWebsiteBuilder {
     this.selectedCustomBlockId = null;
     this.ADMIN_PIN = "4040";
 
-    // Independent Isolated Layers (Core Elements with Safe Defaults)
+    // Independent Isolated Layers (Core Elements with User-Tuned Defaults)
     this.defaultLayers = {
-      avatar: { id: 'avatar', name: 'الأفاتار (مستر مينا)', icon: '👤', selector: '#stage-center-avatar', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 25, visible: true, locked: false },
-      logo: { id: 'logo', name: 'اللوجو واسم المنصة', icon: '🏷️', selector: '.header-logo-wrap', x: 0, y: 30, scale: 1, rotY: 0, zIndex: 50, visible: true, locked: false },
-      badges: { id: 'badges', name: 'أزرار الصفوف (1, 2, 3)', icon: '🔢', selector: '.grade-badges-col', x: 150, y: 34, scale: 1, rotY: 0, zIndex: 50, visible: true, locked: false },
-      stage1: { id: 'stage1', name: 'كارت المرحلة الأولى', icon: '📘', selector: '#stage-card-1', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 30, visible: true, locked: false },
-      stage2: { id: 'stage2', name: 'كارت المرحلة الثانية', icon: '📗', selector: '#stage-card-2', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 30, visible: true, locked: false },
-      stage3: { id: 'stage3', name: 'كارت المرحلة الثالثة', icon: '📙', selector: '#stage-card-3', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 30, visible: true, locked: false },
-      stage4: { id: 'stage4', name: 'كارت المرحلة الرابعة', icon: '📕', selector: '#stage-card-4', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 30, visible: true, locked: false },
-      rightCol: { id: 'rightCol', name: 'عمود الكروت الأيمن (1 و 2)', icon: '📑', selector: '.stage-column-right', x: 90, y: 0, scale: 1, rotY: -17, zIndex: 20, visible: true, locked: false },
-      leftCol: { id: 'leftCol', name: 'عمود الكروت الأيسر (3 و 4)', icon: '📑', selector: '.stage-column-left', x: 90, y: 0, scale: 1, rotY: 17, zIndex: 20, visible: true, locked: false },
-      chat: { id: 'chat', name: 'شريط الشات والمايك السفلي', icon: '💬', selector: '#home-bottom-chat-pill', x: 0, y: 20, scale: 1, height: 68, rotY: 0, zIndex: 60, visible: true, locked: false },
+      avatar: { id: 'avatar', name: 'الأفاتار (مستر مينا)', icon: '👤', selector: '#stage-center-avatar', x: -16, y: -531, scale: 0.96, rotY: 0, zIndex: 25, visible: true, locked: false },
+      logo: { id: 'logo', name: 'اللوجو واسم المنصة', icon: '🏷️', selector: '.header-logo-wrap', x: -30, y: 104, scale: 1.34, rotY: 0, zIndex: 50, visible: true, locked: false },
+      badges: { id: 'badges', name: 'أزرار الصفوف (1, 2, 3)', icon: '🔢', selector: '.grade-badges-col', x: 122, y: 77, scale: 0.82, rotY: 0, zIndex: 50, visible: true, locked: false },
+      stage1: { id: 'stage1', name: 'كارت المرحلة الأولى', icon: '📘', selector: '#stage-card-1', x: 202, y: 8, scale: 1, rotY: 0, zIndex: 30, visible: true, locked: false },
+      stage2: { id: 'stage2', name: 'كارت المرحلة الثانية', icon: '📗', selector: '#stage-card-2', x: 200, y: 16, scale: 1, rotY: 0, zIndex: 30, visible: true, locked: false },
+      stage3: { id: 'stage3', name: 'كارت المرحلة الثالثة', icon: '📙', selector: '#stage-card-3', x: -210, y: 8, scale: 1, rotY: 0, zIndex: 30, visible: true, locked: false },
+      stage4: { id: 'stage4', name: 'كارت المرحلة الرابعة', icon: '📕', selector: '#stage-card-4', x: -210, y: 21, scale: 1, rotY: 0, zIndex: 30, visible: true, locked: false },
+      rightCol: { id: 'rightCol', name: 'عمود الكروت الأيمن (1 و 2)', icon: '📑', selector: '.stage-column-right', x: 105, y: 0, scale: 1, rotY: -17, zIndex: 20, visible: true, locked: false },
+      leftCol: { id: 'leftCol', name: 'عمود الكروت الأيسر (3 و 4)', icon: '📑', selector: '.stage-column-left', x: 105, y: 0, scale: 1, rotY: 17, zIndex: 20, visible: true, locked: false },
+      chat: { id: 'chat', name: 'شريط الشات والمايك السفلي', icon: '💬', selector: '#home-bottom-chat-pill', x: 0, y: 47, scale: 1.22, height: 68, rotY: 0, zIndex: 60, visible: true, locked: false },
       lessonAvatar: { id: 'lessonAvatar', name: 'أفاتار مستر مينا في الدرس', icon: '👨‍🏫', selector: '#lesson-character-stage', x: 0, y: 0, scale: 1, width: 320, rotY: 0, zIndex: 25, visible: true, locked: false },
       lessonBubble: { id: 'lessonBubble', name: 'كتابة وبوب اب الشرح (الدرس)', icon: '💬', selector: '#lesson-avatar-bubble', x: 0, y: 0, scale: 1, fontSize: 16, width: 340, zIndex: 26, visible: true, locked: false }
     };
