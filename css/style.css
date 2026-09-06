@@ -253,16 +253,16 @@ body {
 }
 
 /* ── CENTER AVATAR (Mr. Mina) — Dedicated Independent Layer ──
-   Perfect balanced proportions matching Image 2
+   Enlarged and positioned majestically in center over the stages
 */
 .stage-center-avatar {
   position: absolute;
   left: 50%;
   bottom: 0;
   transform: translateX(-50%);
-  width: clamp(420px, 44vw, 660px);
-  height: 78vh;
-  max-height: 740px;
+  width: clamp(500px, 50vw, 780px);
+  height: 84vh;
+  max-height: 820px;
   z-index: 25;
   pointer-events: none;
   display: flex;
@@ -278,7 +278,7 @@ body {
   object-fit: contain;
   object-position: bottom center;
   transform-origin: bottom center;
-  transform: scale(1.05) translateY(0);
+  transform: scale(1.32) translateY(8%);
   filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.35));
   animation: floatAvatar 4.5s ease-in-out infinite;
   user-select: none;
@@ -287,8 +287,8 @@ body {
 }
 
 @keyframes floatAvatar {
-  0%, 100% { transform: scale(1.05) translateY(0); }
-  50%       { transform: scale(1.05) translateY(-1.5%); }
+  0%, 100% { transform: scale(1.32) translateY(8%); }
+  50%       { transform: scale(1.32) translateY(6.5%); }
 }
 
 /* ══════════════════════════════════════════
