@@ -4167,3 +4167,308 @@ body.odoo-studio-active .lesson-avatar-speech-bubble {
     display: none;
   }
 }
+
+/* ===================================================
+   RESPONSIVE DESIGN SYSTEM — MOBILE & TABLET (< 768px)
+   =================================================== */
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    width: 100% !important;
+    min-height: 100vh !important;
+  }
+
+  body {
+    background-attachment: scroll !important;
+  }
+
+  /* ── Header ────────────────────────────────────── */
+  .home-header {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 10px 14px 4px 14px !important;
+    z-index: 50 !important;
+    pointer-events: auto !important;
+  }
+
+  .header-logo-wrap {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 270px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 auto 6px auto !important;
+    z-index: 50 !important;
+  }
+
+  .header-logo-img {
+    max-height: 68px !important;
+    max-width: 240px !important;
+    width: auto !important;
+    height: auto !important;
+  }
+
+  .grade-badges-col {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin: 2px auto 8px auto !important;
+    z-index: 60 !important;
+  }
+
+  .grade-badge-btn {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  /* ── Hero Layout (2x2 Grid with Centered Avatar Top) ── */
+  .home-hero-layout {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 520px !important;
+    height: auto !important;
+    min-height: calc(100vh - 130px) !important;
+    margin: 0 auto !important;
+    padding: 0 14px 110px 14px !important;
+    perspective: none !important;
+    transform: none !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-areas:
+      "avatar avatar"
+      "col-right col-left" !important;
+    gap: 12px !important;
+    align-items: start !important;
+    justify-items: center !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  /* ── Mr. Mina Avatar ──────────────────────────── */
+  .stage-center-avatar {
+    grid-area: avatar !important;
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 250px !important;
+    height: 240px !important;
+    max-height: 34vh !important;
+    margin: 0 auto 4px auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-end !important;
+    z-index: 25 !important;
+    pointer-events: auto !important;
+  }
+
+  .center-mina-img {
+    width: auto !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    max-width: 100% !important;
+    object-fit: contain !important;
+    object-position: bottom center !important;
+    transform: none !important;
+    filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.32)) !important;
+    animation: floatAvatarMobile 4s ease-in-out infinite !important;
+    cursor: pointer !important;
+  }
+
+  @keyframes floatAvatarMobile {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-6px); }
+  }
+
+  /* ── Stage Cards Right Column (Stage 1 & 2) ───── */
+  .stage-column-right {
+    grid-area: col-right !important;
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    transform-style: flat !important;
+    width: 100% !important;
+    max-width: 200px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    z-index: 20 !important;
+  }
+
+  /* ── Stage Cards Left Column (Stage 3 & 4) ────── */
+  .stage-column-left {
+    grid-area: col-left !important;
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    transform-style: flat !important;
+    width: 100% !important;
+    max-width: 200px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    z-index: 20 !important;
+  }
+
+  .stage-card-item {
+    width: 100% !important;
+    transform: none !important;
+  }
+
+  .stage-card-item:hover,
+  .stage-card-item:active {
+    transform: scale(0.97) !important;
+  }
+
+  .stage-card-img {
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.14));
+  }
+
+  /* ── Bottom Floating Chat Bar ─────────────────── */
+  .home-bottom-chat-pill {
+    position: fixed !important;
+    bottom: 12px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: calc(100% - 24px) !important;
+    max-width: 480px !important;
+    height: 56px !important;
+    padding: 6px 10px 6px 14px !important;
+    gap: 8px !important;
+    border-radius: 35px !important;
+    z-index: 100 !important;
+    background: rgba(17, 40, 75, 0.96) !important;
+    backdrop-filter: blur(14px) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55) !important;
+    direction: ltr !important;
+  }
+
+  .home-chat-input {
+    font-size: 0.95rem !important;
+    padding: 4px 8px !important;
+    direction: rtl !important;
+    text-align: right !important;
+  }
+
+  .home-chat-input::placeholder {
+    font-size: 0.85rem !important;
+  }
+
+  .home-chat-buttons {
+    gap: 6px !important;
+  }
+
+  .chat-pill-btn {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .chat-pill-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  /* ── Stage Drawers (Mobile Bottom Sheet) ───────── */
+  .stage-drawer {
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 72vh !important;
+    max-height: 80vh !important;
+    border-radius: 24px 24px 0 0 !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6) !important;
+    z-index: 200 !important;
+    transform: translateY(110%) !important;
+  }
+
+  .stage-drawer-right,
+  .stage-drawer-left {
+    left: 0 !important;
+    right: 0 !important;
+    transform: translateY(110%) !important;
+  }
+
+  .stage-drawer.active {
+    transform: translateY(0) !important;
+  }
+}
+
+/* ── Extra Small Smartphones (< 400px) ───────────── */
+@media (max-width: 400px) {
+  .header-logo-img {
+    max-height: 56px !important;
+    max-width: 200px !important;
+  }
+
+  .grade-badge-btn {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .stage-center-avatar {
+    height: 200px !important;
+    max-height: 28vh !important;
+  }
+
+  .home-hero-layout {
+    gap: 8px !important;
+    padding: 0 10px 96px 10px !important;
+  }
+
+  .stage-column-right,
+  .stage-column-left {
+    gap: 8px !important;
+  }
+
+  .home-bottom-chat-pill {
+    height: 52px !important;
+    padding: 4px 8px 4px 12px !important;
+  }
+
+  .home-chat-input {
+    font-size: 0.88rem !important;
+  }
+
+  .chat-pill-btn {
+    width: 36px !important;
+    height: 36px !important;
+  }
+}
+
