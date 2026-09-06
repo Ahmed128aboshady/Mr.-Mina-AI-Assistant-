@@ -33,7 +33,7 @@ class InteractiveLab {
           <div class="lab-overlay-controls" id="lab-controls"></div>
 
           <!-- 👨‍🏫 Teacher Avatar Inside 3D Lab (واقف بالكامل داخل الشاشة الغامقة) -->
-          <div class="lesson-character-stage in-lab-screen" id="lesson-character-stage" onclick="window.appController?.playCurrentLessonAudio()" title="اضغط لسماع شرح مستر مينا">
+          <div class="lesson-character-stage in-lab-screen" id="lesson-character-stage">
             <div class="lesson-avatar-speech-bubble" id="lesson-avatar-bubble">
               <div class="bubble-header">
                 <div class="bubble-speaker-info">
