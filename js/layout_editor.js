@@ -24,8 +24,8 @@ class OdooWebsiteBuilder {
       rightCol: { id: 'rightCol', name: 'عمود الكروت الأيمن (1 و 2)', icon: '📑', selector: '.stage-column-right', x: 105, y: 0, scale: 1, rotY: -17, zIndex: 20, visible: true, locked: false },
       leftCol: { id: 'leftCol', name: 'عمود الكروت الأيسر (3 و 4)', icon: '📑', selector: '.stage-column-left', x: 105, y: 0, scale: 1, rotY: 17, zIndex: 20, visible: true, locked: false },
       chat: { id: 'chat', name: 'شريط الشات والمايك السفلي', icon: '💬', selector: '#home-bottom-chat-pill', x: 0, y: 47, scale: 1, height: 68, rotY: 0, zIndex: 60, visible: true, locked: false },
-      lessonAvatar: { id: 'lessonAvatar', name: 'أفاتار مستر مينا في الدرس', icon: '👨‍🏫', selector: '#lesson-character-stage', x: 0, y: 0, scale: 1, width: 320, rotY: 0, zIndex: 25, visible: true, locked: false },
-      lessonBubble: { id: 'lessonBubble', name: 'كتابة وبوب اب الشرح (الدرس)', icon: '💬', selector: '#lesson-avatar-bubble', x: 0, y: 0, scale: 1, fontSize: 16, width: 340, zIndex: 26, visible: true, locked: false }
+      lessonAvatar: { id: 'lessonAvatar', name: 'أفاتار مستر مينا في الدرس', icon: '👨‍🏫', selector: '#lesson-character-stage', x: -260, y: 219, scale: 1.66, width: 320, rotY: -6, zIndex: 25, visible: true, locked: false },
+      lessonBubble: { id: 'lessonBubble', name: 'كتابة وبوب اب الشرح (الدرس)', icon: '💬', selector: '#lesson-avatar-bubble', x: 29, y: 38, scale: 0.66, fontSize: 16, width: 340, zIndex: 26, visible: true, locked: false }
     };
 
     this.layers = JSON.parse(JSON.stringify(this.defaultLayers));
