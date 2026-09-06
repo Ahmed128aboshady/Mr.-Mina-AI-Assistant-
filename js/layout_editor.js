@@ -14,7 +14,7 @@ class OdooWebsiteBuilder {
 
     // Independent Isolated Layers (Core Elements with Safe Defaults)
     this.defaultLayers = {
-      avatar: { id: 'avatar', name: 'الأفاتار (مستر مينا)', icon: '👤', selector: '#stage-center-avatar', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 25, visible: true, locked: false },
+      avatar: { id: 'avatar', name: 'الأفاتار (مستر مينا)', icon: '👤', selector: '#stage-center-avatar', x: 0, y: -60, scale: 1, rotY: 0, zIndex: 25, visible: true, locked: false },
       logo: { id: 'logo', name: 'اللوجو واسم المنصة', icon: '🏷️', selector: '.header-logo-wrap', x: 0, y: 30, scale: 1, rotY: 0, zIndex: 50, visible: true, locked: false },
       badges: { id: 'badges', name: 'أزرار الصفوف (1, 2, 3)', icon: '🔢', selector: '.grade-badges-col', x: 150, y: 34, scale: 1, rotY: 0, zIndex: 50, visible: true, locked: false },
       stage1: { id: 'stage1', name: 'كارت المرحلة الأولى', icon: '📘', selector: '#stage-card-1', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 30, visible: true, locked: false },
