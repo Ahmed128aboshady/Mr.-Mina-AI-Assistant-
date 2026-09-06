@@ -616,77 +616,475 @@ class InteractiveLab {
   }
 
   // ═════════════════════════════════════════════════════════════
-  // 7. الخلية النباتية والحيوانية (u3_l1_cells)
+  // 7. الخلية النباتية والحيوانية ثلاثية الأبعاد الفائقة (u3_l1_cells)
   // ═════════════════════════════════════════════════════════════
   _buildCellScene(controlsEl, infoEl) {
     this.cellGroup = new THREE.Group();
     this.scene.add(this.cellGroup);
 
+    // Enhanced lighting for cellular biology
+    const cellPointLight = new THREE.PointLight(0x22c55e, 2.0, 18);
+    cellPointLight.position.set(0, 2, 4);
+    this.cellGroup.add(cellPointLight);
+
+    const cellRimLight = new THREE.PointLight(0x38bdf8, 1.8, 16);
+    cellRimLight.position.set(0, -2, -3);
+    this.cellGroup.add(cellRimLight);
+
+    this.currentCellType = 'plant';
+    this.focusedOrganelle = 'all';
+
     this.setCellType('plant');
 
     if (controlsEl) {
       controlsEl.innerHTML = `
-        <div class="lab-pill-group">
-          <button class="lab-pill-btn active" id="btn-plant" onclick="window.interactiveLab.setCellType('plant')">🌿 خلية نباتية (جدار + بلاستيدات خضراء)</button>
-          <button class="lab-pill-btn" id="btn-animal" onclick="window.interactiveLab.setCellType('animal')">🐾 خلية حيوانية (غشاء + سنتروسوم)</button>
+        <div class="lab-pill-group" style="flex-wrap: wrap; gap: 6px;">
+          <button class="lab-pill-btn active" id="btn-plant" onclick="window.interactiveLab.setCellType('plant')">🌿 الخلية النباتية</button>
+          <button class="lab-pill-btn" id="btn-animal" onclick="window.interactiveLab.setCellType('animal')">🐾 الخلية الحيوانية</button>
+          <span style="border-left: 1.5px solid rgba(255,255,255,0.2); margin: 0 4px;"></span>
+          <button class="lab-pill-btn" id="btn-org-all" onclick="window.interactiveLab.highlightOrganelle('all')">🔍 فحص كامل</button>
+          <button class="lab-pill-btn" id="btn-org-nucleus" onclick="window.interactiveLab.highlightOrganelle('nucleus')">🟣 النواة والنوية</button>
+          <button class="lab-pill-btn" id="btn-org-chloro" onclick="window.interactiveLab.highlightOrganelle('chloro')">🌿 البلاستيدات</button>
+          <button class="lab-pill-btn" id="btn-org-vacuole" onclick="window.interactiveLab.highlightOrganelle('vacuole')">💧 الفجوة العصارية</button>
+          <button class="lab-pill-btn" id="btn-org-mito" onclick="window.interactiveLab.highlightOrganelle('mito')">⚡ الميتوكوندريا</button>
+          <button class="lab-pill-btn" id="btn-org-centro" onclick="window.interactiveLab.highlightOrganelle('centro')" style="display:none;">🌟 السنتروسوم</button>
         </div>
       `;
     }
   }
 
   setCellType(type) {
+    this.currentCellType = type;
     while (this.cellGroup.children.length) this.cellGroup.remove(this.cellGroup.children[0]);
-    const infoEl = document.getElementById('lab-info-bar');
+    this.organelleMeshes = {};
 
     document.getElementById('btn-plant')?.classList.toggle('active', type === 'plant');
     document.getElementById('btn-animal')?.classList.toggle('active', type === 'animal');
 
-    window.appController?.playLabAudio(`lab_cell_${type}`);
+    const btnChloro = document.getElementById('btn-org-chloro');
+    const btnVacuole = document.getElementById('btn-org-vacuole');
+    const btnCentro = document.getElementById('btn-org-centro');
+    if (btnChloro) btnChloro.style.display = (type === 'plant') ? 'inline-block' : 'none';
+    if (btnVacuole) btnVacuole.style.display = (type === 'plant') ? 'inline-block' : 'none';
+    if (btnCentro) btnCentro.style.display = (type === 'animal') ? 'inline-block' : 'none';
 
     if (type === 'plant') {
-      const wallGeo = new THREE.BoxGeometry(4.8, 3.6, 2.2);
-      const wallMat = new THREE.MeshStandardMaterial({ color: 0x16a34a, wireframe: true });
-      this.cellGroup.add(new THREE.Mesh(wallGeo, wallMat));
-
-      const cytoGeo = new THREE.BoxGeometry(4.4, 3.3, 2.0);
-      const cytoMat = new THREE.MeshStandardMaterial({ color: 0x86efac, transparent: true, opacity: 0.4 });
-      this.cellGroup.add(new THREE.Mesh(cytoGeo, cytoMat));
-
-      const nuc = new THREE.Mesh(new THREE.SphereGeometry(0.75, 16, 16), new THREE.MeshStandardMaterial({ color: 0x9333ea }));
-      nuc.position.set(-1.2, 0.4, 0);
-      this.cellGroup.add(nuc);
-
-      const chloMat = new THREE.MeshStandardMaterial({ color: 0x22c55e });
-      for (let i = 0; i < 6; i++) {
-        const chlo = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.15, 12), chloMat);
-        chlo.position.set(0.6 + Math.sin(i) * 1.2, -0.8 + (i * 0.35), Math.cos(i) * 0.5);
-        this.cellGroup.add(chlo);
-      }
-
-      if (infoEl) {
-        infoEl.innerHTML = `
-          <div class="lab-stat"><span class="stat-label">نوع الخلية:</span><span class="stat-val" style="color:var(--accent-green)">خلية نباتية</span></div>
-          <div class="lab-stat"><span class="stat-label">المميزات الأساسية:</span><span class="stat-val">جدار خلوي قوي + بلاستيدات خضراء للبناء الضوئي + فجوة عصارية كبيرة</span></div>
-        `;
-      }
+      this._buildUltraPlantCell();
     } else {
-      const cytoGeo = new THREE.SphereGeometry(2.2, 32, 32);
-      const cytoMat = new THREE.MeshStandardMaterial({ color: 0xfbcfe8, transparent: true, opacity: 0.5 });
-      this.cellGroup.add(new THREE.Mesh(cytoGeo, cytoMat));
+      this._buildUltraAnimalCell();
+    }
 
-      const nuc = new THREE.Mesh(new THREE.SphereGeometry(0.85, 16, 16), new THREE.MeshStandardMaterial({ color: 0xdb2777 }));
-      this.cellGroup.add(nuc);
+    this.highlightOrganelle('all');
+    window.appController?.playLabAudio(`lab_cell_${type}`);
+  }
 
-      const centro = new THREE.Mesh(new THREE.SphereGeometry(0.28, 12, 12), new THREE.MeshStandardMaterial({ color: 0xf59e0b }));
-      centro.position.set(1.0, 1.0, 0.3);
-      this.cellGroup.add(centro);
+  // ── بناء الخلية النباتية المتقنة ──
+  _buildUltraPlantCell() {
+    // 1. الجدار الخلوي الخارجي (Cell Wall) — تصميم مجسم سداسي مقطوع لإظهار المحتويات
+    const wallShape = new THREE.Shape();
+    const w = 2.7, h = 2.0, r = 0.5;
+    wallShape.moveTo(-w + r, -h);
+    wallShape.lineTo(w - r, -h);
+    wallShape.quadraticCurveTo(w, -h, w, -h + r);
+    wallShape.lineTo(w, h - r);
+    wallShape.quadraticCurveTo(w, h, w - r, h);
+    wallShape.lineTo(-w + r, h);
+    wallShape.quadraticCurveTo(-w, h, -w, h - r);
+    wallShape.lineTo(-w, -h + r);
+    wallShape.quadraticCurveTo(-w, -h, -w + r, -h);
 
-      if (infoEl) {
-        infoEl.innerHTML = `
-          <div class="lab-stat"><span class="stat-label">نوع الخلية:</span><span class="stat-val" style="color:#db2777">خلية حيوانية</span></div>
-          <div class="lab-stat"><span class="stat-label">المميزات:</span><span class="stat-val">غشاء بلازمي مرن + سنتروسوم لانقسام الخلية (بدون جدار أو بلاستيدات)</span></div>
-        `;
+    const extrudeSettings = { depth: 1.8, bevelEnabled: true, bevelSegments: 5, steps: 1, bevelSize: 0.15, bevelThickness: 0.15 };
+    const wallGeo = new THREE.ExtrudeGeometry(wallShape, extrudeSettings);
+    wallGeo.center();
+
+    // خامة الجدار الخلوي (أخضر سليلوزي غني نصف شفاف)
+    const wallMat = new THREE.MeshPhysicalMaterial({
+      color: 0x15803d,
+      emissive: 0x052e16,
+      roughness: 0.35,
+      metalness: 0.1,
+      transmission: 0.55,
+      opacity: 0.85,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide
+    });
+    const wallMesh = new THREE.Mesh(wallGeo, wallMat);
+    this.cellGroup.add(wallMesh);
+    this.organelleMeshes.wall = wallMesh;
+
+    // حواف ذهبية/خضراء تحدد أركان الجدار الخلوي السليلوزي
+    const edges = new THREE.EdgesGeometry(wallGeo, 24);
+    const edgeLines = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x4ade80, linewidth: 2 }));
+    this.cellGroup.add(edgeLines);
+
+    // 2. الغشاء البلازمي الداخلي (Plasma Membrane)
+    const memGeo = new THREE.BoxGeometry(5.0, 3.7, 1.7);
+    const memMat = new THREE.MeshStandardMaterial({
+      color: 0x86efac,
+      transparent: true,
+      opacity: 0.22,
+      roughness: 0.2
+    });
+    this.cellGroup.add(new THREE.Mesh(memGeo, memMat));
+
+    // 3. الفجوة العصارية المركزية الكبيرة (Large Central Vacuole) — قطرة سائلة كريستالية
+    const vacGroup = new THREE.Group();
+    const vacGeo = new THREE.SphereGeometry(1.2, 32, 32);
+    vacGeo.scale(1.45, 1.15, 0.95);
+    const vacMat = new THREE.MeshPhysicalMaterial({
+      color: 0x38bdf8,
+      emissive: 0x0284c7,
+      emissiveIntensity: 0.35,
+      roughness: 0.08,
+      metalness: 0.1,
+      transmission: 0.85,
+      opacity: 0.78,
+      transparent: true,
+      reflectivity: 0.9
+    });
+    const vacMesh = new THREE.Mesh(vacGeo, vacMat);
+    vacGroup.position.set(0.7, -0.15, 0);
+    vacGroup.add(vacMesh);
+    this.cellGroup.add(vacGroup);
+    this.organelleMeshes.vacuole = vacGroup;
+
+    // 4. النواة الكاملة والنوية (Nucleus & Nucleolus Complex)
+    const nucGroup = new THREE.Group();
+    nucGroup.position.set(-1.45, 0.45, 0.2);
+
+    // الغلاف النووي البنفسجي المزدوج
+    const nucGeo = new THREE.SphereGeometry(0.78, 32, 32);
+    const nucMat = new THREE.MeshStandardMaterial({
+      color: 0x7e22ce,
+      emissive: 0x3b0764,
+      roughness: 0.3,
+      metalness: 0.2
+    });
+    const nucMesh = new THREE.Mesh(nucGeo, nucMat);
+    nucGroup.add(nucMesh);
+
+    // النوية الداخلية الذهبية (Nucleolus)
+    const nucleolusGeo = new THREE.SphereGeometry(0.32, 24, 24);
+    const nucleolusMat = new THREE.MeshStandardMaterial({
+      color: 0xfacc15,
+      emissive: 0xb45309,
+      roughness: 0.2
+    });
+    const nucleolusMesh = new THREE.Mesh(nucleolusGeo, nucleolusMat);
+    nucleolusMesh.position.set(0.18, 0.15, 0.25);
+    nucGroup.add(nucleolusMesh);
+
+    // الشبكة الإندوبلازمية المحيطة بالنواة (Endoplasmic Reticulum)
+    const erMat = new THREE.MeshStandardMaterial({ color: 0xc084fc, roughness: 0.4 });
+    for (let i = 0; i < 3; i++) {
+      const erRibbon = new THREE.Mesh(new THREE.TorusGeometry(0.92 + (i * 0.16), 0.06, 8, 32, Math.PI * 1.2), erMat);
+      erRibbon.rotation.x = 0.4 + (i * 0.3);
+      erRibbon.rotation.y = 0.6;
+      nucGroup.add(erRibbon);
+    }
+
+    this.cellGroup.add(nucGroup);
+    this.organelleMeshes.nucleus = nucGroup;
+
+    // 5. البلاستيدات الخضراء الفائقة (8 Chloroplasts with Thylakoids)
+    const chloroGroup = new THREE.Group();
+    const chloroGeo = new THREE.SphereGeometry(0.36, 24, 24);
+    chloroGeo.scale(1.4, 0.7, 0.9);
+    const chloroMat = new THREE.MeshStandardMaterial({
+      color: 0x16a34a,
+      emissive: 0x15803d,
+      emissiveIntensity: 0.45,
+      roughness: 0.25
+    });
+
+    const chloroPositions = [
+      { x: -1.7, y: -0.95, z: 0.35, rot: 0.4 },
+      { x: -1.85, y: 1.15, z: -0.2, rot: -0.5 },
+      { x: -0.3, y: 1.25, z: 0.4, rot: 0.8 },
+      { x: 0.8, y: 1.25, z: -0.35, rot: -0.3 },
+      { x: 1.95, y: 1.1, z: 0.25, rot: 0.6 },
+      { x: 2.05, y: -0.85, z: -0.3, rot: -0.7 },
+      { x: 0.4, y: -1.25, z: 0.45, rot: 0.2 },
+      { x: -0.85, y: -1.2, z: -0.35, rot: -0.4 }
+    ];
+
+    chloroPositions.forEach(pos => {
+      const chlo = new THREE.Mesh(chloroGeo, chloroMat);
+      chlo.position.set(pos.x, pos.y, pos.z);
+      chlo.rotation.z = pos.rot;
+
+      // أقراص الجرانا الثايلاكويد الداخلية (Internal Grana discs)
+      const granaMat = new THREE.MeshBasicMaterial({ color: 0x4ade80 });
+      for (let g = -1; g <= 1; g++) {
+        const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.04, 12), granaMat);
+        disc.position.set(g * 0.15, 0, 0);
+        disc.rotation.x = Math.PI / 2;
+        chlo.add(disc);
       }
+
+      chloroGroup.add(chlo);
+    });
+    this.cellGroup.add(chloroGroup);
+    this.organelleMeshes.chloro = chloroGroup;
+
+    // 6. الميتوكوندريا (4 Mitochondria with Inner Cristae)
+    const mitoGroup = new THREE.Group();
+    const mitoGeo = new THREE.CylinderGeometry(0.18, 0.18, 0.65, 16);
+    const mitoMat = new THREE.MeshStandardMaterial({
+      color: 0xf97316,
+      emissive: 0xc2410c,
+      emissiveIntensity: 0.4,
+      roughness: 0.3
+    });
+
+    const mitoPositions = [
+      { x: -0.65, y: 0.35, z: 0.55, rotZ: 0.8, rotX: 0.4 },
+      { x: -0.75, y: -0.45, z: -0.45, rotZ: -0.5, rotX: 0.7 },
+      { x: 1.85, y: 0.15, z: 0.5, rotZ: 0.3, rotX: -0.6 },
+      { x: 1.55, y: -0.95, z: -0.4, rotZ: -0.9, rotX: 0.3 }
+    ];
+
+    mitoPositions.forEach(pos => {
+      const m = new THREE.Mesh(mitoGeo, mitoMat);
+      m.position.set(pos.x, pos.y, pos.z);
+      m.rotation.z = pos.rotZ;
+      m.rotation.x = pos.rotX;
+      mitoGroup.add(m);
+    });
+    this.cellGroup.add(mitoGroup);
+    this.organelleMeshes.mito = mitoGroup;
+
+    // 7. جهاز جولجي (Golgi Apparatus)
+    const golgiGroup = new THREE.Group();
+    const golgiMat = new THREE.MeshStandardMaterial({ color: 0x06b6d4, roughness: 0.3 });
+    for (let i = 0; i < 4; i++) {
+      const sac = new THREE.Mesh(new THREE.TorusGeometry(0.45 + (i * 0.08), 0.045, 8, 24, Math.PI * 0.65), golgiMat);
+      sac.position.set(-1.1, -0.7 + (i * 0.09), 0.2);
+      sac.rotation.z = 0.5;
+      golgiGroup.add(sac);
+    }
+    this.cellGroup.add(golgiGroup);
+
+    // 8. حبيبات الريبوسومات الدقيقة العائمة في السيتوبلازم (Ribosomes)
+    const riboGeo = new THREE.BufferGeometry();
+    const riboCount = 120;
+    const riboPositions = new Float32Array(riboCount * 3);
+    for (let i = 0; i < riboCount * 3; i += 3) {
+      riboPositions[i] = (Math.random() - 0.5) * 4.4;
+      riboPositions[i+1] = (Math.random() - 0.5) * 3.0;
+      riboPositions[i+2] = (Math.random() - 0.5) * 1.5;
+    }
+    riboGeo.setAttribute('position', new THREE.BufferAttribute(riboPositions, 3));
+    const riboMat = new THREE.PointsMaterial({ color: 0xfef08a, size: 0.06, transparent: true, opacity: 0.75 });
+    this.cellGroup.add(new THREE.Points(riboGeo, riboMat));
+  }
+
+  // ── بناء الخلية الحيوانية المتقنة ──
+  _buildUltraAnimalCell() {
+    // 1. الغشاء البلازمي الخارجي المرن (Flexible Plasma Membrane) — شكل كروي بيضاوي ناعم
+    const memGeo = new THREE.SphereGeometry(2.35, 36, 36);
+    memGeo.scale(1.15, 1.0, 0.85);
+    const memMat = new THREE.MeshPhysicalMaterial({
+      color: 0xf472b6,
+      emissive: 0x831843,
+      emissiveIntensity: 0.25,
+      roughness: 0.25,
+      metalness: 0.1,
+      transmission: 0.65,
+      opacity: 0.75,
+      transparent: true,
+      side: THREE.DoubleSide
+    });
+    const memMesh = new THREE.Mesh(memGeo, memMat);
+    this.cellGroup.add(memMesh);
+    this.organelleMeshes.wall = memMesh;
+
+    // 2. النواة والنوية المركزية (Central Nucleus & Nucleolus)
+    const nucGroup = new THREE.Group();
+    nucGroup.position.set(-0.35, 0.1, 0.1);
+
+    const nucGeo = new THREE.SphereGeometry(0.92, 32, 32);
+    const nucMat = new THREE.MeshStandardMaterial({
+      color: 0x9333ea,
+      emissive: 0x581c87,
+      roughness: 0.3,
+      metalness: 0.25
+    });
+    const nucMesh = new THREE.Mesh(nucGeo, nucMat);
+    nucGroup.add(nucMesh);
+
+    const nucleolusGeo = new THREE.SphereGeometry(0.36, 24, 24);
+    const nucleolusMat = new THREE.MeshStandardMaterial({
+      color: 0xfacc15,
+      emissive: 0xb45309,
+      roughness: 0.2
+    });
+    const nucleolusMesh = new THREE.Mesh(nucleolusGeo, nucleolusMat);
+    nucleolusMesh.position.set(0.2, 0.2, 0.3);
+    nucGroup.add(nucleolusMesh);
+
+    // شبكة إندوبلازمية واسعة (Rough & Smooth ER)
+    const erMat = new THREE.MeshStandardMaterial({ color: 0xd8b4fe, roughness: 0.35 });
+    for (let i = 0; i < 4; i++) {
+      const er = new THREE.Mesh(new THREE.TorusGeometry(1.08 + (i * 0.18), 0.065, 8, 32, Math.PI * 1.3), erMat);
+      er.rotation.x = 0.5 + (i * 0.25);
+      er.rotation.y = 0.4;
+      nucGroup.add(er);
+    }
+    this.cellGroup.add(nucGroup);
+    this.organelleMeshes.nucleus = nucGroup;
+
+    // 3. الجسم المركزي / السنتروسوم (Centrosome - 2 Centrioles at 90 degrees)
+    const centroGroup = new THREE.Group();
+    centroGroup.position.set(1.15, 1.05, 0.35);
+
+    const centrioleGeo = new THREE.CylinderGeometry(0.16, 0.16, 0.52, 9, 1, true);
+    const centrioleMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xd97706, roughness: 0.2, metalness: 0.3 });
+
+    const c1 = new THREE.Mesh(centrioleGeo, centrioleMat);
+    centroGroup.add(c1);
+
+    const c2 = new THREE.Mesh(centrioleGeo, centrioleMat);
+    c2.rotation.x = Math.PI / 2;
+    c2.position.set(0.25, 0, 0);
+    centroGroup.add(c2);
+
+    // هالة إشعاعية لخيوط المغزل (Spindle Ray Aster)
+    const asterGeo = new THREE.RingGeometry(0.3, 0.65, 16);
+    const asterMat = new THREE.MeshBasicMaterial({ color: 0xfef08a, transparent: true, opacity: 0.45, side: THREE.DoubleSide });
+    centroGroup.add(new THREE.Mesh(asterGeo, asterMat));
+
+    this.cellGroup.add(centroGroup);
+    this.organelleMeshes.centro = centroGroup;
+
+    // 4. الميتوكوندريا الحيوية (6 Mitochondria)
+    const mitoGroup = new THREE.Group();
+    const mitoGeo = new THREE.CylinderGeometry(0.19, 0.19, 0.68, 16);
+    const mitoMat = new THREE.MeshStandardMaterial({
+      color: 0xef4444,
+      emissive: 0x991b1b,
+      emissiveIntensity: 0.45,
+      roughness: 0.3
+    });
+
+    const mitoPositions = [
+      { x: -1.45, y: -0.9, z: 0.2, rotZ: 0.6, rotX: 0.3 },
+      { x: -1.55, y: 0.95, z: -0.3, rotZ: -0.7, rotX: 0.5 },
+      { x: 0.85, y: -1.2, z: 0.3, rotZ: -0.4, rotX: 0.8 },
+      { x: 1.55, y: -0.45, z: -0.2, rotZ: 0.9, rotX: -0.4 },
+      { x: 1.35, y: 0.65, z: -0.35, rotZ: 0.4, rotX: 0.6 },
+      { x: 0.15, y: 1.45, z: 0.25, rotZ: -0.8, rotX: 0.2 }
+    ];
+
+    mitoPositions.forEach(pos => {
+      const m = new THREE.Mesh(mitoGeo, mitoMat);
+      m.position.set(pos.x, pos.y, pos.z);
+      m.rotation.z = pos.rotZ;
+      m.rotation.x = pos.rotX;
+      mitoGroup.add(m);
+    });
+    this.cellGroup.add(mitoGroup);
+    this.organelleMeshes.mito = mitoGroup;
+
+    // 5. الليسوسومات / الحويصلات الهاضمة (Lysosomes)
+    const lysoGroup = new THREE.Group();
+    const lysoGeo = new THREE.SphereGeometry(0.24, 16, 16);
+    const lysoMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0xb45309, roughness: 0.2 });
+    const lysoPositions = [
+      { x: -1.1, y: 1.2, z: 0.4 },
+      { x: -0.4, y: -1.35, z: 0.3 },
+      { x: 1.6, y: -0.95, z: 0.35 },
+      { x: 0.9, y: -0.3, z: -0.55 }
+    ];
+    lysoPositions.forEach(p => {
+      const l = new THREE.Mesh(lysoGeo, lysoMat);
+      l.position.set(p.x, p.y, p.z);
+      lysoGroup.add(l);
+    });
+    this.cellGroup.add(lysoGroup);
+
+    // 6. فجوات عصارية صغيرة متعددة (Small Vacuoles)
+    const smVacMat = new THREE.MeshPhysicalMaterial({ color: 0x67e8f9, transmission: 0.8, transparent: true, opacity: 0.6 });
+    for (let i = 0; i < 5; i++) {
+      const sv = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), smVacMat);
+      sv.position.set(Math.sin(i * 1.4) * 1.5, Math.cos(i * 1.4) * 1.2, (Math.random() - 0.5) * 0.8);
+      this.cellGroup.add(sv);
+    }
+  }
+
+  // ── تسليط الضوء وفحص العضيات التعليمية ──
+  highlightOrganelle(organelleKey) {
+    this.focusedOrganelle = organelleKey;
+    const infoEl = document.getElementById('lab-info-bar');
+
+    // Update button states
+    ['all', 'nucleus', 'chloro', 'vacuole', 'mito', 'centro'].forEach(k => {
+      document.getElementById(`btn-org-${k}`)?.classList.toggle('active', k === organelleKey);
+    });
+
+    const isPlant = (this.currentCellType === 'plant');
+
+    const descriptions = {
+      all: {
+        title: isPlant ? '🌿 الخلية النباتية (وحدة بناء النبات)' : '🐾 الخلية الحيوانية (وحدة بناء الحيوان والإنسان)',
+        desc: isPlant
+          ? 'تتميز بوجود جدار خلوي سليلوزي قوي يعطيها شكلاً محدداً، وبلاستيدات خضراء للبناء الضوئي، وفجوة عصارية مركزية عملاقة لتخزين الماء والغذاء.'
+          : 'تتميز بغشاء بلازمي مرن يسمح بتنوع أشكالها، وجسم مركزي (سنتروسوم) يفرز خيوط المغزل لانقسام الخلية، وميتوكوندريا لتوليد الطاقة.',
+        audio: isPlant ? 'lab_cell_plant' : 'lab_cell_animal'
+      },
+      nucleus: {
+        title: '🟣 النواة والنوية (مركز التحكم والعمليات الحيوية)',
+        desc: 'تحتوي على المادة الوراثية (DNA/الكروموسومات) المسؤولة عن نقل الصفات الوراثية، وتنظيم جميع الأنشطة الحيوية وانقسام الخلية.',
+        audio: 'lab_cell_nucleus'
+      },
+      chloro: {
+        title: '🌿 البلاستيدات الخضراء (مصنع الغذاء والطاقة الضوئية)',
+        desc: 'تحتوي على صبغة الكلوروفيل الخضراء التي تمتص ضوء الشمس للقيام بعملية البناء الضوئي وصنع سكر الجلوكوز والأكسجين للنبات.',
+        audio: 'lab_cell_chloro'
+      },
+      vacuole: {
+        title: '💧 الفجوة العصارية المركزية الكبيرة',
+        desc: 'فجوة عملاقة في الخلية النباتية تمتلئ بالعصير الخلوي وتخزن الماء والأملاح والمواد الغذائية وتعطي الخلية دعامتها وامتلاءها.',
+        audio: 'lab_cell_vacuole'
+      },
+      mito: {
+        title: '⚡ الميتوكوندريا (بيوت الطاقة الخلوية)',
+        desc: 'مركز التنفس الخلوي وأكسدة الغذاء لإنتاج جزيئات الطاقة ATP التي تمد الخلية بالحيوية اللازمة لجميع أنشطتها.',
+        audio: 'lab_cell_mito'
+      },
+      centro: {
+        title: '🌟 الجسم المركزي / السنتروسوم (خاص بالخلية الحيوانية)',
+        desc: 'يتكون من حبيبتين مركزيتين (سنتريولان) وله دور أساسي في تكوين خيوط المغزل أثناء انقسام الخلية (غير موجود في النبات).',
+        audio: 'lab_cell_centro'
+      }
+    };
+
+    const data = descriptions[organelleKey] || descriptions.all;
+
+    if (infoEl) {
+      infoEl.innerHTML = `
+        <div class="lab-stat"><span class="stat-label">العضو المحدد:</span><span class="stat-val" style="color:var(--accent-gold); font-weight:800;">${data.title}</span></div>
+        <div class="lab-stat"><span class="stat-label">الوظيفة الحيوية:</span><span class="stat-val">${data.desc}</span></div>
+      `;
+    }
+
+    // Camera animation towards target
+    if (this.camera) {
+      if (organelleKey === 'nucleus') {
+        this.camera.position.set(-1.0, 1.5, 6.5);
+      } else if (organelleKey === 'vacuole') {
+        this.camera.position.set(1.5, 0.5, 6.5);
+      } else if (organelleKey === 'chloro') {
+        this.camera.position.set(0, 2.0, 7.0);
+      } else if (organelleKey === 'centro') {
+        this.camera.position.set(1.2, 1.5, 6.0);
+      } else if (organelleKey === 'mito') {
+        this.camera.position.set(0, -1.0, 6.5);
+      } else {
+        this.camera.position.set(0, 4, 11);
+      }
+      this.camera.lookAt(0, 0, 0);
     }
   }
 
