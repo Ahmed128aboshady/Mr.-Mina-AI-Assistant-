@@ -206,6 +206,22 @@ class OdooWebsiteBuilder {
     this.init();
   }
 
+  loadSavedLayout() {
+    try {
+      const saved = localStorage.getItem('odoo_layout_layers');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        this.layers = Object.assign({}, this.defaultLayers, parsed);
+      }
+    } catch (e) {}
+  }
+
+  autoSaveLayout() {
+    try {
+      localStorage.setItem('odoo_layout_layers', JSON.stringify(this.layers));
+    } catch (e) {}
+  }
+
   init() {
     this.loadSavedLayout();
     this.applyAllLayers();
