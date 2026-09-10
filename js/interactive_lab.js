@@ -176,27 +176,35 @@ class InteractiveLab {
     else if (topicId.includes('u1_l4') || topicId.includes('bonds')) {
       this._buildBondsScene(controlsEl, infoEl);
     }
-    // 5. الدرس الخامس: الطاقة والبندول البسيط
-    else if (topicId.includes('u2_l1') || topicId.includes('energy')) {
+    // 5. الدرس الخامس: القوى الكهربية والدوائر
+    else if (topicId.includes('u2_l1') || topicId.includes('electric') || topicId.includes('energy')) {
       this._buildEnergyScene(controlsEl, infoEl);
     }
-    // 6. الدرس السادس: القوى الأساسية والمغناطيس الكهربي
-    else if (topicId.includes('u2_l2') || topicId.includes('forces') || topicId.includes('magnet')) {
+    // 6. الدرس السادس: القوى المغناطيسية والمجال
+    else if (topicId.includes('u2_l2') || topicId.includes('magnetic') || topicId.includes('magnet') || topicId.includes('forces')) {
       this._buildMagnetScene(controlsEl, infoEl);
     }
-    // 7. الدرس السابع: الخلية النباتية والحيوانية
+    // 7. الدرس السابع: قوى الجاذبية والوزن
+    else if (topicId.includes('u2_l3') || topicId.includes('gravity') || topicId.includes('weight')) {
+      this._buildEnergyScene(controlsEl, infoEl);
+    }
+    // 8. الدرس الثامن: الخلية وحدة بناء الكائن الحي
     else if (topicId.includes('u3_l1') || topicId.includes('cell')) {
       this._buildCellScene(controlsEl, infoEl);
     }
-    // 8. الدرس الثامن: التكيف والمماتنة وتنوع الكائنات
-    else if (topicId.includes('u3_l2') || topicId.includes('adaptation')) {
+    // 9. الدرس التاسع: الصفات العامة للكائنات والتكيف
+    else if (topicId.includes('u3_l2') || topicId.includes('traits') || topicId.includes('adaptation')) {
       this._buildAdaptationScene(controlsEl, infoEl);
     }
-    // 9. الدرس التاسع: كوكب الأرض والبيئة الفضائية
-    else if (topicId.includes('u4_l1') || topicId.includes('earth')) {
+    // 10. الدرس العاشر: الميكروبات والكائنات الدقيقة
+    else if (topicId.includes('u3_l3') || topicId.includes('microbe') || topicId.includes('bacteria')) {
+      this._buildCellScene(controlsEl, infoEl);
+    }
+    // 11. الدرس الحادي عشر: كوكب الأرض والنظام الشمسي
+    else if (topicId.includes('u4_l1') || topicId.includes('solar') || topicId.includes('earth')) {
       this._buildEarthSpaceScene(controlsEl, infoEl);
     }
-    // 10. الدرس العاشر: ظواهر الكسوف والخسوف
+    // 12. الدرس الثاني عشر: ظواهر خسوف القمر والكسوف
     else if (topicId.includes('u4_l2') || topicId.includes('eclipse')) {
       this._buildEclipseScene(controlsEl, infoEl);
     }
