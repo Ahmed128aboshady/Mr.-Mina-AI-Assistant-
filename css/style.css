@@ -3478,38 +3478,79 @@ body:has(#explanation-section.visible) .stage-drawer,
   border-color: #ef4444;
 }
 
-/* Quick Suggestion Chips Bar */
+/* Quick Suggestion Chips Carousel */
+.live-chat-chips-carousel-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(30, 41, 59, 0.75);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+  padding: 6px 8px;
+  gap: 6px;
+  direction: rtl;
+}
+
 .live-chat-chips-bar {
+  flex: 1;
   display: flex;
   gap: 6px;
-  padding: 8px 12px;
-  background: rgba(30, 41, 59, 0.5);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 2px 0;
   overflow-x: auto;
+  scroll-behavior: smooth;
   white-space: nowrap;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
 .live-chat-chips-bar::-webkit-scrollbar { display: none; }
+
+.chips-nav-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(56, 189, 248, 0.18);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  font-size: 1.1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  user-select: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+.chips-nav-btn:hover {
+  background: rgba(56, 189, 248, 0.4);
+  color: #ffffff;
+  border-color: #38bdf8;
+  transform: scale(1.12);
+}
 
 .chat-chip {
   background: rgba(56, 189, 248, 0.12);
   border: 1px solid rgba(56, 189, 248, 0.3);
-  color: #93c5fd;
-  border-radius: 14px;
-  padding: 4px 10px;
+  color: #bae6fd;
+  border-radius: 16px;
+  padding: 5px 12px;
   font-family: inherit;
   font-size: 0.78rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .chat-chip:hover {
-  background: rgba(56, 189, 248, 0.25);
+  background: linear-gradient(135deg, rgba(29, 78, 216, 0.85), rgba(2, 132, 199, 0.85));
   color: #ffffff;
   border-color: #38bdf8;
   transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(56, 189, 248, 0.3);
 }
 
 /* Messages List */

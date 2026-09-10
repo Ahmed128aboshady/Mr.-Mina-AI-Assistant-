@@ -588,6 +588,14 @@ class AppController {
     }
   }
 
+  /** تمرير شريط الاقتراحات السريعة (كاروسيل) يميناً ويساراً */
+  scrollChipsCarousel(direction) {
+    const bar = document.getElementById('live-chat-chips-bar');
+    if (!bar) return;
+    const amount = direction === 'left' ? -130 : 130;
+    bar.scrollBy({ left: amount, behavior: 'smooth' });
+  }
+
   /** إظهار/إخفاء مؤشر التحميل في الشات */
   _setHomeChatLoading(loading) {
     let indicator = document.getElementById('home-chat-loading');

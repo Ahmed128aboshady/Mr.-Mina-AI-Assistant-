@@ -188,13 +188,17 @@
       <button class="live-chat-close-btn" onclick="window.appController?.toggleLiveChat(false)" title="إغلاق الشات">✕</button>
     </div>
 
-    <!-- Quick Suggestion Chips -->
-    <div class="live-chat-chips-bar" id="live-chat-chips-bar">
-      <button class="chat-chip" onclick="window.appController?.quickAskChat('اشرحلي الذرة')">تركيب الذرة</button>
-      <button class="chat-chip" onclick="window.appController?.quickAskChat('اشرحلي الكثافة')">سر الكثافة</button>
-      <button class="chat-chip" onclick="window.appController?.quickAskChat('طاقة الوضع والحركة')">طاقة الوضع والحركة</button>
-      <button class="chat-chip" onclick="window.appController?.quickAskChat('الكسوف والخسوف')">الكسوف والخسوف</button>
-      <button class="chat-chip" onclick="window.appController?.quickAskChat('ليه الذرة متعادلة كهربيا؟')">سؤال علل: تعادل الذرة</button>
+    <!-- Quick Suggestion Chips Carousel -->
+    <div class="live-chat-chips-carousel-wrap">
+      <button class="chips-nav-btn" onclick="window.appController?.scrollChipsCarousel('right')" title="السابق">›</button>
+      <div class="live-chat-chips-bar" id="live-chat-chips-bar">
+        <button class="chat-chip" onclick="window.appController?.quickAskChat('اشرحلي الذرة')">تركيب الذرة</button>
+        <button class="chat-chip" onclick="window.appController?.quickAskChat('اشرحلي الكثافة')">سر الكثافة</button>
+        <button class="chat-chip" onclick="window.appController?.quickAskChat('طاقة الوضع والحركة')">طاقة الوضع والحركة</button>
+        <button class="chat-chip" onclick="window.appController?.quickAskChat('الكسوف والخسوف')">الكسوف والخسوف</button>
+        <button class="chat-chip" onclick="window.appController?.quickAskChat('ليه الذرة متعادلة كهربيا؟')">سؤال علل: تعادل الذرة</button>
+      </div>
+      <button class="chips-nav-btn" onclick="window.appController?.scrollChipsCarousel('left')" title="التالي">‹</button>
     </div>
 
     <!-- Messages Container -->
