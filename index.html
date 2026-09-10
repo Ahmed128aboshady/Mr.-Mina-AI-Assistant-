@@ -157,10 +157,81 @@
     </div>
   </div>
 
-
   <!-- ══════════════════════════════════════════
-       EXPLANATION SECTION (يظهر بعد الترانزيشن)
+       FLOATING LIVE CHAT WIDGET (لايف شات مستر مينا)
   ═══════════════════════════════════════════ -->
+  <!-- Floating Launcher Button -->
+  <button id="live-chat-launcher" class="live-chat-floating-btn" onclick="window.appController?.toggleLiveChat()" title="اسأل مستر مينا (لايف شات)">
+    <div class="live-chat-avatar">
+      <img src="assets/poses/01.png" alt="مستر مينا" class="live-chat-avatar-img" />
+    </div>
+    <span class="live-chat-label">اسأل مستر مينا</span>
+    <span class="live-status-dot"></span>
+  </button>
+
+  <!-- Floating Live Chat Popup Window -->
+  <div id="live-chat-popup" class="live-chat-popup">
+    <!-- Header -->
+    <div class="live-chat-header">
+      <div class="live-chat-header-info">
+        <div class="live-chat-avatar">
+          <img src="assets/poses/01.png" alt="مستر مينا" class="live-chat-avatar-img" />
+        </div>
+        <div class="live-chat-title-wrap">
+          <div class="live-chat-name">مستر مينا جرجس (المساعد الذكي)</div>
+          <div class="live-chat-status">
+            <span class="live-status-dot"></span>
+            <span>جاهز للإجابة وشرح أي جزء في المنهج</span>
+          </div>
+        </div>
+      </div>
+      <button class="live-chat-close-btn" onclick="window.appController?.toggleLiveChat(false)" title="إغلاق الشات">✕</button>
+    </div>
+
+    <!-- Quick Suggestion Chips -->
+    <div class="live-chat-chips-bar" id="live-chat-chips-bar">
+      <button class="chat-chip" onclick="window.appController?.quickAskChat('اشرحلي الذرة')">تركيب الذرة</button>
+      <button class="chat-chip" onclick="window.appController?.quickAskChat('اشرحلي الكثافة')">سر الكثافة</button>
+      <button class="chat-chip" onclick="window.appController?.quickAskChat('طاقة الوضع والحركة')">طاقة الوضع والحركة</button>
+      <button class="chat-chip" onclick="window.appController?.quickAskChat('الكسوف والخسوف')">الكسوف والخسوف</button>
+      <button class="chat-chip" onclick="window.appController?.quickAskChat('ليه الذرة متعادلة كهربيا؟')">سؤال علل: تعادل الذرة</button>
+    </div>
+
+    <!-- Messages Container -->
+    <div class="live-chat-messages" id="live-chat-messages">
+      <!-- Default Welcome Message from Mr. Mina -->
+      <div class="chat-msg bot-msg">
+        <div class="msg-avatar-icon">
+          <img src="assets/poses/01.png" alt="مستر مينا" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />
+        </div>
+        <div class="msg-bubble-content">
+          <div>أهلاً بيك يا بطل! أنا معاك خطوة بخطوة، اسألني في أي قانون، مسألة، أو سؤال في علوم أولى إعدادي وهشرحهولك فوراً.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Typing Loader Indicator -->
+    <div id="live-chat-typing" class="live-chat-typing" style="display:none;">
+      <span></span><span></span><span></span>
+      <span class="typing-label">مستر مينا يكتب...</span>
+    </div>
+
+    <!-- Input Bar -->
+    <div class="live-chat-input-bar">
+      <input
+        type="text"
+        id="live-chat-input"
+        placeholder="اكتب سؤالك لمستر مينا هنا..."
+        onkeydown="if(event.key==='Enter') window.appController?.submitLiveChat()"
+      />
+      <button class="live-chat-mic-btn" id="live-chat-mic-btn" onclick="window.appController?.toggleLiveChatMic()" title="تحدث بالصوت">
+        🎤
+      </button>
+      <button class="live-chat-send-btn" id="live-chat-send-btn" onclick="window.appController?.submitLiveChat()" title="إرسال">
+        ➤
+      </button>
+    </div>
+  </div>
   <section class="explanation-section" id="explanation-section">
 
     <!-- Header -->

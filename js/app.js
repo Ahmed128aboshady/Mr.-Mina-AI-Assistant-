@@ -72,10 +72,6 @@ class AppController {
     this.notebook     = this._loadNotebook();
     this.studentDB    = this._loadStudentDB();
 
-    // ── Gemini AI config
-    this.GEMINI_KEY   = 'YOUR_GEMINI_API_KEY';
-    this.GEMINI_URL   = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
-
     // ── YouTube config
     this.YT_KEY       = 'YOUR_YOUTUBE_API_KEY';
 
@@ -392,20 +388,121 @@ class AppController {
     }
   }
 
+  // ══════════════════════════════════════════
+  //   FLOATING LIVE CHAT MANAGER (لايف شات مستر مينا)
+  // ══════════════════════════════════════════
+  toggleLiveChat(forceState) {
+    const popup = document.getElementById('live-chat-popup');
+    if (!popup) return;
+
+    const isOpening = (forceState !== undefined) ? forceState : !popup.classList.contains('active');
+
+    if (isOpening) {
+      popup.classList.add('active');
+      // 🙈 إخفاء شريط البحث السفلي في الهوم لمنع ظهور شريطي بحث معاً
+      const homeChatPill = document.getElementById('home-bottom-chat-pill');
+      if (homeChatPill) homeChatPill.style.display = 'none';
+
+      const input = document.getElementById('live-chat-input');
+      if (input) {
+        setTimeout(() => input.focus(), 150);
+      }
+      this._scrollLiveChatToBottom();
+    } else {
+      popup.classList.remove('active');
+      // 🌟 إعادة إظهار شريط بحث الهوم فقط إذا كان الطالب في صفحة الهوم (وليس داخل الدرس)
+      const isInLesson = document.getElementById('explanation-section')?.classList.contains('visible');
+      if (!isInLesson) {
+        const homeChatPill = document.getElementById('home-bottom-chat-pill');
+        if (homeChatPill) homeChatPill.style.display = 'flex';
+      }
+    }
+  }
+
+  submitLiveChat() {
+    const inputEl = document.getElementById('live-chat-input');
+    if (!inputEl) return;
+    const query = inputEl.value.trim();
+    if (!query) return;
+
+    inputEl.value = '';
+
+    // 📝 سجّل سؤال الطالب في الداتا بيز
+    this.recordStudentActivity('question', { text: query, source: 'live_chat_text' });
+
+    this._handleQuestion(query);
+  }
+
+  toggleLiveChatMic() {
+    const micBtn = document.getElementById('live-chat-mic-btn');
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      alert('الميكروفون غير مدعوم في هذا المتصفح. يرجى استخدام متصفح Chrome.');
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'ar-EG';
+    recognition.interimResults = false;
+
+    micBtn?.classList.add('recording');
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      const inputEl = document.getElementById('live-chat-input');
+      if (inputEl) {
+        inputEl.value = transcript;
+        this.recordStudentActivity('question', { text: transcript, source: 'live_chat_voice' });
+        this.submitLiveChat();
+      }
+    };
+
+    recognition.onerror = () => {
+      micBtn?.classList.remove('recording');
+    };
+
+    recognition.onend = () => {
+      micBtn?.classList.remove('recording');
+    };
+
+    recognition.start();
+  }
+
+  _scrollLiveChatToBottom() {
+    const messagesEl = document.getElementById('live-chat-messages');
+    if (messagesEl) {
+      setTimeout(() => {
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }, 50);
+    }
+  }
+
+  _setLiveChatLoading(loading) {
+    const typingEl = document.getElementById('live-chat-typing');
+    if (typingEl) {
+      typingEl.style.display = loading ? 'flex' : 'none';
+    }
+    this._scrollLiveChatToBottom();
+  }
+
+  /** معالجة سؤال الطالب وعرض الرد في اللايف شات */
   async _handleQuestion(question) {
-    // ─── Show user message in home chat panel ───
-    this._appendHomeMessage(question, 'user');
-    this._setHomeChatLoading(true);
+    // تأكد من فتح نافذة اللايف شات وإخفاء سيرش بار الهوم
+    this.toggleLiveChat(true);
+
+    // ─── عرض رسالة الطالب داخل اللايف شات ───
+    this._appendLiveChatMessage(question, 'user');
+    this._setLiveChatLoading(true);
 
     try {
       const response = await this._askAI(question);
-      this._setHomeChatLoading(false);
+      this._setLiveChatLoading(false);
       this.currentTopic = response.topic;
 
-      // Show bot answer
-      this._appendHomeMessage(response.answer, 'bot');
+      // عرض رد مستر مينا مع الأزرار التفاعلية المباشرة
+      this._appendLiveChatMessage(response.answer, 'bot', response.actions || []);
 
-      // Speak audio
+      // نطق الشرح الصوتي
       this._speakAudio(response.spokenText || response.answer);
 
       if (response.hasExplanation && response.topicContent) {
@@ -422,49 +519,73 @@ class AppController {
       }
 
     } catch (err) {
-      this._setHomeChatLoading(false);
-      console.error('AI Error:', err);
-      this._appendHomeMessage('معلش يا بطل، حصل خطأ بسيط. جرب تسألني تاني! 🙏', 'bot');
+      this._setLiveChatLoading(false);
+      console.error('Curriculum AI Error:', err);
+      this._appendLiveChatMessage('معلش يا بطل، حصل خطأ بسيط. جرب تسألني تاني!', 'bot');
     }
   }
 
-  /** إضافة رسالة في نافذة الشات السفلية */
-  _appendHomeMessage(text, role) {
-    let panel = document.getElementById('home-chat-panel');
-    if (!panel) {
-      // إنشاء لوحة الردود فوق شريط الشات
-      panel = document.createElement('div');
-      panel.id = 'home-chat-panel';
-      panel.style.cssText = `
-        position:fixed; bottom:98px; left:50%; transform:translateX(-50%);
-        width:88%; max-width:820px; max-height:260px; overflow-y:auto;
-        background:rgba(10,22,50,0.97); border:1.5px solid rgba(56,189,248,0.3);
-        border-radius:18px; padding:14px 16px; z-index:88;
-        display:flex; flex-direction:column; gap:10px;
-        backdrop-filter:blur(14px); box-shadow:0 -8px 30px rgba(0,0,0,0.3);
-        font-family:'Cairo','Tajawal',sans-serif;
+  /** إضافة رسالة تفاعلية داخل نافذة اللايف شات */
+  _appendLiveChatMessage(text, role, actions = []) {
+    const messagesEl = document.getElementById('live-chat-messages');
+    if (!messagesEl) return;
+
+    const isBot = role === 'bot';
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `chat-msg ${isBot ? 'bot-msg' : 'user-msg'}`;
+
+    // تنسيق النص البرمجي والماركداون
+    let formattedText = text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+
+    let avatarHTML = isBot 
+      ? `<div class="msg-avatar-icon"><img src="assets/poses/01.png" alt="مستر مينا" /></div>`
+      : `<div class="msg-avatar-icon">👤</div>`;
+
+    let contentHTML = `
+      ${avatarHTML}
+      <div class="msg-bubble-content">
+        <div>${formattedText}</div>
+    `;
+
+    // إضافة الأزرار التفاعلية المباشرة بتصميم نظيف واحترافي
+    if (actions && actions.length > 0) {
+      contentHTML += `
+        <div class="chat-actions-container">
+          ${actions.map((act) => `
+            <button 
+              class="chat-action-button" 
+              onclick="${act.action}"
+            >
+              <span>${act.label}</span>
+            </button>
+          `).join('')}
+        </div>
       `;
-      document.body.appendChild(panel);
     }
 
-    const bubble = document.createElement('div');
-    const isBot = role === 'bot';
-    bubble.style.cssText = `
-      background: ${isBot ? 'rgba(56,189,248,0.1)' : 'rgba(29,61,122,0.6)'};
-      border: 1px solid ${isBot ? 'rgba(56,189,248,0.25)' : 'rgba(74,144,217,0.25)'};
-      border-radius: 12px;
-      padding: 10px 14px;
-      color: ${isBot ? '#e2e8f0' : '#93c5fd'};
-      font-size: 0.9rem;
-      line-height: 1.6;
-      align-self: ${isBot ? 'flex-start' : 'flex-end'};
-      max-width: 90%;
-      direction: rtl;
-      text-align: right;
-    `;
-    bubble.innerHTML = (isBot ? '👨‍🏫 ' : '👤 ') + text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    panel.appendChild(bubble);
-    panel.scrollTop = panel.scrollHeight;
+    contentHTML += `</div>`;
+    msgDiv.innerHTML = contentHTML;
+
+    messagesEl.appendChild(msgDiv);
+    
+    // التمرير السلس للمحادثة لرؤية بداية الشرح بوضوح
+    setTimeout(() => {
+      msgDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 40);
+  }
+
+  /** إرسال سؤال سريع للايف شات عند الضغط على أي اقتراح */
+  quickAskChat(query) {
+    this.toggleLiveChat(true);
+    const inputEl = document.getElementById('live-chat-input');
+    if (inputEl) {
+      inputEl.value = query;
+      this.submitLiveChat();
+    } else {
+      this._handleQuestion(query);
+    }
   }
 
   /** إظهار/إخفاء مؤشر التحميل في الشات */
@@ -587,27 +708,34 @@ class AppController {
   }
 
   // ══════════════════════════════════════════
-  //   AI ENGINE & CURRICULUM RESOLVER
+  //   AI ENGINE & CURRICULUM RESOLVER (100% مستر مينا والمذكرات)
   // ══════════════════════════════════════════
   async _askAI(question) {
-    // 1) استخدام مفتاح Gemini إذا كان متوفراً
-    if (this.GEMINI_KEY && this.GEMINI_KEY !== 'YOUR_GEMINI_API_KEY') {
-      try {
-        return await this._callGeminiAPI(question);
-      } catch (e) {
-        console.warn('Gemini API failed, falling back to local curriculum engine:', e);
-      }
-    }
-
-    // 2) محرك المنهج المحلي الذكي (مطابق 100% لمذكرات مستر مينا)
+    // محرك المنهج المحلي الذكي المتخصص (مطابق 100% لمذكرات مستر مينا والكتاب المدرسي)
     return this._matchCurriculumQuestion(question);
   }
 
-  /** البحث في قاعدة معرفة المنهج والمطابقة الذكية */
+  /** معالجة وتطبيع النصوص العربية للبحث الذكي */
+  _normalizeArabic(text) {
+    if (!text) return '';
+    return text
+      .trim()
+      .toLowerCase()
+      .replace(/[\u064B-\u065F\u0670]/g, '') // إزالة التشكيل
+      .replace(/[أإآء]/g, 'ا')
+      .replace(/ة/g, 'ه')
+      .replace(/ى/g, 'ي')
+      .replace(/[^\w\s\u0600-\u06FF]/g, ' ') // إزالة علامات الترقيم والرموز
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  /** البحث في قاعدة معرفة المنهج والمطابقة الذكية الشاملة */
   _matchCurriculumQuestion(question) {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const qNorm = question.trim().toLowerCase();
+        const rawQ = question.trim();
+        const qNorm = this._normalizeArabic(rawQ);
         const curr = window.CURRICULUM_GRADE_1;
 
         if (!curr || !curr.units) {
@@ -616,42 +744,48 @@ class AppController {
             topic: 'general',
             topicAr: 'منهج العلوم',
             hasExplanation: false,
-            isOutOfCurriculum: false
+            isOutOfCurriculum: false,
+            actions: []
           });
           return;
         }
 
-        // كلمات التحية والترحيب
-        const greetings = ['ازيك', 'مرحبا', 'السلام عليكم', 'هاي', 'صباح الخير', 'مساء الخير', 'مين انت', 'من انت'];
-        if (greetings.some(g => qNorm.includes(g)) && qNorm.length < 25) {
+        // 1) كلمات التحية والترحيب
+        const greetings = ['ازيك', 'مرحبا', 'سلام', 'السلام عليكم', 'هاي', 'صباح الخير', 'مساء الخير', 'مين انت', 'من انت', 'اهلا', 'يا هلا'];
+        if (greetings.some(g => qNorm.includes(g)) && qNorm.length < 35) {
           resolve({
-            answer: `أهلاً بك يا بطل في فصلي الذكي! 🌟\n\nأنا **مستر مينا جرجس**، مدرس العلوم للمرحلة الإعدادية. جاهز أشرحلك أي درس أو أحل معاك أي مسألة في منهج أولى إعدادي بالتفصيل! 📚🔬\n\nتحب نبدأ بإيه اليوم؟ (تركيب الذرة، الكثافة، الجدول الدوري، القوى، أو الكائنات الحية؟)`,
-            spokenText: `أهلاً بيك يا بطل في فصلي الذكي! أنا مستر مينا جرجس، وجاهز أشرحلك أي درس في علوم أولى إعدادي بطريقة سهلة وممتعة.. تحب نبدأ بإيه النهاردة؟`,
+            answer: `أهلاً بك يا بطل! أنا **مستر مينا جرجس**، معلم العلوم ومساعدك الذكي. جاهز للإجابة على أي سؤال وشرح أي درس في منهج علوم الصف الأول الإعدادي بالكامل.\n\nتقدر تضغط على أي موضوع من المقترحات السريعة أو تكتبلي سؤالك فوراً:`,
+            spokenText: `أهلاً بيك يا بطل في فصلي الذكي! أنا مستر مينا جرجس، جاهز أشرحلك أي درس في علوم أولى إعدادي بطريقة سهلة وممتعة.. تحب نبدأ بإيه النهاردة؟`,
             topic: 'general',
             topicAr: 'مستر مينا',
             hasExplanation: false,
-            isOutOfCurriculum: false
+            isOutOfCurriculum: false,
+            actions: [
+              { label: 'شرح تركيب الذرة ومستويات الطاقة', action: `window.appController.quickAskChat('اشرحلي الذرة')` },
+              { label: 'شرح قانون الكثافة والطفو', action: `window.appController.quickAskChat('اشرحلي الكثافة')` },
+              { label: 'شرح طاقة الوضع والحركة', action: `window.appController.quickAskChat('طاقة الوضع والحركة')` },
+              { label: 'شرح ظواهر الكسوف والخسوف', action: `window.appController.quickAskChat('الكسوف والخسوف')` }
+            ]
           });
           return;
         }
 
-        // طلب شرح الدرس الحالي أو طلب شرح عام
-        const explainTriggers = ['اشرح الدرس', 'اشرحلي الدرس', 'شرح الدرس', 'عايز شرح', 'عاوز شرح', 'اشرح', 'اشرحلي', 'فهمني الدرس', 'فهمني', 'ملخص الدرس', 'سمعني الشرح', 'ملخص', 'اشرحهولي', 'اشرحهالي', 'قولي الشرح', 'اشرح هذا الدرس', 'اشرح الحصة'];
-        const isExplainRequest = explainTriggers.some(t => qNorm.includes(t)) || qNorm === 'شرح' || qNorm === 'اشرح';
+        // 2) طلب شرح عام أو استعراض الوحدات
+        const genericExplainTriggers = ['اشرح الدرس', 'اشرحلي الدرس', 'شرح الدرس', 'عايز شرح', 'عاوز شرح', 'اشرح', 'اشرحلي', 'فهمني الدرس', 'ملخص المنهج', 'الدروس', 'اشرح درس', 'اشرحلي درس', 'عايز درس', 'عاوز درس', 'شرح', 'المنهج'];
+        const isGenericExplain = (genericExplainTriggers.some(t => qNorm === t || qNorm === this._normalizeArabic(t))) || qNorm === 'شرح';
 
-        if (isExplainRequest) {
-          const activeLesson = this._currentLesson || curr.units.flatMap(u => u.lessons).find(l => l.lessonId === this._topicData?.topic);
+        if (isGenericExplain) {
+          const activeLesson = this._currentLesson;
           if (activeLesson) {
             const currentSession = this._currentSessionNum || 1;
             const sessionSummary = activeLesson.sessions?.[currentSession - 1]?.summary || activeLesson.summary;
             const sessionRules = activeLesson.sessions?.[currentSession - 1]?.rules || activeLesson.rules || [];
 
-            let answerText = `يا بطل! من عيوني، ركز معايا في شرح **${activeLesson.title}** 🌟\n\n`;
-            answerText += `💡 **ملخص الحصة:**\n${sessionSummary}\n\n`;
+            let answerText = `ملخص مركز لموضوع **${activeLesson.title}**:\n\n`;
+            answerText += `**ملخص الحصة:**\n${sessionSummary}\n\n`;
             if (sessionRules.length > 0) {
-              answerText += `📐 **أهم القواعد والقوانين:**\n• ` + sessionRules.join('\n• ') + '\n\n';
+              answerText += `**أهم القواعد والقوانين:**\n• ` + sessionRules.join('\n• ') + '\n\n';
             }
-            answerText += `اسمع الشرح بصوتي وشوف المعمل التفاعلي 3D فوق للتجربة بنفسك! 🔬✨`;
 
             resolve({
               answer: answerText,
@@ -660,135 +794,281 @@ class AppController {
               topicAr: activeLesson.title,
               hasExplanation: true,
               topicContent: this._topicData?.content || null,
-              isOutOfCurriculum: false
+              isOutOfCurriculum: false,
+              actions: [
+                { label: `استكمال درس ${activeLesson.title.split(':')[1] || activeLesson.title}`, action: `window.appController.selectLessonSession('${activeLesson.lessonId}', ${currentSession})` },
+                { label: 'المعمل التفاعلي ثلاثي الأبعاد (3D)', action: `window.appController.selectLessonSession('${activeLesson.lessonId}', ${currentSession})` }
+              ]
             });
             return;
           } else {
             resolve({
-              answer: `من عيوني يا بطل! 🌟 تحب أشرحلك أي درس؟ قولي اسم الدرس (مثلاً: تركيب الذرة، الكثافة، طاقة الوضع والحركة، الجدول الدوري، أو التكيف) وهشرحهولك بالتفصيل وبصوتي فوراً! 🎙️🔬`,
-              spokenText: `من عيوني يا بطل، قولي تحب أشرحلك أنهي درس في علوم أولى إعدادي وهشرحهولك فوراً وبطريقة سهلة جداً!`,
+              answer: `اختر الوحدة أو الدرس اللي تحب نبدأ بيه، وجاهز لشرحه فوراً مع المعمل التفاعلي ثلاثي الأبعاد:`,
+              spokenText: `من عيوني يا بطل، اختار الوحدة اللي تحب نبدأ بيها وهشرحهالك فوراً بالتفصيل وبطريقة سهلة جداً!`,
               topic: 'general',
               topicAr: 'شرح المنهج',
               hasExplanation: false,
-              isOutOfCurriculum: false
+              isOutOfCurriculum: false,
+              actions: [
+                { label: 'الوحدة الأولى: المادة وتركيبها وتفاعلاتها', action: `window.appController.toggleStageDropdown(1, 'right')` },
+                { label: 'الوحدة الثانية: الطاقة والقوى في الطبيعة', action: `window.appController.toggleStageDropdown(2, 'left')` },
+                { label: 'الوحدة الثالثة: الكائنات الحية والتكيف والبيئة', action: `window.appController.toggleStageDropdown(3, 'right')` },
+                { label: 'الوحدة الرابعة: الأرض والكون والفلك', action: `window.appController.toggleStageDropdown(4, 'left')` }
+              ]
             });
             return;
           }
         }
 
-        // البحث في كافة الدروس عن تطابق
-        let bestLesson = null;
-        let bestScore = 0;
+        // 3) قاموس المعرفة الشامل لدروس المنهج ومطابقة الكلمات المفتاحية
+        const TOPIC_KNOWLEDGE = [
+          {
+            lessonId: 'u1_l1_atom',
+            title: 'الدرس الأول: تركيب الذرة ومستويات الطاقة',
+            unitName: 'الوحدة الأولى: المادة وتركيبها وتفاعلاتها',
+            primaryKeywords: [
+              'ذره', 'الذره', 'نواه', 'النواه', 'بروتون', 'بروتونات', 'نيوترون', 'نيوترونات', 
+              'الكترون', 'الكترونات', 'مستويات الطاقه', 'مستوى طاقه', 'توزيع الكتروني', 
+              'العدد الذري', 'العدد الكتلي', 'كربون', 'هيدروجين', 'هيليوم', 'صوديوم', 'اكسجين', 
+              '2n2', 'k', 'l', 'm', 'n', 'شحنه النواه', 'متعادله كهربيا', 'تركيب الذره', 'مستويات الطاقه الرئيسيه'
+            ],
+            defaultSession: 1
+          },
+          {
+            lessonId: 'u1_l2_periodic',
+            title: 'الدرس الثاني: الجدول الدوري وتصنيف العناصر',
+            unitName: 'الوحدة الأولى: المادة وتركيبها وتفاعلاتها',
+            primaryKeywords: [
+              'جدول دوري', 'الجدول الدوري', 'مندليف', 'موزلي', 'بور', 'تصنيف العناصر', 
+              'فلزات', 'فلز', 'لا فلزات', 'لا فلز', 'اشباه فلزات', 'غازات خامله', 'غاز خامل', 
+              'دوره', 'دورات', 'مجموعه', 'مجموعات', 'فئه s', 'فئه p', 'فئه d', 'فئه f', 
+              'جدول دوري حديث', 'موقع العنصر', 'جدول مندليف', 'جدول موزلي'
+            ],
+            defaultSession: 1
+          },
+          {
+            lessonId: 'u1_l3_matter',
+            title: 'الدرس الثالث: المادة وخواصها وسر الكثافة',
+            unitName: 'الوحدة الأولى: المادة وتركيبها وتفاعلاتها',
+            primaryKeywords: [
+              'ماده', 'الماده', 'كثافه', 'الكثافه', 'كتله', 'الكتله', 'حجم', 'الحجم', 
+              'طفو', 'غوص', 'يطفو', 'يغوص', 'زيت البترول', 'حرائق البترول', 'خشب', 'الخشب', 
+              'فلين', 'الفلين', 'مسمار الحديد', 'بالونات الهيليوم', 'بالونات الهيدروجين', 
+              'قانون الكثافه', 'تطبيقات الكثافه', 'درجه الانصهار', 'درجه الغليان', 'توصيل كهربي', 'توصيل حراري'
+            ],
+            defaultSession: 1
+          },
+          {
+            lessonId: 'u1_l4_bonds',
+            title: 'الدرس الرابع: الروابط الكيميائية (أيونية وتساهمية)',
+            unitName: 'الوحدة الأولى: المادة وتركيبها وتفاعلاتها',
+            primaryKeywords: [
+              'رابطه', 'الرابطه', 'روابط', 'الروابط', 'رابطه ايونيه', 'رابطه تساهميه', 'ايونيه', 'تساهميه', 
+              'ايون موجب', 'ايون سالب', 'ايونات', 'فقد الكترونات', 'اكتساب الكترونات', 'مشاركه الكترونيه', 
+              'ملح الطعام', 'كلوريد الصوديوم', 'جزيء الماء', 'تساهميه احاديه', 'تساهميه ثنائيه', 'تساهميه ثلاثيه', 
+              'h2o', 'nacl', 'تفاعل كيميائي'
+            ],
+            defaultSession: 1
+          },
+          {
+            lessonId: 'u2_l1_energy',
+            title: 'الدرس الأول: الطاقة وصورها وطاقة الوضع والحركة',
+            unitName: 'الوحدة الثانية: الطاقة والقوى في الطبيعة',
+            primaryKeywords: [
+              'طاقه', 'الطاقه', 'شغل', 'الشغل', 'طاقه وضع', 'طاقه الوضع', 'طاقه حركه', 'طاقه الحركه', 
+              'طاقه ميكانيكيه', 'الطاقه الميكانيكيه', 'بقاء الطاقه', 'قانون بقاء الطاقه', 'تحولات الطاقه', 
+              'بندول', 'البندول البسيط', 'جول', 'نيوتن', 'ارتفاع', 'سرعه'
+            ],
+            defaultSession: 1
+          },
+          {
+            lessonId: 'u2_l2_forces',
+            title: 'الدرس الثاني: القوى الأساسية في الطبيعة والمغناطيسية',
+            unitName: 'الوحدة الثانية: الطاقة والقوى في الطبيعة',
+            primaryKeywords: [
+              'قوه', 'القوه', 'قوى', 'القوى', 'جاذبيه', 'الجاذبيه', 'الجاذبيه الارضيه', 'وزن', 'الوزن', 
+              'كتله ووزن', 'مركز الثقل', 'عجله الجاذبيه', 'كهرومغناطيسيه', 'مغناطيس كهربي', 'مغناطيس', 
+              'دينامو', 'مولد كهربي', 'محرك كهربي', 'موتور', 'قوى نوويه'
+            ],
+            defaultSession: 1
+          },
+          {
+            lessonId: 'u3_l1_cells',
+            title: 'الدرس الأول: الخلية وحدة بناء الكائن الحي',
+            unitName: 'الوحدة الثالثة: الكائنات الحية والتكيف والبيئة',
+            primaryKeywords: [
+              'خليه', 'الخليه', 'خلايا', 'الخلايا', 'خليه نباتيه', 'الخليه النباتيه', 'خليه حيوانيه', 'الخليه الحيوانيه', 
+              'جدار خلوي', 'غشاء بلازمي', 'سيتوبلازم', 'نواه الخليه', 'بلاستيدات خضراء', 'بناء ضوئي', 'فجوه عصاريه', 
+              'ميتوكوندريا', 'عضيات', 'وحده البناء والوظيفه'
+            ],
+            defaultSession: 1
+          },
+          {
+            lessonId: 'u3_l2_adaptation',
+            title: 'الدرس الثاني: تنوع الكائنات الحية وطرق التكيف',
+            unitName: 'الوحدة الثالثة: الكائنات الحية والتكيف والبيئة',
+            primaryKeywords: [
+              'تكيف', 'التكيف', 'تنوع الكائنات', 'تصنيف الكائنات', 'تكيف تركيبي', 'تكيف وظيفي', 'تكيف سلوكي', 
+              'بيات شتوي', 'خمول صيفي', 'هجره الطيور', 'مماتنه', 'المماتنه', 'حرباء', 'الحرباء', 'حشره العود', 
+              'حشره ورقيه', 'نباتات مفترسه', 'نباتات اكاله الحشرات', 'دروسيرا', 'دايونيا', 'حامول الماء', 
+              'منقار الصقر', 'خف الجمل', 'حافر الحصان'
+            ],
+            defaultSession: 1
+          },
+          {
+            lessonId: 'u4_l1_earth_space',
+            title: 'الدرس الأول: كوكب الأرض والبيئة الفضائية',
+            unitName: 'الوحدة الرابعة: الأرض والكون والفلك',
+            primaryKeywords: [
+              'ارض', 'الارض', 'كوكب الارض', 'غلاف جوي', 'غلاف مائي', 'طبقات الارض', 'قشره ارضيه', 'وشاح', 
+              'لب الارض', 'ضغط جوي', 'جاذبيه الارض', 'كوكب الحياه', 'اوزون', 'طبقه الاوزون', 'فضاء'
+            ],
+            defaultSession: 1
+          },
+          {
+            lessonId: 'u4_l2_eclipses',
+            title: 'الدرس الثاني: ظواهر الكسوف والخسوف الفلكية',
+            unitName: 'الوحدة الرابعة: الأرض والكون والفلك',
+            primaryKeywords: [
+              'كسوف', 'خسوف', 'كسوف الشمس', 'خسوف القمر', 'الكسوف', 'الخسوف', 'مخروط الظل', 'شبه الظل', 
+              'كسوف كلي', 'كسوف جزئي', 'كسوف حلقي', 'خسوف كلي', 'خسوف جزئي', 'استقامه واحده', 'حجب ضوء الشمس'
+            ],
+            defaultSession: 1
+          }
+        ];
+
+        // 4) البحث عن مطابقة لأسئلة علل في كافة دروس المنهج
         let matchedWhy = null;
-        let matchedRule = null;
+        let matchedWhyLesson = null;
+        let bestWhyScore = 0;
 
         for (const unit of curr.units) {
           for (const lesson of unit.lessons) {
-            let score = 0;
-
-            // مطابقة الكلمات المفتاحية
-            for (const kw of lesson.keywords) {
-              if (qNorm.includes(kw.toLowerCase())) {
-                score += kw.length > 4 ? 4 : 2;
-              }
-            }
-
-            // مطابقة أسئلة علل
-            if (lesson.whyQuestions) {
-              for (const why of lesson.whyQuestions) {
-                const whyQ = why.q.toLowerCase();
-                const commonWords = qNorm.split(' ').filter(w => w.length > 2 && whyQ.includes(w));
-                if (commonWords.length >= 2) {
-                  score += 6;
+            for (const sess of (lesson.sessions || [])) {
+              for (const why of (sess.whyQuestions || [])) {
+                const whyNorm = this._normalizeArabic(why.q);
+                const queryWords = qNorm.split(' ').filter(w => w.length > 2);
+                let matchCount = 0;
+                for (const w of queryWords) {
+                  if (whyNorm.includes(w)) matchCount++;
+                }
+                if (matchCount >= 2 && matchCount > bestWhyScore) {
+                  bestWhyScore = matchCount;
                   matchedWhy = why;
+                  matchedWhyLesson = lesson;
                 }
               }
-            }
-
-            // مطابقة القوانين
-            if (lesson.rules) {
-              for (const rule of lesson.rules) {
-                const ruleLower = rule.toLowerCase();
-                const commonWords = qNorm.split(' ').filter(w => w.length > 2 && ruleLower.includes(w));
-                if (commonWords.length >= 2) {
-                  score += 4;
-                  matchedRule = rule;
-                }
-              }
-            }
-
-            if (score > bestScore) {
-              bestScore = score;
-              bestLesson = lesson;
             }
           }
         }
 
-        // ── إذا كان السؤال داخل المنهج ──
-        if (bestLesson && bestScore >= 2) {
-          let answerText = `يا بطل! سؤال ممتاز في **${bestLesson.title}** 🌟\n\n`;
-
-          if (matchedWhy) {
-            answerText += `📌 **إجابة سؤال علل النموذجية:**\n${matchedWhy.a}\n\n`;
-          }
-
-          if (matchedRule) {
-            answerText += `📐 **القاعدة / القانون الهام:**\n${matchedRule}\n\n`;
-          }
-
-          answerText += `💡 **ملخص مستر مينا السريع:**\n${bestLesson.summary}\n\n`;
-
-          if (bestLesson.rules && bestLesson.rules.length > 0 && !matchedRule) {
-            answerText += `✨ **أهم النقاط:**\n• ` + bestLesson.rules.slice(0, 2).join('\n• ') + '\n\n';
-          }
-
-          answerText += `اضغط على الزرار تحت عشان تشوف **الشرح التفاعلي الكامل والفيديوهات المقترحة** 👇`;
-
-          // بناء هيكل الشرح التفاعلي للسيكشن
-          const topicContent = {
-            intro: bestLesson.summary,
-            sections: [
-              {
-                title: '📐 القوانين والقواعد الأساسية',
-                type: 'points',
-                points: (bestLesson.rules || []).map((r, idx) => ({ icon: `${idx + 1}️⃣`, text: r }))
-              },
-              {
-                title: '❓ أهم أسئلة علل وتفسيراتها من المذكرة',
-                type: 'points',
-                points: (bestLesson.whyQuestions || []).map(w => ({ icon: '💡', text: `**${w.q}**\n${w.a}` }))
-              }
-            ],
-            ytQuery: bestLesson.ytQuery
-          };
-
-          // صياغة الكلام المنطوق بالعامية المصرية الأصيلة
-          let spoken = bestLesson.spokenEgyptian;
-          if (matchedWhy) {
-            spoken = `سؤال جميل يا بطل! ` + matchedWhy.a + ` ` + bestLesson.spokenEgyptian;
-          }
+        // إذا تم العثور على سؤال علل
+        if (matchedWhy && matchedWhyLesson) {
+          let ans = `سؤال ممتاز في **${matchedWhyLesson.title}**:\n\n`;
+          ans += `**سؤال علل:** ${matchedWhy.q}\n\n`;
+          ans += `**إجابة مستر مينا النموذجية:**\n${matchedWhy.a}\n\n`;
+          ans += `**ملخص سريع:** ${matchedWhyLesson.summary}`;
 
           resolve({
-            answer: answerText,
-            spokenText: spoken,
-            topic: bestLesson.lessonId,
-            topicAr: bestLesson.title,
+            answer: ans,
+            spokenText: `سؤال جميل يا بطل! ${matchedWhy.a} ${matchedWhyLesson.spokenEgyptian || ''}`,
+            topic: matchedWhyLesson.lessonId,
+            topicAr: matchedWhyLesson.title,
             hasExplanation: true,
-            topicContent: topicContent,
-            isOutOfCurriculum: false
+            topicContent: null,
+            isOutOfCurriculum: false,
+            actions: [
+              { label: `فتح درس ${matchedWhyLesson.title.split(':')[1] || matchedWhyLesson.title}`, action: `window.appController.selectLessonSession('${matchedWhyLesson.lessonId}', 1)` },
+              { label: 'المعمل التفاعلي ثلاثي الأبعاد (3D)', action: `window.appController.selectLessonSession('${matchedWhyLesson.lessonId}', 1)` }
+            ]
           });
           return;
         }
 
-        // ── إذا كان السؤال خارج المنهج (Out of Curriculum) ──
+        // 5) مطابقة الكلمات المفتاحية والمواضيع (حتى لو كتب كلمة واحدة مثل: ذرة، كثافة، طاقة، خلية)
+        let bestTopic = null;
+        let bestScore = 0;
+
+        for (const topicItem of TOPIC_KNOWLEDGE) {
+          let score = 0;
+          for (const kw of topicItem.primaryKeywords) {
+            const kwNorm = this._normalizeArabic(kw);
+            if (kwNorm === qNorm) {
+              score += 120; // تطابق تام للكلمة المفتاحية
+            } else if (` ${qNorm} `.includes(` ${kwNorm} `)) {
+              score += 40;
+            } else if (qNorm.includes(kwNorm) || kwNorm.includes(qNorm)) {
+              score += 25;
+            }
+          }
+
+          if (score > bestScore) {
+            bestScore = score;
+            bestTopic = topicItem;
+          }
+        }
+
+        // إذا تم العثور على درس مطابق
+        if (bestTopic && bestScore >= 25) {
+          const matchedCurriculumLesson = curr.units.flatMap(u => u.lessons).find(l => l.lessonId === bestTopic.lessonId);
+          const lessonTitle = matchedCurriculumLesson?.title || bestTopic.title;
+          const lessonSummary = matchedCurriculumLesson?.sessions?.[0]?.summary || matchedCurriculumLesson?.summary || '';
+          const lessonRules = matchedCurriculumLesson?.sessions?.[0]?.rules || matchedCurriculumLesson?.rules || [];
+          const spokenText = matchedCurriculumLesson?.sessions?.[0]?.spokenEgyptian || matchedCurriculumLesson?.spokenEgyptian || lessonSummary;
+
+          let answerText = `شرح مبسط لموضوع **${lessonTitle}**:\n\n`;
+          answerText += `**ملخص مستر مينا:**\n${lessonSummary}\n\n`;
+
+          if (lessonRules.length > 0) {
+            answerText += `**أهم القواعد والقوانين:**\n• ` + lessonRules.slice(0, 2).join('\n• ') + '\n\n';
+          }
+
+          const actions = [
+            { 
+              label: `فتح درس ${lessonTitle.split(':')[1] || lessonTitle}`, 
+              action: `window.appController.selectLessonSession('${bestTopic.lessonId}', 1)` 
+            },
+            { 
+              label: 'المعمل التفاعلي ثلاثي الأبعاد (3D)', 
+              action: `window.appController.selectLessonSession('${bestTopic.lessonId}', 1)` 
+            }
+          ];
+
+          if (matchedCurriculumLesson?.sessions && matchedCurriculumLesson.sessions.length > 1) {
+            actions.push({
+              label: `الحصة 2: ${matchedCurriculumLesson.sessions[1].title.split(':')[1] || 'التطبيقات والقوانين'}`,
+              action: `window.appController.selectLessonSession('${bestTopic.lessonId}', 2)`
+            });
+          }
+
+          resolve({
+            answer: answerText,
+            spokenText: spokenText,
+            topic: bestTopic.lessonId,
+            topicAr: lessonTitle,
+            hasExplanation: true,
+            topicContent: null,
+            isOutOfCurriculum: false,
+            actions: actions
+          });
+          return;
+        }
+
+        // 6) السؤال خارج المنهج — يتم تسجيله بلطف في دفتر مستر مينا مع توفير أزرار لاستكشاف المنهج
         resolve({
-          answer: `يا بطل! 😊 سؤالك ذكي وجميل جداً، بس تخصصي هنا معاك في المنصة هو **منهج العلوم للصف الأول الإعدادي** 🔬 عشان نركز مع بعض ونضمن الدرجة النهائية إن شاء الله! 🎯\n\nوعشانك مش هسيب سؤالك.. أنا **سجلته عندي في الدفتر 📓** وهبحثلك عنه وأجهزهولك ونتناقش فيه سوا! ✨\n\nاسألني في أي جزء في علوم أولى إعدادي وأنا في خدمتك فوراً! 🚀`,
+          answer: `سؤالك ذكي وممتاز، وتخصصنا هنا في المنصة هو **منهج العلوم للصف الأول الإعدادي** لنضمن التفوق والدرجة النهائية معاً.\n\nتم **تسجيل سؤالك في دفتر مستر مينا** للإجابة عليه لاحقاً.\n\nيمكنك اختيار أي وحدة من وحدات المنهج لبدء دراستها الآن:`,
           spokenText: `يا بطل، سؤالك ذكي وجميل جداً، بس تخصصي هنا معاك هو منهج علوم أولى إعدادي عشان نضمن الدرجة النهائية سوا.. وعشانك سجلت سؤالك عندي في الدفتر وهبحثلك عنه للحصة الجاية!`,
           topic: 'out_of_curriculum',
           topicAr: 'خارج المنهج',
           hasExplanation: false,
           topicContent: null,
-          isOutOfCurriculum: true
+          isOutOfCurriculum: true,
+          actions: [
+            { label: 'الوحدة الأولى: المادة وتركيبها وتفاعلاتها', action: `window.appController.toggleStageDropdown(1, 'right')` },
+            { label: 'الوحدة الثانية: الطاقة والقوى في الطبيعة', action: `window.appController.toggleStageDropdown(2, 'left')` },
+            { label: 'الوحدة الثالثة: الكائنات الحية والتكيف والبيئة', action: `window.appController.toggleStageDropdown(3, 'right')` },
+            { label: 'الوحدة الرابعة: الأرض والكون والفلك', action: `window.appController.toggleStageDropdown(4, 'left')` }
+          ]
         });
 
       }, 10);
@@ -1067,6 +1347,10 @@ class AppController {
     }
 
     section.classList.add('visible');
+
+    // 🌟 إظهار زر اللايف شات العائم في صفحة الدرس
+    const launcher = document.getElementById('live-chat-launcher');
+    if (launcher) launcher.style.display = 'flex';
 
     // 🎨 تطبيق أبعاد ومواضع الأفاتار والبوب اب المخصصة من الاستوديو إن وجدت
     if (window.odooBuilder) {
@@ -1732,8 +2016,12 @@ class AppController {
       window.interactiveLab.destroy();
     }
     this.closeStageDrawers();
-    this.toggleLiveChatModal(false);
+    this.toggleLiveChat(false);
     document.getElementById('explanation-section')?.classList.remove('visible');
+
+    // 🌟 إخفاء زر اللايف شات العائم في صفحة الهوم
+    const launcher = document.getElementById('live-chat-launcher');
+    if (launcher) launcher.style.display = 'none';
 
     // 🌟 Restore bottom floating home chat bar
     const homeChatPill = document.getElementById('home-bottom-chat-pill');
