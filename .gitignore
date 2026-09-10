@@ -1,0 +1,12 @@
+﻿# Dependencies & Caches
+audio_cache/
+__pycache__/
+*.pyc
+.cache/
+
+# System & Editor Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
