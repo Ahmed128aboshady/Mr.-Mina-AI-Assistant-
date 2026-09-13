@@ -1447,6 +1447,80 @@ class OdooWebsiteBuilder {
     }
   }
 
+  saveLayout() {
+    this.autoSaveLayout();
+    this.showToast('💾 تم حفظ تخطيط الصفحة بنجاح!');
+  }
+
+  undo() {
+    this.showToast('↶ تراجع');
+  }
+
+  redo() {
+    this.showToast('↷ إعادة');
+  }
+
+  toggleMobilePreview(forceState) {
+    let overlay = document.getElementById('odoo-mobile-simulator-overlay');
+    const isCurrentlyOpen = overlay && overlay.style.display !== 'none';
+    const shouldOpen = forceState !== undefined ? forceState : !isCurrentlyOpen;
+
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'odoo-mobile-simulator-overlay';
+      overlay.style.cssText = `
+        display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(7, 11, 20, 0.85); backdrop-filter: blur(14px);
+        z-index: 999999998; justify-content: center; align-items: center;
+        flex-direction: column; font-family: 'Cairo', 'Tajawal', sans-serif; direction: rtl;
+      `;
+
+      overlay.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 390px; max-width: 92vw; margin-bottom: 12px; color: #f8fafc;">
+          <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.95rem; color: #38bdf8;">
+            <span>📱</span> <span>معاينة نسخة الموبايل (Odoo Mobile)</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button onclick="window.odooBuilder.reloadMobileFrame()" style="background: #1e293b; color: #cbd5e1; border: 1px solid #334155; padding: 4px 10px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 0.78rem; font-weight: 700;">🔄 تحديث</button>
+            <a href="mobile.html" target="_blank" style="background: #0284c7; color: #fff; text-decoration: none; padding: 4px 12px; border-radius: 8px; font-size: 0.78rem; font-weight: 700;">↗️ نافذة مستقلة</a>
+            <button onclick="window.odooBuilder.toggleMobilePreview(false)" style="background: #ef4444; color: #fff; border: none; padding: 4px 10px; border-radius: 8px; cursor: pointer; font-weight: 800;">✕</button>
+          </div>
+        </div>
+
+        <!-- SMARTPHONE DEVICE FRAME -->
+        <div style="
+          position: relative; width: 380px; max-width: 92vw; height: 760px; max-height: 84vh;
+          background: #000; border-radius: 46px; border: 12px solid #1e293b;
+          box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 40px rgba(2,132,199,0.3);
+          overflow: hidden; display: flex; flex-direction: column;
+        ">
+          <!-- Phone Speaker & Camera Notch -->
+          <div style="position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 120px; height: 18px; background: #1e293b; border-radius: 20px; z-index: 10; pointer-events: none;"></div>
+
+          <iframe id="odoo-mobile-iframe" src="mobile.html" style="width: 100%; height: 100%; border: none; border-radius: 34px; background: #f8fafc;"></iframe>
+        </div>
+      `;
+
+      document.body.appendChild(overlay);
+    }
+
+    if (shouldOpen) {
+      overlay.style.display = 'flex';
+      this.showToast('📱 تم فتح وضع معاينة الموبايل');
+    } else {
+      overlay.style.display = 'none';
+      this.showToast('🖥️ تم العودة لوضع الديسكتوب');
+    }
+  }
+
+  reloadMobileFrame() {
+    const iframe = document.getElementById('odoo-mobile-iframe');
+    if (iframe) {
+      iframe.src = 'mobile.html?v=' + Date.now();
+      this.showToast('🔄 تم تحديث معاينة الموبايل');
+    }
+  }
+
   showToast(msg) {
     if (window.appController && window.appController._showToast) {
       window.appController._showToast(msg, 'success');
@@ -1465,3 +1539,4 @@ function toggleOdooStudio(forceState) {
     window.odooBuilder.toggleEditMode(forceState);
   }
 }
+
