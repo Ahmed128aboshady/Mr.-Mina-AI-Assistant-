@@ -1,0 +1,533 @@
+/**
+ * 📱 MOBILE VERSION - STANDALONE STYLESHEET
+ * مخصص بالكامل لصفحة mobile.html بدون أي ارتباط أو تأثير على الديسكتوب
+ */
+
+:root {
+  --primary: #0284c7;
+  --primary-dark: #0369a1;
+  --bg-dark: #070b14;
+  --chat-bg: #0f274a;
+  --text-white: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+html, body {
+  width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  direction: rtl;
+  background-color: #f8fafc;
+  background-image: 
+    linear-gradient(to right, rgba(203, 213, 225, 0.45) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(203, 213, 225, 0.45) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: center center;
+}
+
+/* ── CONTAINER ────────────────────────────────────────── */
+.mobile-app-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* ── 1. TOP RIGHT: LOGO & GRADE BADGES ────────────────── */
+.mobile-header-top-right {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 46%;
+  max-width: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 50;
+}
+
+.mobile-logo-img {
+  width: 100%;
+  max-width: 165px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.08));
+}
+
+.mobile-grades-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.mobile-grade-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mobile-grade-btn:active {
+  transform: scale(0.88);
+}
+
+.mobile-grade-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* ── 2. LEFT COLUMN: 4 STACKED STAGE CARDS ────────────── */
+.mobile-left-cards-column {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 44%;
+  max-width: 165px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 40;
+}
+
+.mobile-stage-card {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #0f2b48;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.mobile-stage-card:active {
+  transform: scale(0.95);
+}
+
+.mobile-stage-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* ── 3. MR MINA AVATAR (RIGHT EXTENDING TO BOTTOM) ────── */
+.mobile-avatar-stage {
+  position: absolute;
+  bottom: 0;
+  right: -10px;
+  width: 68%;
+  max-width: 380px;
+  height: 75vh;
+  max-height: 560px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  z-index: 25;
+  pointer-events: none;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.32));
+}
+
+.mobile-avatar-img {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: bottom right;
+  display: block;
+}
+
+/* ── 4. BOTTOM FLOATING CHAT PILL ─────────────────────── */
+.mobile-bottom-chat-bar {
+  position: fixed;
+  bottom: 14px;
+  left: 14px;
+  width: calc(100vw - 28px);
+  max-width: 440px;
+  height: 56px;
+  border-radius: 20px;
+  background: var(--chat-bg);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45), 0 0 15px rgba(2, 132, 199, 0.25);
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+  direction: ltr;
+}
+
+.mobile-chat-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-family: inherit;
+  padding: 0 8px;
+  direction: rtl;
+  text-align: right;
+}
+
+.mobile-chat-input::placeholder {
+  color: #94a3b8;
+  font-size: 0.92rem;
+  opacity: 0.9;
+  direction: ltr;
+  text-align: left;
+}
+
+.mobile-chat-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-action-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.mobile-action-btn:active {
+  transform: scale(0.92);
+}
+
+.mobile-action-btn.btn-mic {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.mobile-action-btn.btn-send {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(2, 132, 199, 0.5);
+}
+
+/* ── 5. MOBILE LESSON DRAWER (BOTTOM SHEET) ────────────── */
+.mobile-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.mobile-drawer-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-bottom-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  max-height: 82vh;
+  overflow-y: auto;
+  padding: 18px 16px 30px;
+  z-index: 1001;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.35);
+  direction: rtl;
+}
+
+.mobile-drawer-overlay.active .mobile-bottom-drawer {
+  transform: translateY(0);
+}
+
+.drawer-drag-pill {
+  width: 48px;
+  height: 5px;
+  background: #cbd5e1;
+  border-radius: 10px;
+  margin: 0 auto 12px;
+}
+
+.mobile-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1.5px solid #e2e8f0;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+}
+
+.mobile-drawer-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f2b48;
+}
+
+.mobile-drawer-close {
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.mobile-unit-card {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.mobile-unit-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0284c7;
+  margin-bottom: 8px;
+}
+
+.mobile-lesson-item {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mobile-lesson-item:active {
+  background: #f0f9ff;
+  border-color: #38bdf8;
+  transform: scale(0.98);
+}
+
+.mobile-lesson-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.mobile-lesson-badge {
+  background: #e0f2fe;
+  color: #0284c7;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* ── 6. IN-LESSON 3D LAB SCREEN (FULL SCREEN) ─────────── */
+.mobile-lesson-screen {
+  position: fixed;
+  inset: 0;
+  background: #070b14;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  direction: rtl;
+}
+
+.mobile-lesson-screen.active {
+  transform: translateX(0);
+}
+
+.mobile-lesson-header {
+  padding: 10px 14px;
+  background: #0f1e36;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #1e3a8a;
+}
+
+.mobile-back-btn {
+  background: #0284c7;
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.mobile-lesson-header-title {
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 800;
+  flex: 1;
+  text-align: center;
+  padding: 0 8px;
+}
+
+.mobile-lab-wrap {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  background: #070b14;
+}
+
+#mobile-lab-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.mobile-lab-controls {
+  position: absolute;
+  top: 10px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  justify-content: center;
+  z-index: 100;
+}
+
+.mobile-pill-bar {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  padding: 4px 8px;
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-pill-btn {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.mobile-pill-btn.active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+}
+
+/* ── 7. CHAT DIALOG OVERLAY (BOTTOM SHEET / POPUP) ────── */
+.mobile-chat-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 3000;
+  display: none;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.mobile-chat-overlay.active {
+  display: flex;
+}
+
+.mobile-chat-window {
+  background: #0f1e36;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  border-top: 2px solid #0284c7;
+  height: 75vh;
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  direction: rtl;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+}
+
+.mobile-chat-window-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #1e3a8a;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.mobile-chat-window-title {
+  color: #38bdf8;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.mobile-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.mobile-msg-bot {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 14px;
+  padding: 10px 14px;
+  color: #f8fafc;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  max-width: 90%;
+  align-self: flex-start;
+}
+
+.mobile-msg-user {
+  background: #0284c7;
+  color: #ffffff;
+  border-radius: 14px;
+  padding: 8px 14px;
+  font-size: 0.88rem;
+  max-width: 85%;
+  align-self: flex-end;
+}
