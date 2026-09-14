@@ -1483,7 +1483,7 @@ class OdooWebsiteBuilder {
           <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
             <button onclick="window.odooBuilder.copyMobileCode()" style="background: linear-gradient(135deg, #059669, #10b981); color: #fff; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 0.82rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(16,185,129,0.35);">📋 نسخ الكود</button>
             <button onclick="window.odooBuilder.reloadMobileFrame()" style="background: #1e293b; color: #cbd5e1; border: 1px solid #334155; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 0.82rem; font-weight: 700;">🔄 تحديث</button>
-            <a href="mobile.html" target="_blank" style="background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 4px 14px rgba(2,132,199,0.5);">🎨 كامل الشاشة</a>
+            <a href="mobile.html?edit=1" target="_blank" style="background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 4px 14px rgba(2,132,199,0.5);">🎨 كامل الشاشة</a>
             <button onclick="window.odooBuilder.toggleMobilePreview(false)" style="background: #ef4444; color: #fff; border: none; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 0.82rem;">✕ إغلاق</button>
           </div>
         </div>

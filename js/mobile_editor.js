@@ -6,7 +6,11 @@
 
 class MobileOdooBuilder {
   constructor() {
-    this.isEditMode = true; // Default: edit mode is active
+    const urlParams = new URLSearchParams(window.location.search);
+    this.isEditMode = urlParams.get('edit') === '1' || window.location.hash === '#edit';
+    if (this.isEditMode) {
+      document.body.classList.add('enable-mobile-editor');
+    }
     this.currentTab = 'style';
     this.selectedLayerId = null;
 
@@ -61,21 +65,24 @@ class MobileOdooBuilder {
   init() {
     this.loadSavedLayout();
     this.applyAllLayers();
-    this.createStudioDockBtn();
-    this.createCopyTopBtn();
-    this.createSidebarUI();
-    this.createCanvasQuickToolbar();
-    this.createCopyCodeModal();
-    this.bindCanvasTouchEvents();
 
-    const isInsideIframe = window.self !== window.top;
-    const isDesktopMonitor = window.innerWidth >= 900;
+    if (this.isEditMode) {
+      this.createStudioDockBtn();
+      this.createCopyTopBtn();
+      this.createSidebarUI();
+      this.createCanvasQuickToolbar();
+      this.createCopyCodeModal();
+      this.bindCanvasTouchEvents();
 
-    // Only auto-open sidebar when viewed directly full-screen on a large desktop monitor (outside iframe)
-    if (isDesktopMonitor && !isInsideIframe) {
-      document.body.classList.add('desktop-studio-view');
-      const sidebar = document.getElementById('mobile-studio-sidebar');
-      if (sidebar) sidebar.classList.add('open');
+      const isInsideIframe = window.self !== window.top;
+      const isDesktopMonitor = window.innerWidth >= 900;
+
+      // Only auto-open sidebar when viewed directly full-screen on a large desktop monitor (outside iframe)
+      if (isDesktopMonitor && !isInsideIframe) {
+        document.body.classList.add('desktop-studio-view');
+        const sidebar = document.getElementById('mobile-studio-sidebar');
+        if (sidebar) sidebar.classList.add('open');
+      }
     }
   }
 

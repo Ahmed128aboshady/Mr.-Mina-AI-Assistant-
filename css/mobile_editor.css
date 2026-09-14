@@ -118,6 +118,16 @@
 }
 
 /* ── 2. FLOATING TOP TOGGLE BUTTONS (DOCK & COPY) ── */
+#mobile-studio-dock-btn,
+#mobile-copy-top-btn {
+  display: none !important;
+}
+
+body.enable-mobile-editor #mobile-studio-dock-btn,
+body.enable-mobile-editor #mobile-copy-top-btn {
+  display: flex !important;
+}
+
 #mobile-studio-dock-btn {
   position: fixed;
   top: 10px;
@@ -133,7 +143,6 @@
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
-  display: flex;
   align-items: center;
   gap: 5px;
   transition: all 0.2s ease;
