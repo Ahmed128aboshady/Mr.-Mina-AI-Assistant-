@@ -244,10 +244,13 @@ html, body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  min-height: -webkit-fill-available;
   background: rgba(15, 23, 42, 0.7);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 9999;
   display: flex;
   flex-direction: column;
@@ -266,9 +269,11 @@ html, body {
   background: #0f172a;
   border-top: 2px solid #0284c7;
   border-radius: 28px 28px 0 0;
-  padding: 16px 20px 30px;
-  max-height: 80vh;
+  padding: 16px 18px calc(75px + env(safe-area-inset-bottom, 24px));
+  max-height: 85dvh;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
   transform: translateY(100%);
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
@@ -276,6 +281,10 @@ html, body {
 
 .mobile-drawer-overlay.active .mobile-bottom-drawer {
   transform: translateY(0);
+}
+
+#mobile-drawer-content {
+  padding-bottom: 24px;
 }
 
 .drawer-drag-pill {
@@ -352,8 +361,10 @@ html, body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  min-height: -webkit-fill-available;
   background: #070b14;
   z-index: 10000;
   display: none;
@@ -454,10 +465,13 @@ html, body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  min-height: -webkit-fill-available;
   background: rgba(15, 23, 42, 0.7);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 99999;
   display: none;
   align-items: flex-end;
@@ -471,13 +485,13 @@ html, body {
 .mobile-chat-window {
   width: 100%;
   max-width: 480px;
-  height: 70vh;
+  height: 75dvh;
   background: #0f172a;
   border-top: 2px solid #0284c7;
   border-radius: 24px 24px 0 0;
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding: 16px 18px calc(70px + env(safe-area-inset-bottom, 24px));
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
 }
 

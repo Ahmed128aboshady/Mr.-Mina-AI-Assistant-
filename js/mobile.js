@@ -16,6 +16,13 @@ window.MobileApp = {
     this.updateAppHeight();
     window.addEventListener('resize', () => this.updateAppHeight());
     window.addEventListener('orientationchange', () => this.updateAppHeight());
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const stageParam = urlParams.get('stage');
+    if (stageParam) {
+      setTimeout(() => this.openStage(parseInt(stageParam)), 300);
+    }
+    
     console.log("Mobile App Engine Initialized!");
   },
 
