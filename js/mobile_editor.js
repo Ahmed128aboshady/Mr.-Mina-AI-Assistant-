@@ -162,14 +162,13 @@ class MobileOdooBuilder {
       el.style.display = '';
     }
 
-    const tx = layer.x || 0;
-    const ty = layer.y || 0;
-    const scale = layer.scale !== undefined ? layer.scale : 1;
-    const rot = layer.rotY || 0;
-
-    el.style.transform = `translate3d(${tx}px, ${ty}px, 0px) scale(${scale}) rotate(${rot}deg)`;
-    if (layer.zIndex !== undefined) el.style.zIndex = layer.zIndex;
-    if (layer.opacity !== undefined) el.style.opacity = layer.opacity;
+    if (tx !== 0 || ty !== 0 || scale !== 1 || rot !== 0) {
+      el.style.transform = `translate3d(${tx}px, ${ty}px, 0px) scale(${scale}) rotate(${rot}deg)`;
+    } else {
+      el.style.transform = '';
+    }
+    if (layer.zIndex !== undefined && layer.zIndex !== null) el.style.zIndex = layer.zIndex;
+    if (layer.opacity !== undefined && layer.opacity !== 1) el.style.opacity = layer.opacity;
     el.style.transition = this.isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)';
   }
 

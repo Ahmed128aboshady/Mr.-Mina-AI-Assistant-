@@ -1,14 +1,14 @@
 /**
  * 📱 MOBILE VERSION - STANDALONE STYLESHEET
- * مخصص بالكامل لصفحة mobile.html معزول تماماً عن الديسكتوب
- * مطابق للصورة المرفقة 100%
+ * مطابق تماماً لصورة العميل (media_1789389786886.png)
+ * كروت أكبر وممتدة للأسفل، مجسم مستر مينا بحجم طبيعي ومكبر، وأزرار الصفوف (1 2 3) بالترتيب الصحيح
  */
 
 :root {
   --primary: #0284c7;
   --primary-dark: #0369a1;
-  --navy-dark: #102a4c;
-  --navy-btn: #1d3f6d;
+  --navy-dark: #0f274a;
+  --navy-btn: #1a3a66;
 }
 
 * {
@@ -48,14 +48,14 @@ html, body {
 /* ── 1. TOP RIGHT: LOGO & GRADE BADGES ────────────────── */
 .mobile-header-top-right {
   position: absolute;
-  top: 6.5%;
-  right: 7%;
-  width: 42%;
-  max-width: 185px;
+  top: 5.2%;
+  right: 6%;
+  width: 45%;
+  max-width: 215px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 8px;
+  gap: 6px;
   z-index: 40;
 }
 
@@ -69,15 +69,17 @@ html, body {
 .mobile-grades-row {
   display: flex;
   flex-direction: row;
+  direction: ltr !important; /* يحافظ على ترتيب 1 على اليسار ثم 2 ثم 3 تحت اللوجو */
   justify-content: flex-end;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   width: 100%;
+  margin-top: 2px;
 }
 
 .mobile-grade-btn {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: none;
   background: transparent;
@@ -87,12 +89,12 @@ html, body {
 }
 
 .mobile-grade-btn.active {
-  transform: scale(1.12);
-  filter: drop-shadow(0 2px 6px rgba(2, 132, 199, 0.4));
+  transform: scale(1.15);
+  filter: drop-shadow(0 2px 6px rgba(2, 132, 199, 0.5));
 }
 
 .mobile-grade-btn:active {
-  transform: scale(0.9);
+  transform: scale(0.92);
 }
 
 .mobile-grade-btn img {
@@ -103,25 +105,26 @@ html, body {
 }
 
 /* ── 2. LEFT COLUMN: 4 STACKED STAGE CARDS ────────────── */
+/* مكبرة وممتدة للأسفل كما في الصورة المرفقة */
 .mobile-left-cards-column {
   position: absolute;
-  top: 4.8%;
-  left: 7.8%;
-  width: 38.5%;
-  max-width: 180px;
+  top: 5.2%;
+  left: 6.5%;
+  width: 43.5%;
+  max-width: 210px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 11px;
   z-index: 30;
 }
 
 .mobile-stage-card {
   width: 100%;
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;
-  border: 2px solid #0f2b48;
+  border: 2.2px solid #0f2b48;
   background: #ffffff;
-  box-shadow: 0 4px 10px rgba(15, 43, 72, 0.14);
+  box-shadow: 0 5px 14px rgba(15, 43, 72, 0.16);
   cursor: pointer;
   transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
 }
@@ -134,20 +137,21 @@ html, body {
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 10px;
+  border-radius: 12px;
   object-fit: cover;
 }
 
-/* ── 3. MR MINA AVATAR (RIGHT EXTENDING TO BOTTOM) ────── */
+/* ── 3. MR MINA AVATAR (RIGHT & CENTER EXTENDING TO BOTTOM) ── */
+/* مجسم كبير (Chest-up) مطابق تماماً للصورة */
 .mobile-avatar-stage {
   position: absolute;
   top: 31%;
-  right: -8%;
-  width: 82%;
-  max-width: 420px;
+  right: -5%;
+  width: 90%;
+  max-width: 460px;
   height: 69%;
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: flex-end;
   z-index: 25;
   pointer-events: none;
@@ -157,22 +161,22 @@ html, body {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: top right;
+  object-position: bottom right;
   display: block;
-  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.18));
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.2));
 }
 
 /* ── 4. BOTTOM FLOATING CHAT PILL ─────────────────────── */
 .mobile-bottom-chat-bar {
   position: absolute;
-  bottom: 24px;
+  bottom: 22px;
   left: 0;
   width: 85%;
   max-width: 410px;
-  height: 64px;
+  height: 66px;
   border-top-right-radius: 36px;
   border-bottom-right-radius: 36px;
-  background: #102a4c;
+  background: #0f274a;
   box-shadow: 0 10px 28px rgba(7, 18, 33, 0.45);
   padding: 8px 16px 8px 20px;
   display: flex;
@@ -212,7 +216,7 @@ html, body {
   height: 38px;
   border-radius: 50%;
   border: none;
-  background: #1d3f6d;
+  background: #1a3a66;
   color: #ffffff;
   display: flex;
   align-items: center;

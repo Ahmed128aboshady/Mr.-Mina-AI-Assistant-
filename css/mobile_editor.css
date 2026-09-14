@@ -10,24 +10,30 @@ body.mobile-edit-mode .mobile-app-container {
 /* Floating Studio Toggle Dock */
 #mobile-studio-dock-btn {
   position: fixed;
-  top: 12px;
-  left: 12px;
+  top: 8px;
+  left: 8px;
   z-index: 999999;
   background: linear-gradient(135deg, #0f274a, #0284c7);
   color: #ffffff;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  padding: 8px 14px;
-  border-radius: 30px;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  padding: 5px 10px;
+  border-radius: 20px;
   font-family: 'Cairo', sans-serif;
-  font-size: 0.82rem;
+  font-size: 0.72rem;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  opacity: 0.85;
   transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   backdrop-filter: blur(8px);
+}
+
+#mobile-studio-dock-btn:hover {
+  opacity: 1;
+  transform: scale(1.05);
 }
 
 #mobile-studio-dock-btn:hover {
