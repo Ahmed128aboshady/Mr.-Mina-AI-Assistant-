@@ -18,6 +18,23 @@
 
   <!-- Styles -->
   <link rel="stylesheet" href="css/style.css?v=700.0" />
+
+  <!-- 📱 Automatic Mobile Detection & Seamless Routing to Mobile Version -->
+  <script>
+    (function() {
+      var isMobileScreen = window.innerWidth <= 768;
+      var isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      var isForcedDesktop = location.search.indexOf('desktop=1') !== -1 || sessionStorage.getItem('mena_force_desktop') === '1';
+      if ((isMobileScreen || isMobileDevice) && !isForcedDesktop) {
+        window.location.replace('mobile.html' + location.search);
+      }
+    })();
+    window.addEventListener('resize', function() {
+      if (window.innerWidth <= 768 && location.search.indexOf('desktop=1') === -1 && sessionStorage.getItem('mena_force_desktop') !== '1') {
+        window.location.replace('mobile.html');
+      }
+    });
+  </script>
 </head>
 <body>
 
