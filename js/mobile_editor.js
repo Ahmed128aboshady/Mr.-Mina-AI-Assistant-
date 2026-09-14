@@ -11,15 +11,15 @@ class MobileOdooBuilder {
     this.selectedLayerId = null;
 
     this.defaultLayers = {
-      avatar: { id: 'avatar', name: 'الأفاتار (مستر مينا)', icon: '👤', selector: '.mobile-avatar-stage', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 25, opacity: 1, visible: true, locked: false },
-      logo: { id: 'logo', name: 'اللوجو واسم المنصة', icon: '🏷️', selector: '.mobile-header-top-right', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 40, opacity: 1, visible: true, locked: false },
+      avatar: { id: 'avatar', name: 'الأفاتار (مستر مينا)', icon: '👤', selector: '.mobile-avatar-stage', x: 106, y: 196, scale: 1.6, rotY: 0, zIndex: 25, opacity: 1, visible: true, locked: false },
+      logo: { id: 'logo', name: 'اللوجو واسم المنصة', icon: '🏷️', selector: '.mobile-header-top-right', x: 5, y: 32, scale: 1, rotY: 0, zIndex: 40, opacity: 1, visible: true, locked: false },
       badges: { id: 'badges', name: 'أزرار الصفوف (1, 2, 3)', icon: '🔢', selector: '.mobile-grades-row', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 41, opacity: 1, visible: true, locked: false },
       leftCards: { id: 'leftCards', name: 'عمود الكروت الأربعة', icon: '📑', selector: '.mobile-left-cards-column', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 30, opacity: 1, visible: true, locked: false },
-      stage1: { id: 'stage1', name: 'كارت المرحلة الأولى', icon: '📘', selector: '.mobile-stage-card:nth-child(1)', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 31, opacity: 1, visible: true, locked: false },
-      stage2: { id: 'stage2', name: 'كارت المرحلة الثانية', icon: '📗', selector: '.mobile-stage-card:nth-child(2)', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 31, opacity: 1, visible: true, locked: false },
-      stage3: { id: 'stage3', name: 'كارت المرحلة الثالثة', icon: '📙', selector: '.mobile-stage-card:nth-child(3)', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 31, opacity: 1, visible: true, locked: false },
-      stage4: { id: 'stage4', name: 'كارت المرحلة الرابعة', icon: '📕', selector: '.mobile-stage-card:nth-child(4)', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 31, opacity: 1, visible: true, locked: false },
-      chat: { id: 'chat', name: 'شريط الشات والمايك السفلي', icon: '💬', selector: '.mobile-bottom-chat-bar', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 50, opacity: 1, visible: true, locked: false }
+      stage1: { id: 'stage1', name: 'كارت المرحلة الأولى', icon: '📘', selector: '.mobile-stage-card:nth-child(1)', x: 0, y: 24, scale: 1, rotY: 0, zIndex: 31, opacity: 1, visible: true, locked: false },
+      stage2: { id: 'stage2', name: 'كارت المرحلة الثانية', icon: '📗', selector: '.mobile-stage-card:nth-child(2)', x: 0, y: 30, scale: 1, rotY: 0, zIndex: 31, opacity: 1, visible: true, locked: false },
+      stage3: { id: 'stage3', name: 'كارت المرحلة الثالثة', icon: '📙', selector: '.mobile-stage-card:nth-child(3)', x: 3, y: 46, scale: 1, rotY: 0, zIndex: 31, opacity: 1, visible: true, locked: false },
+      stage4: { id: 'stage4', name: 'كارت المرحلة الرابعة', icon: '📕', selector: '.mobile-stage-card:nth-child(4)', x: 1, y: 53, scale: 1, rotY: 0, zIndex: 31, opacity: 1, visible: true, locked: false },
+      chat: { id: 'chat', name: 'شريط الشات والمايك السفلي', icon: '💬', selector: '.mobile-bottom-chat-bar', x: -23, y: -17, scale: 1.25, rotY: 0, zIndex: 50, opacity: 1, visible: true, locked: false }
     };
 
     this.layers = JSON.parse(JSON.stringify(this.defaultLayers));
