@@ -11,8 +11,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
 
   <!-- Isolated Mobile Styles -->
-  <link rel="stylesheet" href="css/mobile.css?v=10.0" />
-  <link rel="stylesheet" href="css/mobile_editor.css?v=1.0" />
+  <link rel="stylesheet" href="css/mobile.css?v=11.0" />
+  <link rel="stylesheet" href="css/mobile_editor.css?v=2.0" />
   
   <!-- Three.js for 3D Lab -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -26,16 +26,16 @@
 
     <!-- ── 1. TOP RIGHT: LOGO + 1 2 3 BADGES ── -->
     <header class="mobile-header-top-right">
-      <img src="assets/logo.png" alt="الكيميائي في العلوم - أ. مينا جرجس" class="mobile-logo-img" />
+      <img src="assets/mobile/logo.png" alt="الكيميائي في العلوم - أ. مينا جرجس" class="mobile-logo-img" />
       <div class="mobile-grades-row">
-        <button class="mobile-grade-btn" onclick="MobileApp.selectGrade(1)" title="الصف الأول الإعدادي">
-          <img src="assets/1_active.png" alt="1" />
+        <button class="mobile-grade-btn active" id="mobile-grade-btn-1" onclick="MobileApp.selectGrade(1)" title="الصف الأول الإعدادي">
+          <img src="assets/mobile/badge_1.png" alt="1" />
         </button>
-        <button class="mobile-grade-btn" onclick="MobileApp.selectGrade(2)" title="الصف الثاني الإعدادي">
-          <img src="assets/2.png" alt="2" />
+        <button class="mobile-grade-btn" id="mobile-grade-btn-2" onclick="MobileApp.selectGrade(2)" title="الصف الثاني الإعدادي">
+          <img src="assets/mobile/badge_2.png" alt="2" />
         </button>
-        <button class="mobile-grade-btn" onclick="MobileApp.selectGrade(3)" title="الصف الثالث الإعدادي">
-          <img src="assets/3.png" alt="3" />
+        <button class="mobile-grade-btn" id="mobile-grade-btn-3" onclick="MobileApp.selectGrade(3)" title="الصف الثالث الإعدادي">
+          <img src="assets/mobile/badge_3.png" alt="3" />
         </button>
       </div>
     </header>
@@ -43,22 +43,22 @@
     <!-- ── 2. LEFT COLUMN: 4 STACKED STAGE CARDS ── -->
     <main class="mobile-left-cards-column">
       <div class="mobile-stage-card" onclick="MobileApp.openStage(1)" title="المرحلة الأولى">
-        <img src="assets/slides-01.png?v=9.0" alt="المرحلة الأولى" />
+        <img src="assets/mobile/card_1.png" alt="المرحلة الأولى" />
       </div>
       <div class="mobile-stage-card" onclick="MobileApp.openStage(2)" title="المرحلة الثانية">
-        <img src="assets/slides-02.png?v=9.0" alt="المرحلة الثانية" />
+        <img src="assets/mobile/card_2.png" alt="المرحلة الثانية" />
       </div>
       <div class="mobile-stage-card" onclick="MobileApp.openStage(3)" title="المرحلة الثالثة">
-        <img src="assets/slides-03.png?v=9.0" alt="المرحلة الثالثة" />
+        <img src="assets/mobile/card_3.png" alt="المرحلة الثالثة" />
       </div>
       <div class="mobile-stage-card" onclick="MobileApp.openStage(4)" title="المرحلة الرابعة">
-        <img src="assets/slides-04.png?v=9.0" alt="المرحلة الرابعة" />
+        <img src="assets/mobile/card_4.png" alt="المرحلة الرابعة" />
       </div>
     </main>
 
     <!-- ── 3. MR MINA 3D AVATAR (RIGHT EXTENDING DOWN) ── -->
     <div class="mobile-avatar-stage">
-      <img src="assets/mina.png?v=9.0" alt="مستر مينا جرجس" class="mobile-avatar-img" />
+      <img src="assets/mobile/mr_mena.png" alt="مستر مينا جرجس" class="mobile-avatar-img" />
     </div>
 
     <!-- ── 4. BOTTOM FLOATING CHAT BAR ── -->
@@ -141,7 +141,7 @@
 
   <!-- Curriculum Database & Mobile Engine -->
   <script src="js/curriculum_data.js"></script>
-  <script src="js/mobile.js?v=10.0"></script>
-  <script src="js/mobile_editor.js?v=1.0"></script>
+  <script src="js/mobile.js?v=11.0"></script>
+  <script src="js/mobile_editor.js?v=2.0"></script>
 </body>
 </html>

@@ -18,7 +18,22 @@ window.MobileApp = {
 
   selectGrade(gradeNum) {
     this.currentGrade = gradeNum;
-    alert(`تم اختيار الصف ${gradeNum === 1 ? 'الأول' : gradeNum === 2 ? 'الثاني' : 'الثالث'} الإعدادي!`);
+    for (let i = 1; i <= 3; i++) {
+      const btn = document.getElementById(`mobile-grade-btn-${i}`);
+      if (btn) {
+        if (i === gradeNum) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      }
+    }
+    const gradeNames = { 1: 'الصف الأول الإعدادي', 2: 'الصف الثاني الإعدادي', 3: 'الصف الثالث الإعدادي' };
+    const toast = document.createElement('div');
+    toast.textContent = `🎯 تم التبديل إلى: ${gradeNames[gradeNum] || ''}`;
+    toast.style.cssText = 'position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#0f274a; color:#38bdf8; border:1px solid #0284c7; padding:8px 18px; border-radius:20px; font-weight:700; font-size:0.85rem; z-index:999999; box-shadow:0 8px 20px rgba(0,0,0,0.4); pointer-events:none; transition:opacity 0.3s;';
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2000);
   },
 
   openStage(unitIndex) {
