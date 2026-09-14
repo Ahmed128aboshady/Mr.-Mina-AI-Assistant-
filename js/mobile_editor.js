@@ -19,7 +19,7 @@ class MobileOdooBuilder {
       stage2: { id: 'stage2', name: 'كارت المرحلة الثانية', icon: '📗', selector: '.mobile-stage-card:nth-child(2)', x: 0, y: 30, scale: 1, rotY: 0, zIndex: 31, opacity: 1, visible: true, locked: false },
       stage3: { id: 'stage3', name: 'كارت المرحلة الثالثة', icon: '📙', selector: '.mobile-stage-card:nth-child(3)', x: 3, y: 46, scale: 1, rotY: 0, zIndex: 31, opacity: 1, visible: true, locked: false },
       stage4: { id: 'stage4', name: 'كارت المرحلة الرابعة', icon: '📕', selector: '.mobile-stage-card:nth-child(4)', x: 1, y: 53, scale: 1, rotY: 0, zIndex: 31, opacity: 1, visible: true, locked: false },
-      chat: { id: 'chat', name: 'شريط الشات والمايك السفلي', icon: '💬', selector: '.mobile-bottom-chat-bar', x: -23, y: -17, scale: 1.25, rotY: 0, zIndex: 50, opacity: 1, visible: true, locked: false }
+      chat: { id: 'chat', name: 'شريط الشات والمايك السفلي', icon: '💬', selector: '.mobile-bottom-chat-bar', x: 0, y: -17, scale: 1.18, rotY: 0, zIndex: 50, opacity: 1, visible: true, locked: false }
     };
 
     this.layers = JSON.parse(JSON.stringify(this.defaultLayers));
@@ -40,6 +40,9 @@ class MobileOdooBuilder {
         const parsed = JSON.parse(saved);
         if (parsed.layers) {
           this.layers = Object.assign({}, this.defaultLayers, parsed.layers);
+          if (this.layers.chat && this.layers.chat.x < 0) {
+            this.layers.chat.x = 0;
+          }
         }
       }
     } catch (e) {}
