@@ -21,10 +21,11 @@ window.MobileApp = {
     for (let i = 1; i <= 3; i++) {
       const btn = document.getElementById(`mobile-grade-btn-${i}`);
       if (btn) {
-        if (i === gradeNum) {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
+        const isActive = (i === gradeNum);
+        btn.classList.toggle('active', isActive);
+        const img = btn.querySelector('img');
+        if (img) {
+          img.src = isActive ? `assets/${i}_active.png` : `assets/${i}.png`;
         }
       }
     }
