@@ -1,112 +1,27 @@
 /**
  * 📱 mobile_editor.js — Odoo Studio Visual Builder for Mobile Version
- * Completely isolated from Desktop version.
+ * Direct Click-to-Edit, On-Canvas Nudge Toolbar, and Docked Studio on PC
  */
 
 class MobileOdooBuilder {
   constructor() {
-    this.isEditMode = false;
-    this.currentTab = 'blocks';
+    this.isEditMode = true; // Always ready for click-to-edit
+    this.currentTab = 'style';
     this.selectedLayerId = null;
-    this.selectedCustomBlockId = null;
 
     this.defaultLayers = {
-      avatar: { id: 'avatar', name: 'الأفاتار (مستر مينا)', icon: '👤', selector: '.mobile-avatar-stage', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 30, opacity: 1, visible: true, locked: false },
-      logo: { id: 'logo', name: 'اللوجو واسم المنصة', icon: '🏷️', selector: '.mobile-header-top-right', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 50, opacity: 1, visible: true, locked: false },
-      badges: { id: 'badges', name: 'أزرار الصفوف (1, 2, 3)', icon: '🔢', selector: '.mobile-grades-row', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 51, opacity: 1, visible: true, locked: false },
-      leftCards: { id: 'leftCards', name: 'عمود الكروت الأربعة', icon: '📑', selector: '.mobile-left-cards-column', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 40, opacity: 1, visible: true, locked: false },
-      stage1: { id: 'stage1', name: 'كارت المرحلة الأولى', icon: '📘', selector: '.mobile-stage-card:nth-child(1)', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 41, opacity: 1, visible: true, locked: false },
-      stage2: { id: 'stage2', name: 'كارت المرحلة الثانية', icon: '📗', selector: '.mobile-stage-card:nth-child(2)', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 41, opacity: 1, visible: true, locked: false },
-      stage3: { id: 'stage3', name: 'كارت المرحلة الثالثة', icon: '📙', selector: '.mobile-stage-card:nth-child(3)', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 41, opacity: 1, visible: true, locked: false },
-      stage4: { id: 'stage4', name: 'كارت المرحلة الرابعة', icon: '📕', selector: '.mobile-stage-card:nth-child(4)', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 41, opacity: 1, visible: true, locked: false },
-      chat: { id: 'chat', name: 'شريط الشات والمايك السفلي', icon: '💬', selector: '.mobile-bottom-chat-bar', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 60, opacity: 1, visible: true, locked: false }
+      avatar: { id: 'avatar', name: 'الأفاتار (مستر مينا)', icon: '👤', selector: '.mobile-avatar-stage', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 25, opacity: 1, visible: true, locked: false },
+      logo: { id: 'logo', name: 'اللوجو واسم المنصة', icon: '🏷️', selector: '.mobile-header-top-right', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 40, opacity: 1, visible: true, locked: false },
+      badges: { id: 'badges', name: 'أزرار الصفوف (1, 2, 3)', icon: '🔢', selector: '.mobile-grades-row', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 41, opacity: 1, visible: true, locked: false },
+      leftCards: { id: 'leftCards', name: 'عمود الكروت الأربعة', icon: '📑', selector: '.mobile-left-cards-column', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 30, opacity: 1, visible: true, locked: false },
+      stage1: { id: 'stage1', name: 'كارت المرحلة الأولى', icon: '📘', selector: '.mobile-stage-card:nth-child(1)', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 31, opacity: 1, visible: true, locked: false },
+      stage2: { id: 'stage2', name: 'كارت المرحلة الثانية', icon: '📗', selector: '.mobile-stage-card:nth-child(2)', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 31, opacity: 1, visible: true, locked: false },
+      stage3: { id: 'stage3', name: 'كارت المرحلة الثالثة', icon: '📙', selector: '.mobile-stage-card:nth-child(3)', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 31, opacity: 1, visible: true, locked: false },
+      stage4: { id: 'stage4', name: 'كارت المرحلة الرابعة', icon: '📕', selector: '.mobile-stage-card:nth-child(4)', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 31, opacity: 1, visible: true, locked: false },
+      chat: { id: 'chat', name: 'شريط الشات والمايك السفلي', icon: '💬', selector: '.mobile-bottom-chat-bar', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 50, opacity: 1, visible: true, locked: false }
     };
 
     this.layers = JSON.parse(JSON.stringify(this.defaultLayers));
-
-    this.snippets = {
-      banner: {
-        name: 'Announcement Banner',
-        icon: '📢',
-        html: `
-          <div class="mobile-snippet-wrap" style="background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; padding: 12px 16px; border-radius: 14px; margin: 8px 12px; box-shadow: 0 4px 14px rgba(2,132,199,0.3); direction: rtl;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-size: 1.5rem;">📢</span>
-              <div>
-                <h4 contenteditable="true" style="margin: 0; font-size: 0.95rem; font-weight: 800;">تنبيه هام لطلاب الموبايل:</h4>
-                <p contenteditable="true" style="margin: 2px 0 0; font-size: 0.8rem; opacity: 0.95;">حصة المراجعة الشاملة لعلوم أولى إعدادي يوم الجمعة 6 مساءً!</p>
-              </div>
-            </div>
-          </div>
-        `
-      },
-      social: {
-        name: 'WhatsApp & Social',
-        icon: '💬',
-        html: `
-          <div class="mobile-snippet-wrap" style="background: #ffffff; border: 1.5px solid #e2e8f0; padding: 10px 14px; border-radius: 14px; margin: 8px 12px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.05); direction: rtl;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-size: 1.4rem; color: #16a34a;">💬</span>
-              <span contenteditable="true" style="font-weight: 700; color: #0f2b48; font-size: 0.82rem;">تواصل مع مستر مينا:</span>
-            </div>
-            <a href="https://wa.me/" target="_blank" style="background: #25d366; color: #fff; text-decoration: none; padding: 5px 12px; border-radius: 16px; font-weight: 700; font-size: 0.78rem;">
-              واتساب 📱
-            </a>
-          </div>
-        `
-      },
-      video: {
-        name: 'YouTube Video',
-        icon: '🎬',
-        html: `
-          <div class="mobile-snippet-wrap" style="background: #ffffff; border: 1.5px solid #e2e8f0; padding: 12px; border-radius: 16px; margin: 8px 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.05); direction: rtl;">
-            <h4 contenteditable="true" style="margin: 0 0 8px 0; font-size: 0.9rem; color: #0f2b48; font-weight: 800;">🎬 فيديو شرح تركيب المادة</h4>
-            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; background: #000;">
-              <iframe style="position: absolute; top:0; left: 0; width: 100%; height: 100%; border: none;" src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
-            </div>
-          </div>
-        `
-      },
-      features: {
-        name: '3 Columns Features',
-        icon: '📑',
-        html: `
-          <div class="mobile-snippet-wrap" style="display: flex; flex-direction: column; gap: 8px; margin: 8px 12px; direction: rtl;">
-            <div style="background: #fff; border: 1px solid #e2e8f0; padding: 10px; border-radius: 12px; text-align: center;">
-              <div style="font-size: 1.5rem;">🔬</div>
-              <h5 contenteditable="true" style="margin: 2px 0; color: #0284c7; font-weight: 800;">معمل تفاعلي 3D</h5>
-              <p contenteditable="true" style="margin: 0; font-size: 0.75rem; color: #64748b;">تجارب ومجسمات ثلاثية الأبعاد لشرح المنهج</p>
-            </div>
-          </div>
-        `
-      },
-      quote: {
-        name: 'Science Tip / Quote',
-        icon: '💡',
-        html: `
-          <div class="mobile-snippet-wrap" style="background: #fefce8; border: 1.5px solid #fef08a; padding: 12px 14px; border-radius: 14px; margin: 8px 12px; display: flex; align-items: center; gap: 10px; direction: rtl;">
-            <span style="font-size: 1.5rem;">💡</span>
-            <div>
-              <h5 contenteditable="true" style="margin: 0; color: #854d0e; font-weight: 800; font-size: 0.85rem;">سر كيميائي من مستر مينا:</h5>
-              <p contenteditable="true" style="margin: 2px 0 0; color: #713f12; font-size: 0.78rem;">الذرة متعادلة كهربياً لأن البروتونات الموجبة = الإلكترونات السالبة!</p>
-            </div>
-          </div>
-        `
-      },
-      faq: {
-        name: 'FAQ Accordion',
-        icon: '❓',
-        html: `
-          <div class="mobile-snippet-wrap" style="background: #ffffff; border: 1.5px solid #e2e8f0; padding: 12px; border-radius: 14px; margin: 8px 12px; direction: rtl;">
-            <h5 contenteditable="true" style="margin: 0 0 8px 0; font-size: 0.9rem; color: #0f2b48; font-weight: 800;">❓ الأسئلة الشائعة:</h5>
-            <details style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px; border-radius: 8px;">
-              <summary contenteditable="true" style="font-weight: 700; color: #0284c7; font-size: 0.82rem; cursor: pointer;">كيف أشاهد المعمل الـ 3D؟</summary>
-              <p contenteditable="true" style="margin: 4px 0 0; font-size: 0.75rem; color: #475569;">اضغط على أي مرحلة ثم اختر الدرس واستمتع بالتجربة!</p>
-            </details>
-          </div>
-        `
-      }
-    };
 
     this.dragCandidate = null;
     this.isDragging = false;
@@ -143,7 +58,15 @@ class MobileOdooBuilder {
     this.applyAllLayers();
     this.createStudioDockBtn();
     this.createSidebarUI();
+    this.createCanvasQuickToolbar();
     this.bindCanvasTouchEvents();
+
+    // Auto dock on desktop screens
+    if (window.innerWidth >= 800) {
+      document.body.classList.add('desktop-studio-view');
+      const sidebar = document.getElementById('mobile-studio-sidebar');
+      if (sidebar) sidebar.classList.add('open');
+    }
   }
 
   applyAllLayers() {
@@ -162,11 +85,17 @@ class MobileOdooBuilder {
       el.style.display = '';
     }
 
+    const tx = layer.x || 0;
+    const ty = layer.y || 0;
+    const scale = layer.scale !== undefined ? layer.scale : 1;
+    const rot = layer.rotY || 0;
+
     if (tx !== 0 || ty !== 0 || scale !== 1 || rot !== 0) {
       el.style.transform = `translate3d(${tx}px, ${ty}px, 0px) scale(${scale}) rotate(${rot}deg)`;
     } else {
       el.style.transform = '';
     }
+
     if (layer.zIndex !== undefined && layer.zIndex !== null) el.style.zIndex = layer.zIndex;
     if (layer.opacity !== undefined && layer.opacity !== 1) el.style.opacity = layer.opacity;
     el.style.transition = this.isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)';
@@ -176,9 +105,50 @@ class MobileOdooBuilder {
     if (document.getElementById('mobile-studio-dock-btn')) return;
     const btn = document.createElement('button');
     btn.id = 'mobile-studio-dock-btn';
-    btn.innerHTML = `⚙️ <span>تعديل الموبايل (Odoo)</span>`;
+    btn.innerHTML = `⚙️ <span>استوديو التعديل</span>`;
     btn.onclick = () => this.toggleEditMode();
     document.body.appendChild(btn);
+  }
+
+  createCanvasQuickToolbar() {
+    if (document.getElementById('mobile-canvas-quick-toolbar')) return;
+    const container = document.querySelector('.mobile-app-container') || document.body;
+    const bar = document.createElement('div');
+    bar.id = 'mobile-canvas-quick-toolbar';
+
+    bar.innerHTML = `
+      <span class="quick-tool-title" id="quick-toolbar-label">عنصر محدد</span>
+      <button class="quick-tool-btn" onclick="window.mobileBuilder.nudgeSelected(0, -6)" title="أعلى">⬆️</button>
+      <button class="quick-tool-btn" onclick="window.mobileBuilder.nudgeSelected(0, 6)" title="أسفل">⬇️</button>
+      <button class="quick-tool-btn" onclick="window.mobileBuilder.nudgeSelected(-6, 0)" title="يسار">⬅️</button>
+      <button class="quick-tool-btn" onclick="window.mobileBuilder.nudgeSelected(6, 0)" title="يمين">➡️</button>
+      <button class="quick-tool-btn" onclick="window.mobileBuilder.scaleSelected(0.05)" title="تكبير">➕</button>
+      <button class="quick-tool-btn" onclick="window.mobileBuilder.scaleSelected(-0.05)" title="تصغير">➖</button>
+      <button class="quick-tool-btn" onclick="window.mobileBuilder.resetLayer(window.mobileBuilder.selectedLayerId)" title="استعادة">🔄</button>
+      <button class="quick-tool-btn btn-save-quick" onclick="window.mobileBuilder.saveAndToast()" title="حفظ">💾</button>
+      <button class="quick-tool-btn" onclick="window.mobileBuilder.deselectAll()" title="إلغاء">✕</button>
+    `;
+
+    container.appendChild(bar);
+  }
+
+  nudgeSelected(dx, dy) {
+    if (!this.selectedLayerId || !this.layers[this.selectedLayerId]) return;
+    const layer = this.layers[this.selectedLayerId];
+    layer.x = (layer.x || 0) + dx;
+    layer.y = (layer.y || 0) + dy;
+    this.applyLayerTransform(this.selectedLayerId);
+    if (this.currentTab === 'style') this.renderStylePanel(this.selectedLayerId);
+    this.autoSaveLayout();
+  }
+
+  scaleSelected(dScale) {
+    if (!this.selectedLayerId || !this.layers[this.selectedLayerId]) return;
+    const layer = this.layers[this.selectedLayerId];
+    layer.scale = Math.max(0.3, Math.min(2.5, Math.round(((layer.scale || 1) + dScale) * 100) / 100));
+    this.applyLayerTransform(this.selectedLayerId);
+    if (this.currentTab === 'style') this.renderStylePanel(this.selectedLayerId);
+    this.autoSaveLayout();
   }
 
   createSidebarUI() {
@@ -200,11 +170,11 @@ class MobileOdooBuilder {
 
       <!-- TABS -->
       <div class="mobile-sidebar-tabs">
-        <div class="mobile-sidebar-tab active" id="tab-btn-blocks" onclick="window.mobileBuilder.switchTab('blocks')">
-          ▦ Blocks
-        </div>
-        <div class="mobile-sidebar-tab" id="tab-btn-style" onclick="window.mobileBuilder.switchTab('style')">
+        <div class="mobile-sidebar-tab active" id="tab-btn-style" onclick="window.mobileBuilder.switchTab('style')">
           🖌️ Style
+        </div>
+        <div class="mobile-sidebar-tab" id="tab-btn-blocks" onclick="window.mobileBuilder.switchTab('blocks')">
+          ▦ Layers
         </div>
         <div class="mobile-sidebar-tab" id="tab-btn-theme" onclick="window.mobileBuilder.switchTab('theme')">
           ⚙️ Theme
@@ -214,56 +184,20 @@ class MobileOdooBuilder {
       <!-- TAB CONTENT PANELS -->
       <div class="mobile-sidebar-content">
         
-        <!-- ── TAB 1: BLOCKS ── -->
-        <div class="mobile-tab-panel active" id="panel-blocks">
-          
-          <div class="studio-sec-title">🧩 DRAGGABLE BUILDING BLOCKS</div>
-          <div class="mobile-snippets-grid">
-            <div class="mobile-snippet-card" onclick="window.mobileBuilder.insertSnippet('banner')">
-              <span class="snippet-icon">📢</span>
-              <span class="snippet-name">Announcement</span>
-              <span class="snippet-badge">Add +</span>
-            </div>
-            <div class="mobile-snippet-card" onclick="window.mobileBuilder.insertSnippet('social')">
-              <span class="snippet-icon">💬</span>
-              <span class="snippet-name">WhatsApp & Social</span>
-              <span class="snippet-badge">Add +</span>
-            </div>
-            <div class="mobile-snippet-card" onclick="window.mobileBuilder.insertSnippet('video')">
-              <span class="snippet-icon">🎬</span>
-              <span class="snippet-name">YouTube Video</span>
-              <span class="snippet-badge">Add +</span>
-            </div>
-            <div class="mobile-snippet-card" onclick="window.mobileBuilder.insertSnippet('features')">
-              <span class="snippet-icon">📑</span>
-              <span class="snippet-name">3 Columns</span>
-              <span class="snippet-badge">Add +</span>
-            </div>
-            <div class="mobile-snippet-card" onclick="window.mobileBuilder.insertSnippet('quote')">
-              <span class="snippet-icon">💡</span>
-              <span class="snippet-name">Science Tip</span>
-              <span class="snippet-badge">Add +</span>
-            </div>
-            <div class="mobile-snippet-card" onclick="window.mobileBuilder.insertSnippet('faq')">
-              <span class="snippet-icon">❓</span>
-              <span class="snippet-name">FAQ Accordion</span>
-              <span class="snippet-badge">Add +</span>
+        <!-- ── TAB 1: STYLE ── -->
+        <div class="mobile-tab-panel active" id="panel-style">
+          <div id="style-controls-dynamic">
+            <div style="text-align: center; color: #94a3b8; padding: 40px 10px;">
+              👈 اضغط على أي عنصر في شاشة الموبايل (مستر مينا، الكروت، اللوجو) لتحريكه وتعديله فوراً!
             </div>
           </div>
+        </div>
 
+        <!-- ── TAB 2: BLOCKS & LAYERS ── -->
+        <div class="mobile-tab-panel" id="panel-blocks">
           <div class="studio-sec-title">📁 LAYERS MANAGEMENT (طبقات الصفحة)</div>
           <div class="mobile-layers-list" id="mobile-layers-tree">
             <!-- Rendered Dynamically -->
-          </div>
-
-        </div>
-
-        <!-- ── TAB 2: STYLE ── -->
-        <div class="mobile-tab-panel" id="panel-style">
-          <div id="style-controls-dynamic">
-            <div style="text-align: center; color: #94a3b8; padding: 40px 10px;">
-              👈 اضغط على أي عنصر في الصفحة أو اختره من قائمة الطبقات لتعديل أبعاده وموضعه!
-            </div>
           </div>
         </div>
 
@@ -275,7 +209,6 @@ class MobileOdooBuilder {
             <div class="studio-control-label">لون شبكة الخلفية</div>
             <button class="mobile-studio-btn" style="width: 100%; margin-bottom: 8px;" onclick="document.body.style.background = '#f8fafc'">⚪ خلفية دفتر شبكي فاتح (الافتراضي)</button>
             <button class="mobile-studio-btn" style="width: 100%; margin-bottom: 8px;" onclick="document.body.style.background = '#0b132b'">🌙 خلفية ليلية Dark Mode</button>
-            <button class="mobile-studio-btn" style="width: 100%;" onclick="document.body.style.background = '#f0fdf4'">🌿 خلفية خضراء علمية</button>
           </div>
 
           <div class="studio-control-group">
@@ -321,19 +254,15 @@ class MobileOdooBuilder {
   }
 
   toggleEditMode(forceState) {
-    this.isEditMode = forceState !== undefined ? forceState : !this.isEditMode;
     const sidebar = document.getElementById('mobile-studio-sidebar');
-    const dock = document.getElementById('mobile-studio-dock-btn');
+    const isCurrentlyOpen = sidebar && sidebar.classList.contains('open');
+    const shouldOpen = forceState !== undefined ? forceState : !isCurrentlyOpen;
 
-    if (this.isEditMode) {
-      document.body.classList.add('mobile-edit-mode');
+    if (shouldOpen) {
       sidebar?.classList.add('open');
-      if (dock) dock.innerHTML = `✖ <span>إغلاق الاستوديو</span>`;
-      this.showToast('🎨 تم تفعيل وضع التعديل (Odoo Studio) للموبايل');
+      this.showToast('🎨 تم فتح لوحة استوديو التعديل');
     } else {
-      document.body.classList.remove('mobile-edit-mode');
       sidebar?.classList.remove('open');
-      if (dock) dock.innerHTML = `⚙️ <span>تعديل الموبايل (Odoo)</span>`;
       this.deselectAll();
     }
   }
@@ -363,15 +292,24 @@ class MobileOdooBuilder {
       if (el) {
         el.classList.add('mobile-selected-highlight');
       }
+
+      // Show quick toolbar
+      const qBar = document.getElementById('mobile-canvas-quick-toolbar');
+      const qLabel = document.getElementById('quick-toolbar-label');
+      if (qBar && qLabel) {
+        qLabel.textContent = `${layer.icon} ${layer.name}`;
+        qBar.classList.add('active');
+      }
     }
 
-    this.switchTab('style');
     this.renderStylePanel(key);
   }
 
   deselectAll() {
     this.selectedLayerId = null;
     document.querySelectorAll('.mobile-selected-highlight').forEach(el => el.classList.remove('mobile-selected-highlight'));
+    const qBar = document.getElementById('mobile-canvas-quick-toolbar');
+    if (qBar) qBar.classList.remove('active');
     this.renderLayersTree();
   }
 
@@ -386,6 +324,21 @@ class MobileOdooBuilder {
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
         <h4 style="margin: 0; color: #38bdf8; font-size: 0.95rem;">${layer.icon} ${layer.name}</h4>
         <button class="mobile-studio-btn btn-discard" onclick="window.mobileBuilder.resetLayer('${key}')">🔄 استعادة</button>
+      </div>
+
+      <!-- Quick Nudge Arrow Pad -->
+      <div class="studio-control-group" style="text-align: center;">
+        <div class="studio-control-label" style="justify-content: center; margin-bottom: 10px;">
+          <span>🎯 تحريك دقيق بالأسهم</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+          <button class="mobile-studio-btn" onclick="window.mobileBuilder.nudgeSelected(0, -8)" style="padding: 6px 18px;">⬆️ أعلى</button>
+          <div style="display: flex; gap: 10px;">
+            <button class="mobile-studio-btn" onclick="window.mobileBuilder.nudgeSelected(-8, 0)" style="padding: 6px 14px;">⬅️ يسار</button>
+            <button class="mobile-studio-btn" onclick="window.mobileBuilder.nudgeSelected(8, 0)" style="padding: 6px 14px;">➡️ يمين</button>
+          </div>
+          <button class="mobile-studio-btn" onclick="window.mobileBuilder.nudgeSelected(0, 8)" style="padding: 6px 18px;">⬇️ أسفل</button>
+        </div>
       </div>
 
       <!-- X Position -->
@@ -414,7 +367,7 @@ class MobileOdooBuilder {
           <span>الحجم والتكبير (Scale)</span>
           <span class="studio-control-value" id="val-scale">${layer.scale || 1}x</span>
         </div>
-        <input type="range" class="studio-slider" min="0.3" max="2.2" step="0.05" value="${layer.scale || 1}"
+        <input type="range" class="studio-slider" min="0.3" max="2.4" step="0.05" value="${layer.scale || 1}"
           oninput="window.mobileBuilder.updateLayerProp('${key}', 'scale', parseFloat(this.value)); document.getElementById('val-scale').textContent = this.value + 'x'" />
       </div>
 
@@ -475,7 +428,7 @@ class MobileOdooBuilder {
     if (this.defaultLayers[key]) {
       this.layers[key] = JSON.parse(JSON.stringify(this.defaultLayers[key]));
       this.applyLayerTransform(key);
-      this.renderStylePanel(key);
+      if (this.currentTab === 'style') this.renderStylePanel(key);
       this.autoSaveLayout();
       this.showToast(`🔄 تم استعادة ${this.layers[key].name}`);
     }
@@ -490,30 +443,6 @@ class MobileOdooBuilder {
       this.autoSaveLayout();
       this.showToast('🔄 تم استعادة التوزيع الافتراضي بنجاح!');
     }
-  }
-
-  insertSnippet(type) {
-    const snippet = this.snippets[type];
-    if (!snippet) return;
-
-    let container = document.getElementById('mobile-custom-blocks-container');
-    if (!container) {
-      container = document.createElement('div');
-      container.id = 'mobile-custom-blocks-container';
-      const mainApp = document.querySelector('.mobile-app-container');
-      if (mainApp) {
-        mainApp.appendChild(container);
-      } else {
-        document.body.appendChild(container);
-      }
-    }
-
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = snippet.html.trim();
-    const blockEl = wrapper.firstElementChild;
-    container.appendChild(blockEl);
-
-    this.showToast(`➕ تم إضافة بلوك: ${snippet.name}`);
   }
 
   saveAndToast() {
@@ -539,7 +468,11 @@ class MobileOdooBuilder {
 
   bindCanvasTouchEvents() {
     const handleStart = (e) => {
-      if (!this.isEditMode) return;
+      // Don't intercept clicks inside drawers, toolbars, or headers
+      if (e.target.closest('#mobile-canvas-quick-toolbar, #mobile-studio-sidebar, #mobile-studio-dock-btn, .desktop-switch-banner')) {
+        return;
+      }
+
       const target = e.target.closest(
         '.mobile-header-top-right, .mobile-grades-row, .mobile-left-cards-column, .mobile-stage-card, .mobile-avatar-stage, .mobile-bottom-chat-bar'
       );
