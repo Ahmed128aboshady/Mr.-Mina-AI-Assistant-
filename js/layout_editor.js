@@ -1476,14 +1476,15 @@ class OdooWebsiteBuilder {
       `;
 
       overlay.innerHTML = `
-        <div style="display: flex; align-items: center; justify-content: space-between; width: 390px; max-width: 92vw; margin-bottom: 12px; color: #f8fafc;">
-          <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.95rem; color: #38bdf8;">
-            <span>📱</span> <span>معاينة نسخة الموبايل (Odoo Mobile)</span>
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 440px; max-width: 95vw; margin-bottom: 12px; color: #f8fafc; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.92rem; color: #38bdf8;">
+            <span>📱</span> <span>معاينة الموبايل</span>
           </div>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <button onclick="window.odooBuilder.reloadMobileFrame()" style="background: #1e293b; color: #cbd5e1; border: 1px solid #334155; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 0.82rem; font-weight: 700;">🔄 تحديث</button>
-            <a href="mobile.html" target="_blank" style="background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; text-decoration: none; padding: 6px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(2,132,199,0.5);">🎨 فتح استوديو تعديل الموبايل (كامل الشاشة)</a>
-            <button onclick="window.odooBuilder.toggleMobilePreview(false)" style="background: #ef4444; color: #fff; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 0.85rem;">✕ إغلاق</button>
+          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+            <button onclick="window.odooBuilder.copyMobileCode()" style="background: linear-gradient(135deg, #059669, #10b981); color: #fff; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 0.82rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(16,185,129,0.35);">📋 نسخ الكود</button>
+            <button onclick="window.odooBuilder.reloadMobileFrame()" style="background: #1e293b; color: #cbd5e1; border: 1px solid #334155; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 0.82rem; font-weight: 700;">🔄 تحديث</button>
+            <a href="mobile.html" target="_blank" style="background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 4px 14px rgba(2,132,199,0.5);">🎨 كامل الشاشة</a>
+            <button onclick="window.odooBuilder.toggleMobilePreview(false)" style="background: #ef4444; color: #fff; border: none; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 0.82rem;">✕ إغلاق</button>
           </div>
         </div>
 
@@ -1518,6 +1519,16 @@ class OdooWebsiteBuilder {
     if (iframe) {
       iframe.src = 'mobile.html?v=' + Date.now();
       this.showToast('🔄 تم تحديث معاينة الموبايل');
+    }
+  }
+
+  copyMobileCode() {
+    const iframe = document.getElementById('odoo-mobile-iframe');
+    if (iframe && iframe.contentWindow && iframe.contentWindow.mobileBuilder) {
+      iframe.contentWindow.mobileBuilder.copyLayoutCode();
+      this.showToast('📋 تم فتح نافذة نسخ كود الموبايل بنجاح!');
+    } else {
+      this.showToast('⚠️ يرجى الضغط على زر التحديث أولاً');
     }
   }
 

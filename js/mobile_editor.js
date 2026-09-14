@@ -1,6 +1,7 @@
 /**
  * 📱 mobile_editor.js — Odoo Studio Visual Builder for Mobile Version
- * Direct Click-to-Edit, On-Canvas Floating Quick Toolbar, Non-covering Bottom Sheet
+ * Direct Click-to-Edit, On-Canvas Floating Quick Toolbar, Non-covering Bottom Sheet,
+ * and 1-Click Code Copy Modal for AI Assistant.
  */
 
 class MobileOdooBuilder {
@@ -58,8 +59,10 @@ class MobileOdooBuilder {
     this.loadSavedLayout();
     this.applyAllLayers();
     this.createStudioDockBtn();
+    this.createCopyTopBtn();
     this.createSidebarUI();
     this.createCanvasQuickToolbar();
+    this.createCopyCodeModal();
     this.bindCanvasTouchEvents();
 
     const isInsideIframe = window.self !== window.top;
@@ -115,6 +118,16 @@ class MobileOdooBuilder {
     document.body.appendChild(btn);
   }
 
+  createCopyTopBtn() {
+    if (document.getElementById('mobile-copy-top-btn')) return;
+    const btn = document.createElement('button');
+    btn.id = 'mobile-copy-top-btn';
+    btn.innerHTML = `📋 <span>نسخ الكود للشات</span>`;
+    btn.title = "انسخ كود التعديلات لتقديمه في الشات للذكاء الاصطناعي";
+    btn.onclick = () => this.copyLayoutCode();
+    document.body.appendChild(btn);
+  }
+
   createCanvasQuickToolbar() {
     if (document.getElementById('mobile-canvas-quick-toolbar')) return;
     const container = document.querySelector('.mobile-app-container') || document.body;
@@ -131,6 +144,7 @@ class MobileOdooBuilder {
       <button class="quick-tool-btn" onclick="window.mobileBuilder.scaleSelected(-0.05)" title="تصغير">➖</button>
       <button class="quick-tool-btn" onclick="window.mobileBuilder.resetLayer(window.mobileBuilder.selectedLayerId)" title="استعادة">🔄</button>
       <button class="quick-tool-btn btn-more-props" onclick="window.mobileBuilder.openSidebarForSelected()" title="تفاصيل وتحكم أكبر">⚙️ تفاصيل</button>
+      <button class="quick-tool-btn btn-copy-quick" onclick="window.mobileBuilder.copyLayoutCode()" title="نسخ الكود لتقديمه في الشات">📋 نسخ الكود</button>
       <button class="quick-tool-btn btn-save-quick" onclick="window.mobileBuilder.saveAndToast()" title="حفظ">💾 حفظ</button>
       <button class="quick-tool-btn" onclick="window.mobileBuilder.deselectAll()" title="إلغاء التحديد">✕</button>
     `;
@@ -171,8 +185,8 @@ class MobileOdooBuilder {
       <div class="mobile-sidebar-top-bar">
         <div class="sidebar-action-group">
           <button class="mobile-studio-btn btn-save" onclick="window.mobileBuilder.saveAndToast()">💾 حفظ</button>
+          <button class="mobile-studio-btn btn-copy" onclick="window.mobileBuilder.copyLayoutCode()" title="نسخ كود التعديلات">📋 نسخ الكود</button>
           <button class="mobile-studio-btn btn-discard" onclick="window.mobileBuilder.discardChanges()">✖ إلغاء</button>
-          <button class="mobile-studio-btn btn-copy" onclick="window.mobileBuilder.copyLayoutCode()">📋 نسخ الكود</button>
         </div>
         <button class="mobile-studio-btn btn-close" onclick="window.mobileBuilder.toggleSidebar(false)">✕ تصغير</button>
       </div>
@@ -465,7 +479,7 @@ class MobileOdooBuilder {
 
   saveAndToast() {
     this.autoSaveLayout();
-    this.showToast('💾 تم حفظ التعديلات في الذاكرة بنجاح!');
+    this.showToast('💾 تم حفظ التعديلات بنجاح!');
   }
 
   discardChanges() {
@@ -475,19 +489,135 @@ class MobileOdooBuilder {
     this.showToast('✖ تم إلغاء التغييرات غير المحفوظة');
   }
 
-  copyLayoutCode() {
-    const jsonStr = JSON.stringify(this.layers, null, 2);
-    navigator.clipboard.writeText(jsonStr).then(() => {
-      this.showToast('📋 تم نسخ كود التخطيط إلى الحافظة!');
-    }).catch(() => {
-      prompt('انسخ كود التخطيط:', jsonStr);
+  /* ── 4. POPUP CODE MODAL AND COPY METHODS ── */
+  createCopyCodeModal() {
+    if (document.getElementById('mobile-copy-code-modal')) return;
+
+    const modal = document.createElement('div');
+    modal.id = 'mobile-copy-code-modal';
+    modal.className = 'mobile-modal-overlay';
+    modal.onclick = (e) => {
+      if (e.target === modal) this.closeCopyModal();
+    };
+
+    modal.innerHTML = `
+      <div class="mobile-modal-card" onclick="event.stopPropagation()">
+        <div class="mobile-modal-header">
+          <div class="mobile-modal-title">📋 كود التعديلات (جاهز للإرسال في الشات)</div>
+          <button class="mobile-modal-close" onclick="window.mobileBuilder.closeCopyModal()">✕</button>
+        </div>
+        <div class="mobile-modal-body">
+          <p class="mobile-modal-desc">
+            اضغط على الزر الأخضر أدناه لنسخ الكود بالكامل، ثم الصقه في الشات للذكاء الاصطناعي ليتم تثبيته في كود المشروع نهائياً:
+          </p>
+          <textarea id="mobile-copy-code-textarea" class="mobile-modal-textarea" readonly></textarea>
+          <div class="mobile-modal-actions">
+            <button class="modal-action-btn btn-copy-now" id="btn-modal-copy-action" onclick="window.mobileBuilder.executeCopyFromModal()">
+              📋 نسخ الكود بنقرة واحدة
+            </button>
+            <button class="modal-action-btn btn-close-modal" onclick="window.mobileBuilder.closeCopyModal()">
+              إغلاق
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+  }
+
+  generateExportCode() {
+    const summary = {
+      description: "Mena Mobile Version - Custom Layout Coordinates",
+      timestamp: new Date().toLocaleString('ar-EG'),
+      coordinates: {}
+    };
+
+    Object.keys(this.layers).forEach(key => {
+      const l = this.layers[key];
+      summary.coordinates[key] = {
+        name: l.name,
+        x: l.x || 0,
+        y: l.y || 0,
+        scale: l.scale !== undefined ? l.scale : 1,
+        rotation: l.rotY || 0,
+        zIndex: l.zIndex || 10,
+        opacity: l.opacity !== undefined ? l.opacity : 1
+      };
     });
+
+    return JSON.stringify(summary, null, 2);
+  }
+
+  copyLayoutCode() {
+    const code = this.generateExportCode();
+    const modal = document.getElementById('mobile-copy-code-modal');
+    const textarea = document.getElementById('mobile-copy-code-textarea');
+
+    if (textarea) {
+      textarea.value = code;
+    }
+
+    if (modal) {
+      modal.classList.add('active');
+      setTimeout(() => {
+        if (textarea) {
+          textarea.focus();
+          textarea.select();
+        }
+      }, 100);
+    }
+
+    // Try automatic copy to clipboard
+    try {
+      navigator.clipboard.writeText(code).then(() => {
+        this.showToast('📋 تم نسخ الكود للحافظة وفتح النافذة!');
+      }).catch(() => {
+        this.showToast('📋 تم فتح كود التخطيط للنسخ');
+      });
+    } catch (e) {
+      this.showToast('📋 تم فتح كود التخطيط للنسخ');
+    }
+  }
+
+  executeCopyFromModal() {
+    const textarea = document.getElementById('mobile-copy-code-textarea');
+    const btn = document.getElementById('btn-modal-copy-action');
+    if (!textarea) return;
+
+    textarea.focus();
+    textarea.select();
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(textarea.value);
+      } else {
+        document.execCommand('copy');
+      }
+      if (btn) {
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '✅ تم النسخ بنجاح!';
+        btn.style.background = '#059669';
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.style.background = '';
+        }, 2200);
+      }
+      this.showToast('✅ تم نسخ الكود إلى الحافظة بنجاح!');
+    } catch (err) {
+      prompt('حدد الكود وانسخه يدوياً:', textarea.value);
+    }
+  }
+
+  closeCopyModal() {
+    const modal = document.getElementById('mobile-copy-code-modal');
+    if (modal) modal.classList.remove('active');
   }
 
   bindCanvasTouchEvents() {
     const handleStart = (e) => {
-      // Don't intercept clicks inside drawers, toolbars, or headers
-      if (e.target.closest('#mobile-canvas-quick-toolbar, #mobile-studio-sidebar, #mobile-studio-dock-btn, .desktop-switch-banner')) {
+      // Don't intercept clicks inside drawers, toolbars, modals, or headers
+      if (e.target.closest('#mobile-canvas-quick-toolbar, #mobile-studio-sidebar, #mobile-studio-dock-btn, #mobile-copy-top-btn, #mobile-copy-code-modal, .desktop-switch-banner')) {
         return;
       }
 
@@ -496,7 +626,6 @@ class MobileOdooBuilder {
       let matchedKey = null;
 
       if (stageCard) {
-        // Find which stage card index
         const cards = Array.from(document.querySelectorAll('.mobile-stage-card'));
         const idx = cards.indexOf(stageCard) + 1;
         matchedKey = 'stage' + idx;
