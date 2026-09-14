@@ -144,19 +144,21 @@ html, body {
   object-fit: cover;
 }
 
-/* ── 3. MR MINA AVATAR ────────────────────────────────── */
+/* ── 3. MR MINA AVATAR (RIGHT & CENTER EXTENDING TO BOTTOM) ── */
+/* الرأس يبدأ مباشرة تحت أزرار الصفوف، واليد تشير أسفل الكارت الرابع */
 .mobile-avatar-stage {
   position: absolute;
-  top: clamp(210px, 26vh, 260px);
-  right: -14%;
-  width: 108%;
-  max-width: 520px;
-  height: 74%;
+  top: 26.5%;
+  right: -7%;
+  width: 95%;
+  max-width: 480px;
+  height: 73.5%;
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
   z-index: 25;
   pointer-events: none;
+  transform: translate3d(106px, 196px, 0px) scale(1.6);
 }
 
 .mobile-avatar-img {
