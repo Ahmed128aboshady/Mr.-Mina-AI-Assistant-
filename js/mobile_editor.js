@@ -63,10 +63,9 @@ class MobileOdooBuilder {
   }
 
   init() {
-    this.loadSavedLayout();
-    this.applyAllLayers();
-
     if (this.isEditMode) {
+      this.loadSavedLayout();
+      this.applyAllLayers();
       this.createStudioDockBtn();
       this.createCopyTopBtn();
       this.createSidebarUI();

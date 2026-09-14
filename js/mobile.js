@@ -13,7 +13,16 @@ window.MobileApp = {
   current3DGroup: null,
 
   init() {
+    this.updateAppHeight();
+    window.addEventListener('resize', () => this.updateAppHeight());
+    window.addEventListener('orientationchange', () => this.updateAppHeight());
     console.log("Mobile App Engine Initialized!");
+  },
+
+  updateAppHeight() {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+    document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
   },
 
   selectGrade(gradeNum) {
