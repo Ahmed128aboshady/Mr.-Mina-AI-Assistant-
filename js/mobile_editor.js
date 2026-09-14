@@ -1,11 +1,11 @@
 /**
  * 📱 mobile_editor.js — Odoo Studio Visual Builder for Mobile Version
- * Direct Click-to-Edit, On-Canvas Nudge Toolbar, and Docked Studio on PC
+ * Direct Click-to-Edit, On-Canvas Floating Quick Toolbar, Non-covering Bottom Sheet
  */
 
 class MobileOdooBuilder {
   constructor() {
-    this.isEditMode = true; // Always ready for click-to-edit
+    this.isEditMode = true; // Default: edit mode is active
     this.currentTab = 'style';
     this.selectedLayerId = null;
 
@@ -27,6 +27,7 @@ class MobileOdooBuilder {
     this.isDragging = false;
     this.dragStart = { x: 0, y: 0 };
     this.initialPos = { x: 0, y: 0 };
+    this.hasMovedSignificantly = false;
 
     this.init();
   }
@@ -61,8 +62,11 @@ class MobileOdooBuilder {
     this.createCanvasQuickToolbar();
     this.bindCanvasTouchEvents();
 
-    // Auto dock on desktop screens
-    if (window.innerWidth >= 800) {
+    const isInsideIframe = window.self !== window.top;
+    const isDesktopMonitor = window.innerWidth >= 900;
+
+    // Only auto-open sidebar when viewed directly full-screen on a large desktop monitor (outside iframe)
+    if (isDesktopMonitor && !isInsideIframe) {
       document.body.classList.add('desktop-studio-view');
       const sidebar = document.getElementById('mobile-studio-sidebar');
       if (sidebar) sidebar.classList.add('open');
@@ -98,7 +102,8 @@ class MobileOdooBuilder {
 
     if (layer.zIndex !== undefined && layer.zIndex !== null) el.style.zIndex = layer.zIndex;
     if (layer.opacity !== undefined && layer.opacity !== 1) el.style.opacity = layer.opacity;
-    el.style.transition = this.isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)';
+
+    el.style.transition = this.isDragging ? 'none' : 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1)';
   }
 
   createStudioDockBtn() {
@@ -106,7 +111,7 @@ class MobileOdooBuilder {
     const btn = document.createElement('button');
     btn.id = 'mobile-studio-dock-btn';
     btn.innerHTML = `⚙️ <span>استوديو التعديل</span>`;
-    btn.onclick = () => this.toggleEditMode();
+    btn.onclick = () => this.toggleSidebar();
     document.body.appendChild(btn);
   }
 
@@ -125,8 +130,9 @@ class MobileOdooBuilder {
       <button class="quick-tool-btn" onclick="window.mobileBuilder.scaleSelected(0.05)" title="تكبير">➕</button>
       <button class="quick-tool-btn" onclick="window.mobileBuilder.scaleSelected(-0.05)" title="تصغير">➖</button>
       <button class="quick-tool-btn" onclick="window.mobileBuilder.resetLayer(window.mobileBuilder.selectedLayerId)" title="استعادة">🔄</button>
-      <button class="quick-tool-btn btn-save-quick" onclick="window.mobileBuilder.saveAndToast()" title="حفظ">💾</button>
-      <button class="quick-tool-btn" onclick="window.mobileBuilder.deselectAll()" title="إلغاء">✕</button>
+      <button class="quick-tool-btn btn-more-props" onclick="window.mobileBuilder.openSidebarForSelected()" title="تفاصيل وتحكم أكبر">⚙️ تفاصيل</button>
+      <button class="quick-tool-btn btn-save-quick" onclick="window.mobileBuilder.saveAndToast()" title="حفظ">💾 حفظ</button>
+      <button class="quick-tool-btn" onclick="window.mobileBuilder.deselectAll()" title="إلغاء التحديد">✕</button>
     `;
 
     container.appendChild(bar);
@@ -158,6 +164,9 @@ class MobileOdooBuilder {
     sidebar.id = 'mobile-studio-sidebar';
 
     sidebar.innerHTML = `
+      <!-- Drag Handle for Drawer -->
+      <div class="sidebar-drag-handle" onclick="window.mobileBuilder.toggleSidebar(false)" title="تصغير / إغلاق"></div>
+
       <!-- TOP ACTION BAR -->
       <div class="mobile-sidebar-top-bar">
         <div class="sidebar-action-group">
@@ -165,16 +174,16 @@ class MobileOdooBuilder {
           <button class="mobile-studio-btn btn-discard" onclick="window.mobileBuilder.discardChanges()">✖ إلغاء</button>
           <button class="mobile-studio-btn btn-copy" onclick="window.mobileBuilder.copyLayoutCode()">📋 نسخ الكود</button>
         </div>
-        <button class="mobile-studio-btn btn-close" onclick="window.mobileBuilder.toggleEditMode(false)">✕</button>
+        <button class="mobile-studio-btn btn-close" onclick="window.mobileBuilder.toggleSidebar(false)">✕ تصغير</button>
       </div>
 
       <!-- TABS -->
       <div class="mobile-sidebar-tabs">
         <div class="mobile-sidebar-tab active" id="tab-btn-style" onclick="window.mobileBuilder.switchTab('style')">
-          🖌️ Style
+          🖌️ Style (التحكم)
         </div>
         <div class="mobile-sidebar-tab" id="tab-btn-blocks" onclick="window.mobileBuilder.switchTab('blocks')">
-          ▦ Layers
+          ▦ Layers (الطبقات)
         </div>
         <div class="mobile-sidebar-tab" id="tab-btn-theme" onclick="window.mobileBuilder.switchTab('theme')">
           ⚙️ Theme
@@ -187,7 +196,7 @@ class MobileOdooBuilder {
         <!-- ── TAB 1: STYLE ── -->
         <div class="mobile-tab-panel active" id="panel-style">
           <div id="style-controls-dynamic">
-            <div style="text-align: center; color: #94a3b8; padding: 40px 10px;">
+            <div style="text-align: center; color: #94a3b8; padding: 20px 10px; font-size: 0.85rem;">
               👈 اضغط على أي عنصر في شاشة الموبايل (مستر مينا، الكروت، اللوجو) لتحريكه وتعديله فوراً!
             </div>
           </div>
@@ -253,17 +262,26 @@ class MobileOdooBuilder {
     });
   }
 
-  toggleEditMode(forceState) {
+  toggleSidebar(forceState) {
     const sidebar = document.getElementById('mobile-studio-sidebar');
     const isCurrentlyOpen = sidebar && sidebar.classList.contains('open');
     const shouldOpen = forceState !== undefined ? forceState : !isCurrentlyOpen;
 
     if (shouldOpen) {
       sidebar?.classList.add('open');
-      this.showToast('🎨 تم فتح لوحة استوديو التعديل');
+      if (this.selectedLayerId) {
+        this.switchTab('style');
+      }
     } else {
       sidebar?.classList.remove('open');
-      this.deselectAll();
+    }
+  }
+
+  openSidebarForSelected() {
+    this.toggleSidebar(true);
+    this.switchTab('style');
+    if (this.selectedLayerId) {
+      this.renderStylePanel(this.selectedLayerId);
     }
   }
 
@@ -321,23 +339,23 @@ class MobileOdooBuilder {
     if (!layer) return;
 
     panel.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-        <h4 style="margin: 0; color: #38bdf8; font-size: 0.95rem;">${layer.icon} ${layer.name}</h4>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h4 style="margin: 0; color: #38bdf8; font-size: 0.9rem;">${layer.icon} ${layer.name}</h4>
         <button class="mobile-studio-btn btn-discard" onclick="window.mobileBuilder.resetLayer('${key}')">🔄 استعادة</button>
       </div>
 
       <!-- Quick Nudge Arrow Pad -->
-      <div class="studio-control-group" style="text-align: center;">
-        <div class="studio-control-label" style="justify-content: center; margin-bottom: 10px;">
+      <div class="studio-control-group" style="text-align: center; padding: 6px;">
+        <div class="studio-control-label" style="justify-content: center; margin-bottom: 6px;">
           <span>🎯 تحريك دقيق بالأسهم</span>
         </div>
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
-          <button class="mobile-studio-btn" onclick="window.mobileBuilder.nudgeSelected(0, -8)" style="padding: 6px 18px;">⬆️ أعلى</button>
-          <div style="display: flex; gap: 10px;">
-            <button class="mobile-studio-btn" onclick="window.mobileBuilder.nudgeSelected(-8, 0)" style="padding: 6px 14px;">⬅️ يسار</button>
-            <button class="mobile-studio-btn" onclick="window.mobileBuilder.nudgeSelected(8, 0)" style="padding: 6px 14px;">➡️ يمين</button>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+          <button class="mobile-studio-btn" onclick="window.mobileBuilder.nudgeSelected(0, -6)" style="padding: 4px 16px;">⬆️ أعلى</button>
+          <div style="display: flex; gap: 8px;">
+            <button class="mobile-studio-btn" onclick="window.mobileBuilder.nudgeSelected(-6, 0)" style="padding: 4px 12px;">⬅️ يسار</button>
+            <button class="mobile-studio-btn" onclick="window.mobileBuilder.nudgeSelected(6, 0)" style="padding: 4px 12px;">➡️ يمين</button>
           </div>
-          <button class="mobile-studio-btn" onclick="window.mobileBuilder.nudgeSelected(0, 8)" style="padding: 6px 18px;">⬇️ أسفل</button>
+          <button class="mobile-studio-btn" onclick="window.mobileBuilder.nudgeSelected(0, 6)" style="padding: 4px 16px;">⬇️ أسفل</button>
         </div>
       </div>
 
@@ -473,24 +491,35 @@ class MobileOdooBuilder {
         return;
       }
 
-      const target = e.target.closest(
-        '.mobile-header-top-right, .mobile-grades-row, .mobile-left-cards-column, .mobile-stage-card, .mobile-avatar-stage, .mobile-bottom-chat-bar'
-      );
-      if (!target) return;
-
-      // Find which layer
+      // Check for specific stage card first
+      const stageCard = e.target.closest('.mobile-stage-card');
       let matchedKey = null;
-      for (const key of Object.keys(this.layers)) {
-        if (target.matches(this.layers[key].selector)) {
-          matchedKey = key;
-          break;
+
+      if (stageCard) {
+        // Find which stage card index
+        const cards = Array.from(document.querySelectorAll('.mobile-stage-card'));
+        const idx = cards.indexOf(stageCard) + 1;
+        matchedKey = 'stage' + idx;
+      } else {
+        const target = e.target.closest(
+          '.mobile-avatar-stage, .mobile-header-top-right, .mobile-grades-row, .mobile-left-cards-column, .mobile-bottom-chat-bar'
+        );
+        if (!target) return;
+
+        for (const key of Object.keys(this.layers)) {
+          if (target.matches(this.layers[key].selector)) {
+            matchedKey = key;
+            break;
+          }
         }
       }
 
-      if (!matchedKey || this.layers[matchedKey].locked) return;
+      if (!matchedKey || this.layers[matchedKey]?.locked) return;
 
       this.dragCandidate = matchedKey;
       this.isDragging = true;
+      this.hasMovedSignificantly = false;
+
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
@@ -507,6 +536,10 @@ class MobileOdooBuilder {
 
       const dx = clientX - this.dragStart.x;
       const dy = clientY - this.dragStart.y;
+
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+        this.hasMovedSignificantly = true;
+      }
 
       const layer = this.layers[this.dragCandidate];
       layer.x = Math.round(this.initialPos.x + dx);
@@ -545,8 +578,8 @@ class MobileOdooBuilder {
       toast.style.cssText = `
         position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
         background: #0f274a; color: #fff; border: 1.5px solid #0284c7;
-        padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 700;
-        z-index: 99999999; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        padding: 8px 18px; border-radius: 30px; font-size: 0.82rem; font-weight: 700;
+        z-index: 99999999; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         pointer-events: none; opacity: 0; transition: opacity 0.25s ease;
         font-family: 'Cairo', sans-serif; direction: rtl; text-align: center;
       `;
@@ -557,7 +590,7 @@ class MobileOdooBuilder {
     clearTimeout(this._toastTimer);
     this._toastTimer = setTimeout(() => {
       toast.style.opacity = '0';
-    }, 2800);
+    }, 2400);
   }
 }
 

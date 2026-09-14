@@ -37,6 +37,10 @@ window.MobileApp = {
   },
 
   openStage(unitIndex) {
+    if (window.mobileBuilder && window.mobileBuilder.isEditMode) {
+      window.mobileBuilder.selectLayer('stage' + unitIndex);
+      return;
+    }
     this.currentUnit = unitIndex;
     const curr = window.CURRICULUM_GRADE_1;
     if (!curr || !curr.units) return;
