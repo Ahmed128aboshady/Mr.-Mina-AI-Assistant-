@@ -510,3 +510,60 @@ html, body {
   max-width: 85%;
   align-self: flex-start;
 }
+
+/* ── 8. DESKTOP SCREEN ADAPTATION (WHEN OPENED ON PC) ── */
+.desktop-switch-banner {
+  display: none;
+}
+
+@media (min-width: 600px) {
+  body {
+    background: #0b1329 !important;
+    background-image: radial-gradient(circle at center, #172554 0%, #070b14 100%) !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .desktop-switch-banner {
+    position: fixed;
+    top: 14px;
+    z-index: 9999999;
+    background: linear-gradient(135deg, #0284c7, #0369a1);
+    color: #ffffff;
+    padding: 8px 24px;
+    border-radius: 30px;
+    font-weight: 800;
+    font-size: 0.92rem;
+    text-decoration: none;
+    box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    transition: all 0.2s ease;
+  }
+
+  .desktop-switch-banner:hover {
+    transform: scale(1.06);
+    background: #0284c7;
+    box-shadow: 0 8px 25px rgba(2, 132, 199, 0.6);
+  }
+
+  /* Render as an elegant Smartphone Mockup on PC screens */
+  .mobile-app-container {
+    width: 390px;
+    height: 820px;
+    max-height: 88vh;
+    border-radius: 46px;
+    border: 12px solid #1e293b;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(2, 132, 199, 0.25);
+    background-color: #fdfdfd;
+    background-image: 
+      linear-gradient(to right, rgba(203, 213, 225, 0.45) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(203, 213, 225, 0.45) 1px, transparent 1px);
+    background-size: 26px 26px;
+    margin-top: 30px;
+  }
+}
