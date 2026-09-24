@@ -269,20 +269,23 @@ window.MenaAuth = {
         margin-bottom: 22px;
       }
       .mena-auth-logo {
-        width: 86px;
-        height: 86px;
-        margin: 0 auto 14px;
+        width: 96px;
+        height: 96px;
+        margin: 0 auto 16px;
         border-radius: 50%;
         border: 2px solid rgba(56, 189, 248, 0.6);
-        background: radial-gradient(circle, #0284c7 0%, #070e1b 80%);
+        background: radial-gradient(circle, #0e3a63 0%, #070e1b 100%);
         overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         box-shadow: 0 8px 25px rgba(2, 132, 199, 0.45);
       }
       .mena-auth-logo img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        object-position: center 15%;
+        object-position: center center;
         display: block;
       }
       .mena-auth-title {
@@ -425,7 +428,7 @@ window.MenaAuth = {
       <div class="mena-auth-card">
         <div class="mena-auth-header">
           <div class="mena-auth-logo">
-            <img src="assets/mobile/mr_mena_upper.png" alt="مستر مينا جرجس" />
+            <img src="assets/mena_avatar_centered.png" alt="مستر مينا جرجس" />
           </div>
           <div class="mena-auth-title">منصة الخيميائي في العلوم</div>
           <div class="mena-auth-sub">بإشراف: أ. مينا جرجس</div>
@@ -449,13 +452,20 @@ window.MenaAuth = {
           <div id="mena-auth-error-box" class="mena-auth-error"></div>
         </form>
 
-        <div class="mena-auth-footer-links">
+        <div class="mena-auth-footer-links" style="justify-content: center; text-align: center;">
           <span>نسيت بياناتك؟ راجع مستر مينا</span>
-          <span class="mena-auth-config-link" onclick="MenaAuth.showConfigModal()">إعدادات Supabase</span>
         </div>
       </div>
     `;
     document.body.appendChild(overlay);
+
+    // اختصار لوحة المفاتيح لمستر مينا فقط (Ctrl + Shift + S) لضبط إعدادات Supabase بدون ظهور أي زر للطلاب
+    window.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) {
+        e.preventDefault();
+        MenaAuth.showConfigModal();
+      }
+    });
   },
 
   showLoginModal() {
