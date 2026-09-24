@@ -269,16 +269,21 @@ window.MenaAuth = {
         margin-bottom: 22px;
       }
       .mena-auth-logo {
-        width: 72px;
-        height: 72px;
-        margin: 0 auto 12px;
+        width: 86px;
+        height: 86px;
+        margin: 0 auto 14px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #0284c7, #2563eb);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 34px;
-        box-shadow: 0 8px 25px rgba(2, 132, 199, 0.5);
+        border: 2px solid rgba(56, 189, 248, 0.6);
+        background: radial-gradient(circle, #0284c7 0%, #070e1b 80%);
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(2, 132, 199, 0.45);
+      }
+      .mena-auth-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 15%;
+        display: block;
       }
       .mena-auth-title {
         font-size: 1.35rem;
@@ -289,19 +294,6 @@ window.MenaAuth = {
       .mena-auth-sub {
         font-size: 0.88rem;
         color: #94a3b8;
-      }
-      .mena-auth-security-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(14, 165, 233, 0.12);
-        border: 1px solid rgba(14, 165, 233, 0.3);
-        color: #38bdf8;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.78rem;
-        font-weight: 700;
-        margin-top: 10px;
       }
       .mena-auth-form-group {
         margin-bottom: 16px;
@@ -432,12 +424,11 @@ window.MenaAuth = {
     overlay.innerHTML = `
       <div class="mena-auth-card">
         <div class="mena-auth-header">
-          <div class="mena-auth-logo">👨‍🏫</div>
-          <div class="mena-auth-title">منصة الكيميائي في العلوم</div>
-          <div class="mena-auth-sub">بإشراف: أ. مينا جرجس</div>
-          <div>
-            <span class="mena-auth-security-badge">🔒 محمي: جهاز واحد فقط لكل حساب</span>
+          <div class="mena-auth-logo">
+            <img src="assets/mobile/mr_mena_upper.png" alt="مستر مينا جرجس" />
           </div>
+          <div class="mena-auth-title">منصة الخيميائي في العلوم</div>
+          <div class="mena-auth-sub">بإشراف: أ. مينا جرجس</div>
         </div>
 
         <form id="mena-auth-form" onsubmit="MenaAuth.handleSubmit(event)">
@@ -452,7 +443,7 @@ window.MenaAuth = {
           </div>
 
           <button type="submit" id="mena-auth-submit-btn" class="mena-auth-btn">
-            تسجيل الدخول للمنصة 🚀
+            تسجيل الدخول للمنصة
           </button>
 
           <div id="mena-auth-error-box" class="mena-auth-error"></div>
@@ -460,7 +451,7 @@ window.MenaAuth = {
 
         <div class="mena-auth-footer-links">
           <span>نسيت بياناتك؟ راجع مستر مينا</span>
-          <span class="mena-auth-config-link" onclick="MenaAuth.showConfigModal()">⚙️ إعدادات Supabase</span>
+          <span class="mena-auth-config-link" onclick="MenaAuth.showConfigModal()">إعدادات Supabase</span>
         </div>
       </div>
     `;
@@ -494,14 +485,14 @@ window.MenaAuth = {
     if (!username || !password) return;
 
     btn.disabled = true;
-    btn.textContent = 'جاري التحقق من الحساب والجهاز... ⏳';
+    btn.textContent = 'جاري التحقق من الحساب والجهاز...';
     errBox.className = 'mena-auth-error';
     errBox.textContent = '';
 
     const res = await this.login(username, password);
 
     btn.disabled = false;
-    btn.textContent = 'تسجيل الدخول للمنصة 🚀';
+    btn.textContent = 'تسجيل الدخول للمنصة';
 
     if (res.success) {
       this.hideLoginModal();
@@ -514,7 +505,7 @@ window.MenaAuth = {
       }
 
       const toast = document.createElement('div');
-      toast.textContent = `مرحباً بك يا دكتور ${res.student.full_name || username}! 🎉`;
+      toast.textContent = `مرحباً بك يا دكتور ${res.student.full_name || username}!`;
       toast.style.cssText = 'position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#0f274a; color:#38bdf8; border:1px solid #0284c7; padding:12px 24px; border-radius:30px; font-weight:800; font-size:1rem; z-index:9999999; box-shadow:0 8px 30px rgba(0,0,0,0.6);';
       document.body.appendChild(toast);
       setTimeout(() => toast.remove(), 3500);
@@ -543,17 +534,15 @@ window.MenaAuth = {
       if (student) {
         deskContainer.innerHTML = `
           <div class="mena-student-chip">
-            <span>👨‍🎓</span>
             <span class="student-name">${student.full_name || student.username}</span>
             <span style="color:#64748b; font-size:0.75rem;">(${student.grade || '1ع'})</span>
-            <span title="هذا الجهاز معتمد ومربوط بحسابك" style="cursor:help;">🔒</span>
             <button class="student-logout-btn" onclick="MenaAuth.logout()" title="تسجيل الخروج">خروج</button>
           </div>
         `;
       } else {
         deskContainer.innerHTML = `
           <button onclick="MenaAuth.showLoginModal()" style="background:#0284c7; color:#fff; border:none; padding:6px 14px; border-radius:18px; font-weight:700; cursor:pointer; font-size:0.82rem;">
-            تسجيل دخول الطالب 👤
+            تسجيل دخول الطالب
           </button>
         `;
       }
@@ -576,14 +565,13 @@ window.MenaAuth = {
         mobileContainer.innerHTML = `
           <div class="mena-student-chip" style="padding:3px 8px; font-size:0.75rem;">
             <span class="student-name">${(student.full_name || student.username).split(' ')[0]}</span>
-            <span>🔒</span>
             <button class="student-logout-btn" onclick="MenaAuth.logout()">خروج</button>
           </div>
         `;
       } else {
         mobileContainer.innerHTML = `
           <button onclick="MenaAuth.showLoginModal()" style="background:#0284c7; color:#fff; border:none; padding:4px 10px; border-radius:14px; font-weight:700; cursor:pointer; font-size:0.72rem;">
-            دخول 👤
+            دخول
           </button>
         `;
       }
