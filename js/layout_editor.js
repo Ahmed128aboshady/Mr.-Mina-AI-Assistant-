@@ -14,7 +14,7 @@ class OdooWebsiteBuilder {
 
     // Independent Isolated Layers (Exact User-Designed Layout Locked)
     this.defaultLayers = {
-      avatar: { id: 'avatar', name: 'الأفاتار (مستر مينا)', icon: '👤', selector: '#stage-center-avatar', x: -16, y: -531, scale: 0.96, rotY: 0, zIndex: 25, visible: true, locked: false },
+      avatar: { id: 'avatar', name: 'الأفاتار (مستر مينا)', icon: '👤', selector: '#stage-center-avatar', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 25, visible: true, locked: false },
       logo: { id: 'logo', name: 'اللوجو واسم المنصة', icon: '🏷️', selector: '.header-logo-wrap', x: -30, y: 104, scale: 1.34, rotY: 0, zIndex: 50, visible: true, locked: false },
       badges: { id: 'badges', name: 'أزرار الصفوف (1, 2, 3)', icon: '🔢', selector: '.grade-badges-col', x: 122, y: 77, scale: 0.82, rotY: 0, zIndex: 50, visible: true, locked: false },
       stage1: { id: 'stage1', name: 'كارت المرحلة الأولى', icon: '📘', selector: '#stage-card-1', x: 202, y: 8, scale: 1, rotY: 0, zIndex: 30, visible: true, locked: false },
@@ -432,6 +432,14 @@ class OdooWebsiteBuilder {
     if (l.zIndex) el.style.zIndex = l.zIndex;
 
     if (key === 'avatar') {
+      if (posY < -50 || posY > 150) {
+        posY = 0;
+        l.y = 0;
+      }
+      if (Math.abs(posX) > 150) {
+        posX = 0;
+        l.x = 0;
+      }
       el.style.position = 'absolute';
       el.style.bottom = posY + 'px';
       el.style.left = '50%';
@@ -1182,8 +1190,8 @@ class OdooWebsiteBuilder {
       if (!l || l.locked) return;
 
       if (this.dragCandidate === 'avatar') {
-        l.x = this.initialPos.x + dx;
-        l.y = this.initialPos.y + dy;
+        l.x = Math.max(-120, Math.min(120, this.initialPos.x + dx));
+        l.y = Math.max(-40, Math.min(120, this.initialPos.y - dy));
       } else if (this.dragCandidate === 'chat') {
         l.x = 0;
         l.y = Math.max(10, Math.min(180, this.initialPos.y - dy));
@@ -1409,6 +1417,12 @@ class OdooWebsiteBuilder {
         if (this.layers.chat) {
           this.layers.chat.x = 0;
           if (this.layers.chat.y < 0 || this.layers.chat.y > 180) this.layers.chat.y = 47;
+        }
+
+        if (this.layers.avatar && (this.layers.avatar.y < -50 || this.layers.avatar.y > 150 || Math.abs(this.layers.avatar.x) > 150)) {
+          this.layers.avatar.x = 0;
+          this.layers.avatar.y = 0;
+          this.layers.avatar.scale = 1;
         }
 
         this.layers.rightCol.visible = true;

@@ -913,11 +913,6 @@ body {
   background: #2563eb;
   transform: scale(1.08);
 }
-  display: flex;
-  gap: 0;
-  overflow: hidden;
-  transition: var(--transition);
-}
 
 /* ── Character Panel (Left) ────────────────────── */
 .character-panel {
@@ -2001,6 +1996,8 @@ body.odoo-studio-active #home-bottom-chat-pill {
   pointer-events: auto !important;
   position: relative !important;
   z-index: 10000 !important;
+}
+
 .lab-session2-controls {
   display: flex;
   flex-direction: column;
@@ -2215,6 +2212,7 @@ body.odoo-studio-active #home-bottom-chat-pill {
 #loading-screen.hidden {
   opacity: 0;
   pointer-events: none;
+  display: none !important;
 }
 
 .loading-logo {
