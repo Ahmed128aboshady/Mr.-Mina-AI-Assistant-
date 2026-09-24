@@ -785,10 +785,10 @@ class AppController {
               hasExplanation: false,
               isOutOfCurriculum: false,
               actions: [
-                { label: 'الوحدة الأولى: المادة وتركيبها وتفاعلاتها', action: `window.appController.toggleStageDropdown(1, 'right')` },
-                { label: 'الوحدة الثانية: الطاقة والقوى في الطبيعة', action: `window.appController.toggleStageDropdown(2, 'left')` },
-                { label: 'الوحدة الثالثة: الكائنات الحية والتكيف والبيئة', action: `window.appController.toggleStageDropdown(3, 'right')` },
-                { label: 'الوحدة الرابعة: الأرض والكون والفلك', action: `window.appController.toggleStageDropdown(4, 'left')` }
+                { label: 'الوحدة الأولى: المادة', action: `window.appController.toggleStageDropdown(1, 'right')` },
+                { label: 'الوحدة الثانية: مجالات القوى', action: `window.appController.toggleStageDropdown(2, 'right')` },
+                { label: 'الوحدة الثالثة: الكائنات الحية تركيبها وعملياتها', action: `window.appController.toggleStageDropdown(3, 'left')` },
+                { label: 'الوحدة الرابعة: نظام (الأرض - الشمس - القمر)', action: `window.appController.toggleStageDropdown(4, 'left')` }
               ]
             });
             return;
@@ -1351,10 +1351,10 @@ class AppController {
           topicContent: null,
           isOutOfCurriculum: true,
           actions: [
-            { label: 'الوحدة الأولى: المادة وتركيبها وتفاعلاتها', action: `window.appController.toggleStageDropdown(1, 'right')` },
-            { label: 'الوحدة الثانية: الطاقة والقوى في الطبيعة', action: `window.appController.toggleStageDropdown(2, 'left')` },
-            { label: 'الوحدة الثالثة: الكائنات الحية والتكيف والبيئة', action: `window.appController.toggleStageDropdown(3, 'right')` },
-            { label: 'الوحدة الرابعة: الأرض والكون والفلك', action: `window.appController.toggleStageDropdown(4, 'left')` }
+            { label: 'الوحدة الأولى: المادة', action: `window.appController.toggleStageDropdown(1, 'right')` },
+            { label: 'الوحدة الثانية: مجالات القوى', action: `window.appController.toggleStageDropdown(2, 'right')` },
+            { label: 'الوحدة الثالثة: الكائنات الحية تركيبها وعملياتها', action: `window.appController.toggleStageDropdown(3, 'left')` },
+            { label: 'الوحدة الرابعة: نظام (الأرض - الشمس - القمر)', action: `window.appController.toggleStageDropdown(4, 'left')` }
           ]
         });
 
@@ -1964,15 +1964,17 @@ class AppController {
       card.classList.add('active');
       ans.style.maxHeight = '500px';
 
-      const ind = document.getElementById(`why-indicator-${idx}`);
-      if (ind) ind.style.display = 'inline-flex';
-
       const wq = this._currentWhyQuestions?.[idx];
-      if (wq) {
+      const ind = document.getElementById(`why-indicator-${idx}`);
+      if (wq && wq.audio) {
+        if (ind) ind.style.display = 'inline-flex';
         window.appAudioManager?.stopAll();
-        if (wq.audio) {
-          window.appAudioManager?.play(`audio_cache/${wq.audio}.mp3`);
-        }
+        window.appAudioManager?.play(`audio_cache/${wq.audio}.mp3`);
+      } else {
+        if (ind) ind.style.display = 'none';
+        window.appAudioManager?.stopAll();
+      }
+      if (wq) {
         this.typewriterSpeech(`إجابة سؤال علل: ${wq.a}`);
       }
     } else {
