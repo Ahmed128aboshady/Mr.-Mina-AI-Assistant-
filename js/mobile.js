@@ -88,6 +88,28 @@ window.MobileApp = {
     if (overlay) overlay.classList.remove('active');
   },
 
+  _currentAudio: null,
+
+  playWelcomeAudio() {
+    if (this._currentAudio) {
+      this._currentAudio.pause();
+      this._currentAudio.currentTime = 0;
+    }
+    this._currentAudio = new Audio('audio_cache/welcome_mr_mena.mp3');
+    this._currentAudio.play().catch(e => console.log('Autoplay audio blocked:', e));
+  },
+
+  playLessonAudio(lessonId, sessionNum = 1) {
+    if (this._currentAudio) {
+      this._currentAudio.pause();
+      this._currentAudio.currentTime = 0;
+    }
+    const prefix = lessonId.split('_').slice(0, 2).join('_');
+    const audioSrc = `audio_cache/${prefix}_s${sessionNum}.mp3`;
+    this._currentAudio = new Audio(audioSrc);
+    this._currentAudio.play().catch(e => console.log('Lesson audio blocked:', e));
+  },
+
   launchLesson(lessonId) {
     this.closeDrawer();
     const curr = window.CURRICULUM_GRADE_1;
@@ -100,10 +122,16 @@ window.MobileApp = {
     if (title) title.textContent = lesson.title;
     if (screen) screen.classList.add('active');
 
+    this.playLessonAudio(lessonId, 1);
     this.init3DLab(lessonId);
   },
 
   closeLessonScreen() {
+    if (this._currentAudio) {
+      this._currentAudio.pause();
+      this._currentAudio.currentTime = 0;
+      this._currentAudio = null;
+    }
     const screen = document.getElementById('mobile-lesson-screen');
     if (screen) screen.classList.remove('active');
   },

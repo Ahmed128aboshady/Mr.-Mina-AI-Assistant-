@@ -676,44 +676,9 @@ class AppController {
 
     if (!cleanText) return;
 
-    // 💬 إذا كانت شاشة الشرح مفتوحة، شغل البوب اب التفاعلي للكتابة المتزامنة
+    // 💬 إذا كانت شاشة الشرح مفتوحة، شغل الكتابة المتزامنة بدون أي صوت اصطناعي (اعتماد حصري 100% على ريكوردات مستر مينا الحقيقية)
     if (document.getElementById('explanation-section')?.classList.contains('visible')) {
       this.typewriterSpeech(cleanText);
-    }
-
-    // 2) تشغيل سيرفر الصوت المستنسخ لمستر مينا إن وُجد
-    try {
-      const res = await fetch('http://localhost:5050/api/speak', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: cleanText })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.audio_url && data.status === 'success') {
-          window.appAudioManager.play(data.audio_url);
-          return;
-        }
-      }
-    } catch (err) {
-      // السيرفر المحلي غير متصل (أثناء التشغيل أونلاين على GitHub Pages)
-    }
-
-    // 3) بديل صوتي تلقائي وسلس عبر متصفح الهاتف والكمبيوتر (Web Speech API)
-    if ('speechSynthesis' in window) {
-      try {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(cleanText);
-        utterance.lang = 'ar-EG';
-        utterance.rate = 1.05;
-        const voices = window.speechSynthesis.getVoices();
-        const arabicVoice = voices.find(v => v.lang.startsWith('ar') || v.name.includes('Arabic'));
-        if (arabicVoice) utterance.voice = arabicVoice;
-        window.speechSynthesis.speak(utterance);
-      } catch (e) {
-        console.warn('Speech synthesis error:', e);
-      }
     }
   }
 
@@ -1702,12 +1667,15 @@ class AppController {
     const sessionNum = this._currentSessionNum || 1;
     const sessionWordMap = { 1: 'أول', 2: 'تاني', 3: 'تالت', 4: 'رابع' };
     const sessionWord = sessionWordMap[sessionNum] || 'أول';
-    const welcomeSpeech = `أهلاً بيك يا بطل في ${sessionWord} حصة مع مستر مينا!`;
+    const introAudio = `audio_cache/intro_session_${sessionNum}.mp3`;
+    const introText = (sessionNum === 1)
+      ? 'أهلاً بيك يا بطل في أول حصة مع مستر مينا، جاهز نكتشف أسرار العلوم سوا؟'
+      : 'أهلاً بيك يا بطل في تاني حصة مع مستر مينا، يلا نكمل مغامرتنا العلمية ونقفل درجاتنا النهائية!';
 
     setTimeout(() => {
       window.appAudioManager.stopAll();
-      this.typewriterSpeech(welcomeSpeech);
-      this._speakAudio(welcomeSpeech);
+      this.typewriterSpeech(introText);
+      window.appAudioManager.play(introAudio);
     }, 400);
   }
 
@@ -1922,7 +1890,9 @@ class AppController {
       const scoreBadge = document.getElementById('quiz-score-badge');
       if (scoreBadge) scoreBadge.textContent = `درجاتك: ${this._quizScore} ⭐`;
 
-      this.playLabAudio('quiz_correct_1', `الله ينور عليك يا بطل! إجابة صحيحة 100%! ${explanation}`);
+      const correctAudios = ['quiz_correct_1', 'quiz_correct_2'];
+      const chosenCorrect = correctAudios[Math.floor(Math.random() * correctAudios.length)];
+      this.playLabAudio(chosenCorrect, `الله ينور عليك يا بطل! إجابة صحيحة 100%! ${explanation}`);
     } else {
       btn.style.background = 'rgba(239, 68, 68, 0.25)';
       btn.style.borderColor = '#ef4444';
@@ -1943,7 +1913,9 @@ class AppController {
         </div>
       `;
 
-      this.playLabAudio('quiz_wrong_1', `ركز يا بطل! ${explanation}`);
+      const wrongAudios = ['quiz_wrong_1', 'quiz_wrong_2'];
+      const chosenWrong = wrongAudios[Math.floor(Math.random() * wrongAudios.length)];
+      this.playLabAudio(chosenWrong, `ركز يا بطل! ${explanation}`);
     }
 
     // 🏆 سجّل إجابة الكويز في الداتا بيز
@@ -1984,8 +1956,7 @@ class AppController {
       const rule = this._currentRules?.[idx];
       if (rule) {
         window.appAudioManager?.stopAll();
-        // ينطق القاعدة فورياً بدون انتظار
-        this._speakAudio(`القاعدة العلمية: ${rule}`);
+        this.typewriterSpeech(`القاعدة العلمية: ${rule}`);
       }
     } else {
       window.appAudioManager?.stopAll();
@@ -1993,7 +1964,7 @@ class AppController {
   }
 
   // ═════════════════════════════════════════════════════════════
-  // ❓ INTERACTIVE WHY QUESTIONS HANDLERS (تفاعل أسئلة علل مع مستر مينا)
+  // ❓ INTERACTIVE WHY QUESTIONS HANDLERS (تفاعل أسئلة علل مع مستر مينا بصوت المعلم الحقيقي)
   // ═════════════════════════════════════════════════════════════
   toggleWhyQuestion(idx) {
     const card = document.getElementById(`why-card-${idx}`);
@@ -2021,8 +1992,10 @@ class AppController {
       const wq = this._currentWhyQuestions?.[idx];
       if (wq) {
         window.appAudioManager?.stopAll();
-        // ينطق الإجابة فورياً بدون انتظار
-        this._speakAudio(`إجابة سؤال علل: ${wq.a}`);
+        if (wq.audio) {
+          window.appAudioManager?.play(`audio_cache/${wq.audio}.mp3`);
+        }
+        this.typewriterSpeech(`إجابة سؤال علل: ${wq.a}`);
       }
     } else {
       window.appAudioManager?.stopAll();
@@ -2033,12 +2006,22 @@ class AppController {
     const wq = this._currentWhyQuestions?.[idx];
     if (!wq) return;
     window.appAudioManager?.stopAll();
-    this._speakAudio(`إجابة مستر مينا: ${wq.a}`);
+    if (wq.audio) {
+      window.appAudioManager?.play(`audio_cache/${wq.audio}.mp3`);
+    }
+    this.typewriterSpeech(`إجابة مستر مينا: ${wq.a}`);
     if (btn) {
       const originalBg = btn.style.background;
       btn.style.background = '#16a34a';
       setTimeout(() => btn.style.background = originalBg, 3000);
     }
+  }
+
+  playWelcomeVoice() {
+    window.appAudioManager?.stopAll();
+    const welcomeText = 'أهلاً بيك يا دكتور أنا مستر مينا جرجس معلم العلوم مساعدك الذكي جاهز لشرح أي درس والإجابة على أي سؤال في المنهج!';
+    this.typewriterSpeech(welcomeText);
+    window.appAudioManager?.play('audio_cache/welcome_mr_mena.mp3');
   }
 
   // ═════════════════════════════════════════════════════════════
@@ -2139,23 +2122,8 @@ class AppController {
     }
 
     const audioMp3 = `audio_cache/${audioId}.mp3`;
-    const audioWav = `audio_cache/${audioId}.wav`;
-
-    const testAudio = new Audio(audioMp3);
-    testAudio.oncanplay = () => {
-      window.appAudioManager.play(audioMp3);
-    };
-    testAudio.onerror = () => {
-      const testWav = new Audio(audioWav);
-      testWav.oncanplay = () => {
-        window.appAudioManager.play(audioWav);
-      };
-      testWav.onerror = () => {
-        if (textToSpeak) {
-          this._speakAudio(textToSpeak);
-        }
-      };
-    };
+    window.appAudioManager.stopAll();
+    window.appAudioManager.play(audioMp3);
   }
 
   playCurrentLessonAudio() {
@@ -2172,23 +2140,7 @@ class AppController {
 
       const prefix = (lesson.lessonId || 'u1_l1').split('_').slice(0, 2).join('_');
       const audioMp3 = `audio_cache/${prefix}_s${sessionNum}.mp3`;
-      const audioWav = `audio_cache/${prefix}_s${sessionNum}.wav`;
-
-      const testAudio = new Audio(audioMp3);
-      testAudio.oncanplay = () => {
-        window.appAudioManager.play(audioMp3);
-      };
-      testAudio.onerror = () => {
-        const testWav = new Audio(audioWav);
-        testWav.oncanplay = () => {
-          window.appAudioManager.play(audioWav);
-        };
-        testWav.onerror = () => {
-          if (spokenText) {
-            this._speakAudio(spokenText);
-          }
-        };
-      };
+      window.appAudioManager.play(audioMp3);
     }
   }
 

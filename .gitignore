@@ -1,5 +1,4 @@
-﻿# Dependencies & Caches
-audio_cache/
+# Dependencies & Caches
 __pycache__/
 *.pyc
 .cache/

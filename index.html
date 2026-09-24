@@ -111,7 +111,7 @@
     </div>
 
     <!-- ── DEDICATED AVATAR LAYER (مستر مينا في لاير مستقل) ── -->
-    <div class="stage-center-avatar" id="stage-center-avatar">
+    <div class="stage-center-avatar" id="stage-center-avatar" onclick="window.appController?.playWelcomeVoice()" style="cursor:pointer;" title="اضغط لسماع ترحيب مستر مينا">
       <img src="assets/mina.png?v=9.0" alt="مستر مينا" class="center-mina-img" id="center-mina-img" />
       <div class="character-panel mini-3d-panel" id="character-panel" style="display:none;">
         <canvas id="character-canvas"></canvas>
@@ -519,6 +519,11 @@
   <!-- FBXLoader & GLTFLoader from Three.js -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FBXLoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+  <!-- Supabase Database & Student Auth -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase_config.js?v=1.0"></script>
+  <script src="js/auth.js?v=1.0"></script>
 
   <!-- App Modules -->
   <script src="js/curriculum_data.js?v=700.0"></script>
