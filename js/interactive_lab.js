@@ -257,7 +257,10 @@ class InteractiveLab {
 
     if (controlsEl) {
       controlsEl.innerHTML = `
-        <div class="lab-pill-group">
+        <div class="lab-pill-group vertical">
+          <div style="font-size:11px; font-weight:800; color:#0284c7; text-align:center; padding:2px 4px 4px 4px; border-bottom:1px solid #e2e8f0; margin-bottom:4px; width:100%; box-sizing:border-box;">
+            ⚛️ اختر عنصر المحاكاة:
+          </div>
           <button class="lab-pill-btn active" data-symbol="C" onclick="window.interactiveLab.changeElement('C')">كربون (6C)</button>
           <button class="lab-pill-btn" data-symbol="H" onclick="window.interactiveLab.changeElement('H')">هيدروجين (1H - بلا نيوترونات)</button>
           <button class="lab-pill-btn" data-symbol="He" onclick="window.interactiveLab.changeElement('He')">هيليوم (2He - خامل)</button>
@@ -298,22 +301,22 @@ class InteractiveLab {
       controlsEl.innerHTML = `
         <div class="lab-session2-controls" style="display:flex; flex-direction:column; gap:8px; align-items:flex-start; pointer-events:auto;">
           <!-- مجموعة محاكي النظائر -->
-          <div style="display:flex; flex-direction:column; align-items:flex-start; gap:4px;">
-            <div style="font-size:11px; font-weight:800; color:#38bdf8; text-shadow:0 1px 4px rgba(0,0,0,0.85); background:rgba(2,132,199,0.3); padding:3px 12px; border-radius:12px; border:1px solid rgba(56,189,248,0.5);">
+          <div style="display:flex; flex-direction:column; align-items:flex-start; gap:4px; width:100%;">
+            <div style="font-size:11px; font-weight:800; color:#38bdf8; text-shadow:0 1px 4px rgba(0,0,0,0.85); background:rgba(2,132,199,0.3); padding:3px 12px; border-radius:12px; border:1px solid rgba(56,189,248,0.5); width:100%; box-sizing:border-box; text-align:center;">
               🔬 محاكي لغز النظائر (Isotopes):
             </div>
-            <div class="lab-pill-group">
+            <div class="lab-pill-group vertical" style="width:100%; box-sizing:border-box;">
               <button class="lab-pill-btn active" data-symbol="H1" onclick="window.interactiveLab.changeSession2Item('H1')">بروتيوم (¹₁H - 0 نيوترون)</button>
               <button class="lab-pill-btn" data-symbol="H2" onclick="window.interactiveLab.changeSession2Item('H2')">ديوتيريوم (²₁H - 1 نيوترون)</button>
               <button class="lab-pill-btn" data-symbol="H3" onclick="window.interactiveLab.changeSession2Item('H3')">تريتيوم (³₁H - 2 نيوترون)</button>
             </div>
           </div>
           <!-- مجموعة قاعدة 2n² والنشاط الكيميائي -->
-          <div style="display:flex; flex-direction:column; align-items:flex-start; gap:4px;">
-            <div style="font-size:11px; font-weight:800; color:#facc15; text-shadow:0 1px 4px rgba(0,0,0,0.85); background:rgba(234,179,8,0.25); padding:3px 12px; border-radius:12px; border:1px solid rgba(250,204,21,0.5);">
+          <div style="display:flex; flex-direction:column; align-items:flex-start; gap:4px; width:100%;">
+            <div style="font-size:11px; font-weight:800; color:#facc15; text-shadow:0 1px 4px rgba(0,0,0,0.85); background:rgba(234,179,8,0.25); padding:3px 12px; border-radius:12px; border:1px solid rgba(250,204,21,0.5); width:100%; box-sizing:border-box; text-align:center;">
               ⚡ قاعدة (2n²) والنشاط الكيميائي:
             </div>
-            <div class="lab-pill-group">
+            <div class="lab-pill-group vertical" style="width:100%; box-sizing:border-box;">
               <button class="lab-pill-btn" data-symbol="Ne" onclick="window.interactiveLab.changeSession2Item('Ne')">نيون (10Ne - غاز نبيل)</button>
               <button class="lab-pill-btn" data-symbol="Ar" onclick="window.interactiveLab.changeSession2Item('Ar')">أرجون (18Ar - غاز نبيل)</button>
               <button class="lab-pill-btn" data-symbol="Na" onclick="window.interactiveLab.changeSession2Item('Na')">صوديوم (11Na - نشط)</button>
@@ -665,7 +668,7 @@ class InteractiveLab {
 
     if (controlsEl) {
       controlsEl.innerHTML = `
-        <div class="lab-pill-group">
+        <div class="lab-pill-group vertical">
           <button class="lab-pill-btn ${defaultBond === 'ionic' ? 'active' : ''}" id="btn-bond-ionic" onclick="window.interactiveLab.setBondType('ionic')">🧂 رابطة أيونية (ملح الطعام NaCl)</button>
           <button class="lab-pill-btn ${defaultBond === 'covalent' ? 'active' : ''}" id="btn-bond-covalent" onclick="window.interactiveLab.setBondType('covalent')">💧 رابطة تساهمية (جزيء الماء H2O)</button>
         </div>
@@ -1406,7 +1409,7 @@ class InteractiveLab {
 
     if (controlsEl) {
       controlsEl.innerHTML = `
-        <div class="lab-pill-group">
+        <div class="lab-pill-group vertical">
           <button class="lab-pill-btn ${defaultMode === 'solar' ? 'active' : ''}" id="btn-solar" onclick="window.interactiveLab.setEclipseMode('solar')">☀️ كسوف الشمس (القمر في المنتصف نهاراً)</button>
           <button class="lab-pill-btn ${defaultMode === 'lunar' ? 'active' : ''}" id="btn-lunar" onclick="window.interactiveLab.setEclipseMode('lunar')">🌕 خسوف القمر (الأرض في المنتصف ليلاً)</button>
         </div>
