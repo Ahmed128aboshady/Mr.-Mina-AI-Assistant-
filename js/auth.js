@@ -595,7 +595,7 @@ window.MenaAuth = {
       } else if (deskContainer.parentElement !== document.body) {
         document.body.appendChild(deskContainer);
       }
-      deskContainer.style.cssText = 'position:fixed; top:20px; right:24px; z-index:99999; pointer-events:auto; display:flex; align-items:center;';
+      deskContainer.style.cssText = 'position:fixed; top:14px; left:24px; z-index:99999; pointer-events:auto; display:flex; align-items:center;';
 
       if (student) {
         deskContainer.innerHTML = `
