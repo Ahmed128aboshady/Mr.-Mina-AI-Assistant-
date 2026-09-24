@@ -258,7 +258,7 @@ class InteractiveLab {
     if (controlsEl) {
       controlsEl.innerHTML = `
         <div class="lab-pill-group vertical">
-          <div style="font-size:11px; font-weight:800; color:#0284c7; text-align:center; padding:2px 4px 4px 4px; border-bottom:1px solid #e2e8f0; margin-bottom:4px; width:100%; box-sizing:border-box;">
+          <div style="font-size:12.5px; font-weight:800; color:#0284c7; text-align:center; padding:4px 6px 6px 6px; border-bottom:1.5px solid #e2e8f0; margin-bottom:6px; width:100%; box-sizing:border-box;">
             ⚛️ اختر عنصر المحاكاة:
           </div>
           <button class="lab-pill-btn active" data-symbol="C" onclick="window.interactiveLab.changeElement('C')">كربون (6C)</button>
@@ -299,10 +299,10 @@ class InteractiveLab {
 
     if (controlsEl) {
       controlsEl.innerHTML = `
-        <div class="lab-session2-controls" style="display:flex; flex-direction:column; gap:8px; align-items:flex-start; pointer-events:auto;">
+        <div class="lab-session2-controls" style="display:flex; flex-direction:column; gap:10px; align-items:flex-start; pointer-events:auto;">
           <!-- مجموعة محاكي النظائر -->
-          <div style="display:flex; flex-direction:column; align-items:flex-start; gap:4px; width:100%;">
-            <div style="font-size:11px; font-weight:800; color:#38bdf8; text-shadow:0 1px 4px rgba(0,0,0,0.85); background:rgba(2,132,199,0.3); padding:3px 12px; border-radius:12px; border:1px solid rgba(56,189,248,0.5); width:100%; box-sizing:border-box; text-align:center;">
+          <div style="display:flex; flex-direction:column; align-items:flex-start; gap:5px; width:100%;">
+            <div style="font-size:12px; font-weight:800; color:#38bdf8; text-shadow:0 1px 4px rgba(0,0,0,0.85); background:rgba(2,132,199,0.35); padding:5px 14px; border-radius:14px; border:1px solid rgba(56,189,248,0.5); width:100%; box-sizing:border-box; text-align:center;">
               🔬 محاكي لغز النظائر (Isotopes):
             </div>
             <div class="lab-pill-group vertical" style="width:100%; box-sizing:border-box;">
@@ -312,8 +312,8 @@ class InteractiveLab {
             </div>
           </div>
           <!-- مجموعة قاعدة 2n² والنشاط الكيميائي -->
-          <div style="display:flex; flex-direction:column; align-items:flex-start; gap:4px; width:100%;">
-            <div style="font-size:11px; font-weight:800; color:#facc15; text-shadow:0 1px 4px rgba(0,0,0,0.85); background:rgba(234,179,8,0.25); padding:3px 12px; border-radius:12px; border:1px solid rgba(250,204,21,0.5); width:100%; box-sizing:border-box; text-align:center;">
+          <div style="display:flex; flex-direction:column; align-items:flex-start; gap:5px; width:100%;">
+            <div style="font-size:12px; font-weight:800; color:#facc15; text-shadow:0 1px 4px rgba(0,0,0,0.85); background:rgba(234,179,8,0.3); padding:5px 14px; border-radius:14px; border:1px solid rgba(250,204,21,0.5); width:100%; box-sizing:border-box; text-align:center;">
               ⚡ قاعدة (2n²) والنشاط الكيميائي:
             </div>
             <div class="lab-pill-group vertical" style="width:100%; box-sizing:border-box;">

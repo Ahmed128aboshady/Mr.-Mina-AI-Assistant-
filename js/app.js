@@ -60,6 +60,43 @@ class GlobalAudioManager {
 
     return audio;
   }
+
+  speakText(text, onEndedCallback) {
+    this.stopAll();
+
+    if (!('speechSynthesis' in window)) {
+      if (typeof onEndedCallback === 'function') onEndedCallback();
+      return;
+    }
+
+    try {
+      const clean = text.replace(/[*#_~`]/g, '').trim();
+      const utter = new SpeechSynthesisUtterance(clean);
+      utter.lang = 'ar-EG';
+      utter.rate = 0.95;
+      utter.pitch = 1.05;
+
+      const voices = window.speechSynthesis.getVoices();
+      const arVoice = voices.find(v => v.lang && (v.lang.startsWith('ar') || v.lang.includes('EG') || v.lang.includes('SA')));
+      if (arVoice) utter.voice = arVoice;
+
+      window.appController?.character?.setSpeaking(true);
+
+      utter.onend = () => {
+        window.appController?.character?.setSpeaking(false);
+        if (typeof onEndedCallback === 'function') onEndedCallback();
+      };
+      utter.onerror = () => {
+        window.appController?.character?.setSpeaking(false);
+        if (typeof onEndedCallback === 'function') onEndedCallback();
+      };
+
+      window.speechSynthesis.speak(utter);
+    } catch (e) {
+      console.warn('SpeechSynthesis error:', e);
+      if (typeof onEndedCallback === 'function') onEndedCallback();
+    }
+  }
 }
 window.appAudioManager = new GlobalAudioManager();
 
@@ -1722,8 +1759,12 @@ class AppController {
                         <img src="assets/mena_avatar_centered.png" alt="مستر مينا يوضح القاعدة" class="rule-teacher-img" />
                       </div>
                       <div class="rule-speech-bubble">
-                        <div class="rule-speaker-tag">
+                        <div class="rule-speaker-tag" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
                           <span>💡 قاعدة مستر مينا الذهبية (${title}):</span>
+                          <button class="why-audio-play-btn" id="rule-audio-btn-${idx}" onclick="event.stopPropagation(); window.appController.speakRule(${idx}, this)" title="استمع لشرح القاعدة بصوت مستر مينا">
+                            <span class="audio-btn-icon">🔊</span>
+                            <span class="audio-btn-text">استمع لشرح القاعدة</span>
+                          </button>
                         </div>
                         <div class="rule-answer-text">
                           <strong>${title}:</strong> ${desc}
@@ -1758,11 +1799,12 @@ class AppController {
                         <img src="assets/mena_avatar_centered.png" alt="مستر مينا يشرح على السبورة" class="why-teacher-img" />
                       </div>
                       <div class="why-speech-bubble">
-                        <div class="why-speaker-tag">
+                        <div class="why-speaker-tag" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
                           <span>👨‍🏫 مستر مينا يشرح لك على السبورة:</span>
-                          <span class="why-playing-indicator" id="why-indicator-${idx}" style="display:none; color:#16a34a; font-size:0.82rem; font-weight:700;">
-                            <span>🔊 مستر مينا يشرح بصوته...</span>
-                          </span>
+                          <button class="why-audio-play-btn" id="why-audio-btn-${idx}" onclick="event.stopPropagation(); window.appController.speakWhyAnswer(${idx}, this)" title="استمع لتفسير السؤال بصوت مستر مينا">
+                            <span class="audio-btn-icon">🔊</span>
+                            <span class="audio-btn-text">استمع للتفسير بصوت مستر مينا</span>
+                          </button>
                         </div>
                         <div class="why-answer-text">
                           ${wq.a}
@@ -1933,12 +1975,61 @@ class AppController {
       c.classList.remove('active');
       const a = c.querySelector('.rule-answer-collapse');
       if (a) a.style.maxHeight = null;
+      const b = c.querySelector('.why-audio-play-btn');
+      if (b) {
+        b.classList.remove('playing');
+        const icon = b.querySelector('.audio-btn-icon');
+        const text = b.querySelector('.audio-btn-text');
+        if (icon) icon.textContent = '🔊';
+        if (text) text.textContent = 'استمع لشرح القاعدة';
+      }
     });
 
     if (!isAlreadyOpen) {
       card.classList.add('active');
-      ans.style.maxHeight = '500px';
+      ans.style.maxHeight = '600px';
+
+      const btn = document.getElementById(`rule-audio-btn-${idx}`);
+      this.speakRule(idx, btn);
+    } else {
+      window.appAudioManager?.stopAll();
     }
+  }
+
+  speakRule(idx, btn) {
+    const rules = this._currentRules || (this._topicData?.content?.sections?.find(s => s.rules)?.rules) || [];
+    const rule = rules[idx];
+    if (!rule) return;
+
+    const btnText = btn?.querySelector('.audio-btn-text');
+    const btnIcon = btn?.querySelector('.audio-btn-icon');
+
+    if (btn?.classList.contains('playing')) {
+      window.appAudioManager?.stopAll();
+      btn.classList.remove('playing');
+      if (btnText) btnText.textContent = 'استمع لشرح القاعدة';
+      if (btnIcon) btnIcon.textContent = '🔊';
+      return;
+    }
+
+    window.appAudioManager?.stopAll();
+    if (btn) {
+      btn.classList.add('playing');
+      if (btnText) btnText.textContent = 'جاري الشرح الآن...';
+      if (btnIcon) btnIcon.textContent = '⏸️';
+    }
+
+    const parts = rule.split(':');
+    const title = parts.length > 1 ? parts[0].trim() : `قاعدة`;
+    const desc = parts.length > 1 ? parts.slice(1).join(':').trim() : rule.trim();
+    const spokenText = `قاعدة مستر مينا: ${title}. ${desc}`;
+
+    this.typewriterSpeech(spokenText);
+    window.appAudioManager?.speakText(spokenText, () => {
+      btn?.classList.remove('playing');
+      if (btnText) btnText.textContent = 'استمع لشرح القاعدة';
+      if (btnIcon) btnIcon.textContent = '🔊';
+    });
   }
 
   // ═════════════════════════════════════════════════════════════
@@ -1956,44 +2047,66 @@ class AppController {
       c.classList.remove('active');
       const a = c.querySelector('.why-answer-collapse');
       if (a) a.style.maxHeight = null;
-      const ind = c.querySelector('.why-playing-indicator');
-      if (ind) ind.style.display = 'none';
+      const b = c.querySelector('.why-audio-play-btn');
+      if (b) {
+        b.classList.remove('playing');
+        const icon = b.querySelector('.audio-btn-icon');
+        const text = b.querySelector('.audio-btn-text');
+        if (icon) icon.textContent = '🔊';
+        if (text) text.textContent = 'استمع للتفسير بصوت مستر مينا';
+      }
     });
 
     if (!isAlreadyOpen) {
       card.classList.add('active');
-      ans.style.maxHeight = '500px';
+      ans.style.maxHeight = '650px';
 
-      const wq = this._currentWhyQuestions?.[idx];
-      const ind = document.getElementById(`why-indicator-${idx}`);
-      if (wq && wq.audio) {
-        if (ind) ind.style.display = 'inline-flex';
-        window.appAudioManager?.stopAll();
-        window.appAudioManager?.play(`audio_cache/${wq.audio}.mp3`);
-      } else {
-        if (ind) ind.style.display = 'none';
-        window.appAudioManager?.stopAll();
-      }
-      if (wq) {
-        this.typewriterSpeech(`إجابة سؤال علل: ${wq.a}`);
-      }
+      const btn = document.getElementById(`why-audio-btn-${idx}`);
+      this.speakWhyAnswer(idx, btn);
     } else {
       window.appAudioManager?.stopAll();
     }
   }
 
   speakWhyAnswer(idx, btn) {
-    const wq = this._currentWhyQuestions?.[idx];
+    const questions = this._currentWhyQuestions || (this._topicData?.content?.sections?.find(s => s.whyQuestions)?.whyQuestions) || [];
+    const wq = questions[idx];
     if (!wq) return;
-    window.appAudioManager?.stopAll();
-    if (wq.audio) {
-      window.appAudioManager?.play(`audio_cache/${wq.audio}.mp3`);
+
+    const btnText = btn?.querySelector('.audio-btn-text');
+    const btnIcon = btn?.querySelector('.audio-btn-icon');
+
+    if (btn?.classList.contains('playing')) {
+      window.appAudioManager?.stopAll();
+      btn.classList.remove('playing');
+      if (btnText) btnText.textContent = 'استمع للتفسير بصوت مستر مينا';
+      if (btnIcon) btnIcon.textContent = '🔊';
+      return;
     }
-    this.typewriterSpeech(`إجابة مستر مينا: ${wq.a}`);
+
+    window.appAudioManager?.stopAll();
     if (btn) {
-      const originalBg = btn.style.background;
-      btn.style.background = '#16a34a';
-      setTimeout(() => btn.style.background = originalBg, 3000);
+      btn.classList.add('playing');
+      if (btnText) btnText.textContent = 'مستر مينا يشرح التفسير الآن...';
+      if (btnIcon) btnIcon.textContent = '⏸️';
+    }
+
+    const spokenText = `إجابة سؤال علل: ${wq.a}`;
+    this.typewriterSpeech(spokenText);
+
+    if (wq.audio) {
+      window.appAudioManager?.play(`audio_cache/${wq.audio}.mp3`, () => {
+        btn?.classList.remove('playing');
+        if (btnText) btnText.textContent = 'استمع للتفسير بصوت مستر مينا';
+        if (btnIcon) btnIcon.textContent = '🔊';
+      });
+    } else {
+      // Fallback: Immediate high-quality Arabic speech synthesis so no question is silent
+      window.appAudioManager?.speakText(spokenText, () => {
+        btn?.classList.remove('playing');
+        if (btnText) btnText.textContent = 'استمع للتفسير بصوت مستر مينا';
+        if (btnIcon) btnIcon.textContent = '🔊';
+      });
     }
   }
 
