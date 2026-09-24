@@ -6,7 +6,7 @@
 window.MENA_SUPABASE_CONFIG = {
   // 🔑 بيانات مشروع Supabase الخاص بمستر مينا:
   // يمكن كتابتها هنا مباشرة، أو حفظها عبر واجهة الإعدادات السريعة في المتصفح
-  DEFAULT_URL: 'https://vugmrmvjtwphvymzoxlh.supabase.co', // استبدلها برابط مشروعك من Supabase
+  DEFAULT_URL: 'https://omsutcvoukueqxcxleah.supabase.co', // رابط مشروع مستر مينا من Supabase
   DEFAULT_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy_anon_key_replace_with_yours', // استبدلها بـ Anon Key
 
   getUrl() {

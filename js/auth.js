@@ -161,8 +161,12 @@ window.MenaAuth = {
       mockStudents = [
         { id: '1', username: 'student1', password: '123456', full_name: 'أحمد محمد علي', grade: 'الصف الأول الإعدادي', registered_device_id: null, is_active: true },
         { id: '2', username: 'student2', password: '123456', full_name: 'مريم جرجس حنا', grade: 'الصف الأول الإعدادي', registered_device_id: null, is_active: true },
-        { id: '3', username: 'mena_demo', password: '123456', full_name: 'طالب تجريبي (مستر مينا)', grade: 'الصف الأول الإعدادي', registered_device_id: null, is_active: true }
+        { id: '3', username: 'mena_demo', password: '123456', full_name: 'طالب تجريبي (مستر مينا)', grade: 'الصف الأول الإعدادي', registered_device_id: null, is_active: true },
+        { id: '4', username: 'admin', password: 'admin', full_name: 'أ. مينا جرجس (المدير)', grade: 'الإدارة العامة', registered_device_id: null, is_active: true }
       ];
+      localStorage.setItem(mockDbKey, JSON.stringify(mockStudents));
+    } else if (!mockStudents.some(s => s.username.toLowerCase() === 'admin')) {
+      mockStudents.push({ id: '4', username: 'admin', password: 'admin', full_name: 'أ. مينا جرجس (المدير)', grade: 'الإدارة العامة', registered_device_id: null, is_active: true });
       localStorage.setItem(mockDbKey, JSON.stringify(mockStudents));
     }
 
@@ -171,7 +175,9 @@ window.MenaAuth = {
       return { success: false, message: 'اسم المستخدم غير مسجل، برجاء مراجعة مستر مينا.' };
     }
 
-    if (student.password !== password) {
+    // السماح لـ admin بالدخول بكلمة سر admin أو 123456
+    const isAdminPass = student.username.toLowerCase() === 'admin' && (password === 'admin' || password === '123456');
+    if (!isAdminPass && student.password !== password) {
       return { success: false, message: 'كلمة المرور غير صحيحة.' };
     }
 
@@ -386,14 +392,20 @@ window.MenaAuth = {
       .mena-student-chip {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        background: rgba(15, 23, 42, 0.85);
-        border: 1px solid rgba(56, 189, 248, 0.4);
-        padding: 5px 12px;
-        border-radius: 20px;
-        font-size: 0.82rem;
+        gap: 10px;
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(56, 189, 248, 0.45);
+        padding: 7px 16px;
+        border-radius: 24px;
+        font-size: 0.85rem;
         color: #f8fafc;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(2, 132, 199, 0.2);
+        pointer-events: auto !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        user-select: none;
+        position: relative;
+        z-index: 99999;
       }
       .mena-student-chip .student-name {
         font-weight: 800;
@@ -401,18 +413,26 @@ window.MenaAuth = {
       }
       .mena-student-chip .student-logout-btn {
         background: rgba(239, 68, 68, 0.2);
-        border: 1px solid rgba(239, 68, 68, 0.4);
-        color: #f87171;
-        padding: 2px 8px;
+        border: 1px solid rgba(239, 68, 68, 0.55);
+        color: #fca5a5;
+        padding: 4px 12px;
         border-radius: 12px;
         cursor: pointer;
-        font-size: 0.72rem;
-        font-weight: 700;
-        transition: background 0.2s;
+        font-size: 0.76rem;
+        font-weight: 800;
+        transition: all 0.2s ease;
+        pointer-events: auto !important;
+        outline: none;
       }
       .mena-student-chip .student-logout-btn:hover {
         background: #ef4444;
-        color: #fff;
+        color: #ffffff;
+        border-color: #ef4444;
+        transform: scale(1.06);
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+      }
+      .mena-student-chip .student-logout-btn:active {
+        transform: scale(0.96);
       }
     `;
     document.head.appendChild(style);
@@ -472,8 +492,18 @@ window.MenaAuth = {
     const overlay = document.getElementById('mena-auth-overlay');
     if (overlay) {
       overlay.classList.add('active');
+      const passInput = document.getElementById('mena-auth-pass');
+      if (passInput) passInput.value = '';
       const userInput = document.getElementById('mena-auth-user');
-      if (userInput) userInput.focus();
+      if (userInput) {
+        userInput.value = '';
+        setTimeout(() => userInput.focus(), 150);
+      }
+      const errBox = document.getElementById('mena-auth-error-box');
+      if (errBox) {
+        errBox.className = 'mena-auth-error';
+        errBox.textContent = '';
+      }
     }
   },
 
@@ -527,61 +557,58 @@ window.MenaAuth = {
 
   updateHeaderUI() {
     const student = this.getCurrentStudent();
+    const isMobile = !!document.querySelector('.mobile-app-container') || (window.location && window.location.pathname.includes('mobile.html'));
 
-    // 1. في نسخة الديسكتوب (index.html)
-    let deskContainer = document.getElementById('desktop-student-chip-container');
-    if (!deskContainer) {
-      const header = document.querySelector('.home-header');
-      if (header) {
+    if (isMobile) {
+      // 2. في نسخة الموبايل (mobile.html)
+      let mobileContainer = document.getElementById('mobile-student-chip-container');
+      if (!mobileContainer) {
+        mobileContainer = document.createElement('div');
+        mobileContainer.id = 'mobile-student-chip-container';
+        document.body.appendChild(mobileContainer);
+      } else if (mobileContainer.parentElement !== document.body) {
+        document.body.appendChild(mobileContainer);
+      }
+      mobileContainer.style.cssText = 'position:fixed; top:12px; left:12px; z-index:99999; pointer-events:auto; display:flex; align-items:center;';
+
+      if (student) {
+        mobileContainer.innerHTML = `
+          <div class="mena-student-chip" style="padding:4px 10px; font-size:0.75rem;">
+            <span class="student-name">${(student.full_name || student.username).split(' ')[0]}</span>
+            <button type="button" class="student-logout-btn" onclick="window.MenaAuth.logout()">خروج</button>
+          </div>
+        `;
+      } else {
+        mobileContainer.innerHTML = `
+          <button type="button" onclick="window.MenaAuth.showLoginModal()" style="background:#0284c7; color:#fff; border:none; padding:5px 12px; border-radius:14px; font-weight:700; cursor:pointer; font-size:0.75rem; box-shadow:0 4px 12px rgba(2,132,199,0.4); pointer-events:auto;">
+            دخول
+          </button>
+        `;
+      }
+    } else {
+      // 1. في نسخة الديسكتوب (index.html)
+      let deskContainer = document.getElementById('desktop-student-chip-container');
+      if (!deskContainer) {
         deskContainer = document.createElement('div');
         deskContainer.id = 'desktop-student-chip-container';
-        deskContainer.style.cssText = 'display:flex; align-items:center; gap:8px; margin-right:auto; padding-right:15px;';
-        header.appendChild(deskContainer);
+        document.body.appendChild(deskContainer);
+      } else if (deskContainer.parentElement !== document.body) {
+        document.body.appendChild(deskContainer);
       }
-    }
+      deskContainer.style.cssText = 'position:fixed; top:20px; right:24px; z-index:99999; pointer-events:auto; display:flex; align-items:center;';
 
-    if (deskContainer) {
       if (student) {
         deskContainer.innerHTML = `
           <div class="mena-student-chip">
             <span class="student-name">${student.full_name || student.username}</span>
-            <span style="color:#64748b; font-size:0.75rem;">(${student.grade || '1ع'})</span>
-            <button class="student-logout-btn" onclick="MenaAuth.logout()" title="تسجيل الخروج">خروج</button>
+            <span style="color:#94a3b8; font-size:0.75rem;">(${student.grade || '1ع'})</span>
+            <button type="button" class="student-logout-btn" onclick="window.MenaAuth.logout()" title="تسجيل الخروج">خروج</button>
           </div>
         `;
       } else {
         deskContainer.innerHTML = `
-          <button onclick="MenaAuth.showLoginModal()" style="background:#0284c7; color:#fff; border:none; padding:6px 14px; border-radius:18px; font-weight:700; cursor:pointer; font-size:0.82rem;">
+          <button type="button" onclick="window.MenaAuth.showLoginModal()" style="background:linear-gradient(135deg, #0284c7, #2563eb); color:#fff; border:none; padding:8px 18px; border-radius:20px; font-weight:800; cursor:pointer; font-size:0.85rem; box-shadow:0 6px 18px rgba(2,132,199,0.45); pointer-events:auto; transition:transform 0.15s;">
             تسجيل دخول الطالب
-          </button>
-        `;
-      }
-    }
-
-    // 2. في نسخة الموبايل (mobile.html)
-    let mobileContainer = document.getElementById('mobile-student-chip-container');
-    if (!mobileContainer) {
-      const mobHeader = document.querySelector('.mobile-header-top-right');
-      if (mobHeader) {
-        mobileContainer = document.createElement('div');
-        mobileContainer.id = 'mobile-student-chip-container';
-        mobileContainer.style.cssText = 'margin-top:6px;';
-        mobHeader.appendChild(mobileContainer);
-      }
-    }
-
-    if (mobileContainer) {
-      if (student) {
-        mobileContainer.innerHTML = `
-          <div class="mena-student-chip" style="padding:3px 8px; font-size:0.75rem;">
-            <span class="student-name">${(student.full_name || student.username).split(' ')[0]}</span>
-            <button class="student-logout-btn" onclick="MenaAuth.logout()">خروج</button>
-          </div>
-        `;
-      } else {
-        mobileContainer.innerHTML = `
-          <button onclick="MenaAuth.showLoginModal()" style="background:#0284c7; color:#fff; border:none; padding:4px 10px; border-radius:14px; font-weight:700; cursor:pointer; font-size:0.72rem;">
-            دخول
           </button>
         `;
       }
