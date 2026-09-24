@@ -296,9 +296,9 @@ class InteractiveLab {
 
     if (controlsEl) {
       controlsEl.innerHTML = `
-        <div class="lab-session2-controls" style="display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:auto;">
+        <div class="lab-session2-controls" style="display:flex; flex-direction:column; gap:8px; align-items:flex-start; pointer-events:auto;">
           <!-- مجموعة محاكي النظائر -->
-          <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+          <div style="display:flex; flex-direction:column; align-items:flex-start; gap:4px;">
             <div style="font-size:11px; font-weight:800; color:#38bdf8; text-shadow:0 1px 4px rgba(0,0,0,0.85); background:rgba(2,132,199,0.3); padding:3px 12px; border-radius:12px; border:1px solid rgba(56,189,248,0.5);">
               🔬 محاكي لغز النظائر (Isotopes):
             </div>
@@ -309,7 +309,7 @@ class InteractiveLab {
             </div>
           </div>
           <!-- مجموعة قاعدة 2n² والنشاط الكيميائي -->
-          <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+          <div style="display:flex; flex-direction:column; align-items:flex-start; gap:4px;">
             <div style="font-size:11px; font-weight:800; color:#facc15; text-shadow:0 1px 4px rgba(0,0,0,0.85); background:rgba(234,179,8,0.25); padding:3px 12px; border-radius:12px; border:1px solid rgba(250,204,21,0.5);">
               ⚡ قاعدة (2n²) والنشاط الكيميائي:
             </div>
