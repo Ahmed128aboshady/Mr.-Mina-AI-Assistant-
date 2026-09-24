@@ -388,51 +388,102 @@ window.MenaAuth = {
         cursor: pointer;
         text-decoration: underline;
       }
-      /* Top Bar Student Info Badge */
-      .mena-student-chip {
+      /* Circular Student Ball Avatar */
+      .mena-student-ball-wrap {
+        position: relative;
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        background: rgba(15, 23, 42, 0.95);
-        border: 1px solid rgba(56, 189, 248, 0.45);
-        padding: 7px 16px;
-        border-radius: 24px;
-        font-size: 0.85rem;
-        color: #f8fafc;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(2, 132, 199, 0.2);
-        pointer-events: auto !important;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
         user-select: none;
-        position: relative;
-        z-index: 99999;
       }
-      .mena-student-chip .student-name {
+      .mena-student-ball {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, #38bdf8, #0284c7 60%, #034870 100%);
+        border: 2px solid rgba(255, 255, 255, 0.7);
+        box-shadow: 0 4px 14px rgba(2, 132, 199, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.5);
+        color: #ffffff;
         font-weight: 800;
-        color: #38bdf8;
-      }
-      .mena-student-chip .student-logout-btn {
-        background: rgba(239, 68, 68, 0.2);
-        border: 1px solid rgba(239, 68, 68, 0.55);
-        color: #fca5a5;
-        padding: 4px 12px;
-        border-radius: 12px;
+        font-size: 1.15rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
-        font-size: 0.76rem;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+        outline: none;
+        padding: 0;
+      }
+      .mena-student-ball:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(2, 132, 199, 0.65), inset 0 2px 5px rgba(255, 255, 255, 0.7);
+      }
+      .mena-student-ball:active {
+        transform: scale(0.95);
+      }
+      
+      /* Dropdown Popover */
+      .mena-student-dropdown {
+        position: absolute;
+        top: 48px;
+        left: 0;
+        background: rgba(13, 24, 41, 0.96);
+        border: 1.5px solid rgba(56, 189, 248, 0.4);
+        border-radius: 16px;
+        padding: 12px 14px;
+        min-width: 190px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(2, 132, 199, 0.25);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        display: none;
+        flex-direction: column;
+        gap: 8px;
+        direction: rtl;
+        text-align: right;
+        z-index: 100000;
+        animation: dropDownPop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      @keyframes dropDownPop {
+        0% { transform: translateY(-8px) scale(0.95); opacity: 0; }
+        100% { transform: translateY(0) scale(1); opacity: 1; }
+      }
+      .mena-student-dropdown.active {
+        display: flex;
+      }
+      .mena-dropdown-header {
+        border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+        padding-bottom: 8px;
+      }
+      .mena-dropdown-name {
         font-weight: 800;
-        transition: all 0.2s ease;
-        pointer-events: auto !important;
+        font-size: 0.92rem;
+        color: #f1f5f9;
+        margin-bottom: 2px;
+      }
+      .mena-dropdown-grade {
+        font-size: 0.76rem;
+        color: #94a3b8;
+      }
+      .mena-dropdown-logout-btn {
+        width: 100%;
+        padding: 7px 10px;
+        background: rgba(239, 68, 68, 0.2);
+        border: 1px solid rgba(239, 68, 68, 0.5);
+        color: #fca5a5;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 0.82rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.2s;
         outline: none;
       }
-      .mena-student-chip .student-logout-btn:hover {
+      .mena-dropdown-logout-btn:hover {
         background: #ef4444;
         color: #ffffff;
         border-color: #ef4444;
-        transform: scale(1.06);
-        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
-      }
-      .mena-student-chip .student-logout-btn:active {
-        transform: scale(0.96);
       }
     `;
     document.head.appendChild(style);
@@ -555,6 +606,25 @@ window.MenaAuth = {
     }
   },
 
+  getFirstLetter(student) {
+    if (!student) return '👤';
+    const name = (student.full_name || student.username || '').trim();
+    if (!name) return '👤';
+    const cleanName = name.replace(/^(أستاذ|أستاذة|أ\.|د\.|مستر)\s*/, '').trim();
+    return (cleanName.charAt(0) || name.charAt(0) || '👤').toUpperCase();
+  },
+
+  toggleProfileDropdown(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const dd = document.getElementById('student-profile-dropdown') || document.getElementById('mobile-student-profile-dropdown');
+    if (dd) {
+      dd.classList.toggle('active');
+    }
+  },
+
   updateHeaderUI() {
     const student = this.getCurrentStudent();
     const isMobile = !!document.querySelector('.mobile-app-container') || (window.location && window.location.pathname.includes('mobile.html'));
@@ -569,19 +639,30 @@ window.MenaAuth = {
       } else if (mobileContainer.parentElement !== document.body) {
         document.body.appendChild(mobileContainer);
       }
-      mobileContainer.style.cssText = 'position:fixed; top:12px; left:12px; z-index:99999; pointer-events:auto; display:flex; align-items:center;';
+      mobileContainer.style.cssText = 'position:fixed; top:10px; left:12px; z-index:99999; pointer-events:auto; display:flex; align-items:center;';
 
       if (student) {
+        const letter = this.getFirstLetter(student);
         mobileContainer.innerHTML = `
-          <div class="mena-student-chip" style="padding:4px 10px; font-size:0.75rem;">
-            <span class="student-name">${(student.full_name || student.username).split(' ')[0]}</span>
-            <button type="button" class="student-logout-btn" onclick="window.MenaAuth.logout()">خروج</button>
+          <div class="mena-student-ball-wrap">
+            <button type="button" class="mena-student-ball" id="mobile-student-ball-btn" onclick="window.MenaAuth.toggleProfileDropdown(event)" title="${student.full_name || student.username}">
+              ${letter}
+            </button>
+            <div class="mena-student-dropdown" id="mobile-student-profile-dropdown">
+              <div class="mena-dropdown-header">
+                <div class="mena-dropdown-name">${student.full_name || student.username}</div>
+                <div class="mena-dropdown-grade">${student.grade || 'الصف الأول الإعدادي'}</div>
+              </div>
+              <button type="button" class="mena-dropdown-logout-btn" onclick="window.MenaAuth.logout()">
+                تسجيل الخروج
+              </button>
+            </div>
           </div>
         `;
       } else {
         mobileContainer.innerHTML = `
-          <button type="button" onclick="window.MenaAuth.showLoginModal()" style="background:#0284c7; color:#fff; border:none; padding:5px 12px; border-radius:14px; font-weight:700; cursor:pointer; font-size:0.75rem; box-shadow:0 4px 12px rgba(2,132,199,0.4); pointer-events:auto;">
-            دخول
+          <button type="button" class="mena-student-ball" onclick="window.MenaAuth.showLoginModal()" title="تسجيل الدخول" style="font-size:0.95rem;">
+            👤
           </button>
         `;
       }
@@ -595,20 +676,30 @@ window.MenaAuth = {
       } else if (deskContainer.parentElement !== document.body) {
         document.body.appendChild(deskContainer);
       }
-      deskContainer.style.cssText = 'position:fixed; top:14px; left:24px; z-index:99999; pointer-events:auto; display:flex; align-items:center;';
+      deskContainer.style.cssText = 'position:fixed; top:12px; left:16px; z-index:99999; pointer-events:auto; display:flex; align-items:center;';
 
       if (student) {
+        const letter = this.getFirstLetter(student);
         deskContainer.innerHTML = `
-          <div class="mena-student-chip">
-            <span class="student-name">${student.full_name || student.username}</span>
-            <span style="color:#94a3b8; font-size:0.75rem;">(${student.grade || '1ع'})</span>
-            <button type="button" class="student-logout-btn" onclick="window.MenaAuth.logout()" title="تسجيل الخروج">خروج</button>
+          <div class="mena-student-ball-wrap">
+            <button type="button" class="mena-student-ball" id="student-ball-btn" onclick="window.MenaAuth.toggleProfileDropdown(event)" title="${student.full_name || student.username}">
+              ${letter}
+            </button>
+            <div class="mena-student-dropdown" id="student-profile-dropdown">
+              <div class="mena-dropdown-header">
+                <div class="mena-dropdown-name">${student.full_name || student.username}</div>
+                <div class="mena-dropdown-grade">${student.grade || 'الصف الأول الإعدادي'}</div>
+              </div>
+              <button type="button" class="mena-dropdown-logout-btn" onclick="window.MenaAuth.logout()">
+                تسجيل الخروج
+              </button>
+            </div>
           </div>
         `;
       } else {
         deskContainer.innerHTML = `
-          <button type="button" onclick="window.MenaAuth.showLoginModal()" style="background:linear-gradient(135deg, #0284c7, #2563eb); color:#fff; border:none; padding:8px 18px; border-radius:20px; font-weight:800; cursor:pointer; font-size:0.85rem; box-shadow:0 6px 18px rgba(2,132,199,0.45); pointer-events:auto; transition:transform 0.15s;">
-            تسجيل دخول الطالب
+          <button type="button" class="mena-student-ball" onclick="window.MenaAuth.showLoginModal()" title="تسجيل دخول الطالب" style="font-size:1rem;">
+            👤
           </button>
         `;
       }
@@ -631,6 +722,15 @@ window.MenaAuth = {
     }
   }
 };
+
+document.addEventListener('click', (e) => {
+  const dds = document.querySelectorAll('.mena-student-dropdown.active');
+  dds.forEach(dd => {
+    if (!dd.contains(e.target) && !e.target.closest('.mena-student-ball')) {
+      dd.classList.remove('active');
+    }
+  });
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   window.MenaAuth.init();
