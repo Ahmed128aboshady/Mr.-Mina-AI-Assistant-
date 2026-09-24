@@ -299,12 +299,12 @@
   <!-- ══════════════════════════════════════════
        ODOO-STYLE VISUAL BUILDER STUDIO
   ═══════════════════════════════════════════ -->
-  <!-- Top Corner Trigger Ribbon Button (Blue Odoo Studio) -->
+  <!-- Top Corner Trigger Ribbon Button (Blue Odoo Studio) - Hidden by default -->
   <button
     id="odoo-edit-trigger"
     class="odoo-edit-trigger"
     onclick="toggleOdooStudio()"
-    style="position:fixed; top:14px; left:18px; z-index:99999999; background:linear-gradient(135deg, #0284c7, #0369a1); color:#ffffff; border:2px solid #38bdf8; border-radius:24px; padding:8px 20px; font-family:'Cairo',sans-serif; font-size:0.95rem; font-weight:800; cursor:pointer; box-shadow:0 4px 18px rgba(2,132,199,0.5), 0 0 15px rgba(56,189,248,0.4); display:flex; align-items:center; gap:8px;"
+    style="display: none !important; position:fixed; top:14px; left:18px; z-index:99999999; background:linear-gradient(135deg, #0284c7, #0369a1); color:#ffffff; border:2px solid #38bdf8; border-radius:24px; padding:8px 20px; font-family:'Cairo',sans-serif; font-size:0.95rem; font-weight:800; cursor:pointer; box-shadow:0 4px 18px rgba(2,132,199,0.5), 0 0 15px rgba(56,189,248,0.4); align-items:center; gap:8px;"
     title="Odoo Studio (Alt+E)"
   >
     <div class="odoo-ribbon-tag">
@@ -324,7 +324,10 @@
         sidebar.style.display = 'flex';
         sidebar.classList.add('open');
         document.body.classList.add('odoo-studio-active');
-        if (trigger) trigger.style.background = 'linear-gradient(135deg, #008784, #005f5d)';
+        if (trigger) {
+          trigger.style.display = 'flex';
+          trigger.style.background = 'linear-gradient(135deg, #008784, #005f5d)';
+        }
         if (window.layoutEditor) {
           window.layoutEditor.isActive = true;
           window.layoutEditor.selectElement('avatar');
@@ -333,7 +336,9 @@
         sidebar.style.display = 'none';
         sidebar.classList.remove('open');
         document.body.classList.remove('odoo-studio-active');
-        if (trigger) trigger.style.background = 'linear-gradient(135deg, #0284c7, #0369a1)';
+        if (trigger) {
+          trigger.style.display = 'none';
+        }
         if (window.layoutEditor) {
           window.layoutEditor.isActive = false;
         }
