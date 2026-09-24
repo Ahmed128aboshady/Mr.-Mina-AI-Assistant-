@@ -542,7 +542,7 @@ class AppController {
       .replace(/\n/g, '<br>');
 
     let avatarHTML = isBot 
-      ? `<div class="msg-avatar-icon"><img src="assets/poses/01.png" alt="مستر مينا" /></div>`
+      ? `<div class="msg-avatar-icon"><img src="assets/mena_avatar_centered.png" alt="مستر مينا" /></div>`
       : `<div class="msg-avatar-icon">👤</div>`;
 
     let contentHTML = `
@@ -1704,8 +1704,6 @@ class AppController {
               const parts = rule.split(':');
               const title = parts.length > 1 ? parts[0].trim() : `قاعدة ${idx + 1}`;
               const desc = parts.length > 1 ? parts.slice(1).join(':').trim() : rule.trim();
-              const poses = ['checklist.png', 'point_up.png', 'idea.png', 'book.png', 'tablet.png', 'clipboard.png'];
-              const poseImg = poses[idx % poses.length];
               return `
                 <div class="rule-card" id="rule-card-${idx}">
                   <div class="rule-header" onclick="window.appController.toggleRule(${idx})">
@@ -1721,14 +1719,11 @@ class AppController {
                   <div class="rule-answer-collapse" id="rule-ans-${idx}">
                     <div class="rule-answer-content">
                       <div class="rule-teacher-avatar-wrap">
-                        <img src="assets/poses/${poseImg}" alt="مستر مينا يوضح القاعدة" class="rule-teacher-img" />
+                        <img src="assets/mena_avatar_centered.png" alt="مستر مينا يوضح القاعدة" class="rule-teacher-img" />
                       </div>
                       <div class="rule-speech-bubble">
                         <div class="rule-speaker-tag">
                           <span>💡 قاعدة مستر مينا الذهبية (${title}):</span>
-                          <span class="rule-playing-indicator" id="rule-indicator-${idx}" style="display:none; color:#0284c7; font-size:0.82rem; font-weight:700;">
-                            <span>🔊 يشرح القاعدة الآن...</span>
-                          </span>
                         </div>
                         <div class="rule-answer-text">
                           <strong>${title}:</strong> ${desc}
@@ -1745,8 +1740,6 @@ class AppController {
         html += `
           <div class="why-questions-accordion">
             ${sec.whyQuestions.map((wq, idx) => {
-              const poses = ['chalkboard_point.png', 'blackboard_write.png'];
-              const poseImg = poses[idx % poses.length];
               return `
                 <div class="why-question-card" id="why-card-${idx}">
                   <div class="why-question-header" onclick="window.appController.toggleWhyQuestion(${idx})">
@@ -1762,13 +1755,13 @@ class AppController {
                   <div class="why-answer-collapse" id="why-ans-${idx}">
                     <div class="why-answer-content">
                       <div class="why-teacher-avatar-wrap">
-                        <img src="assets/poses/${poseImg}" alt="مستر مينا يشرح على السبورة" class="why-teacher-img" />
+                        <img src="assets/mena_avatar_centered.png" alt="مستر مينا يشرح على السبورة" class="why-teacher-img" />
                       </div>
                       <div class="why-speech-bubble">
                         <div class="why-speaker-tag">
                           <span>👨‍🏫 مستر مينا يشرح لك على السبورة:</span>
                           <span class="why-playing-indicator" id="why-indicator-${idx}" style="display:none; color:#16a34a; font-size:0.82rem; font-weight:700;">
-                            <span>🔊 يتحدث الآن...</span>
+                            <span>🔊 مستر مينا يشرح بصوته...</span>
                           </span>
                         </div>
                         <div class="why-answer-text">
@@ -1874,7 +1867,7 @@ class AppController {
       feedback.style.display = 'flex';
       feedback.innerHTML = `
         <div class="quiz-feedback-avatar-wrap">
-          <img src="assets/poses/quiz_correct.png" alt="مستر مينا يحتفل" class="quiz-feedback-img" />
+          <img src="assets/mena_avatar_centered.png" alt="مستر مينا يحتفل" class="quiz-feedback-img" style="border: 2px solid #16a34a;" />
         </div>
         <div class="quiz-feedback-bubble">
           <div class="quiz-feedback-title" style="color: #15803d;">
@@ -1901,7 +1894,7 @@ class AppController {
       feedback.style.display = 'flex';
       feedback.innerHTML = `
         <div class="quiz-feedback-avatar-wrap">
-          <img src="assets/poses/quiz_wrong.png" alt="مستر مينا ينبهك" class="quiz-feedback-img" />
+          <img src="assets/mena_avatar_centered.png" alt="مستر مينا ينبهك" class="quiz-feedback-img" style="border: 2px solid #ef4444;" />
         </div>
         <div class="quiz-feedback-bubble">
           <div class="quiz-feedback-title" style="color: #dc2626;">
@@ -1942,24 +1935,11 @@ class AppController {
       c.classList.remove('active');
       const a = c.querySelector('.rule-answer-collapse');
       if (a) a.style.maxHeight = null;
-      const ind = c.querySelector('.rule-playing-indicator');
-      if (ind) ind.style.display = 'none';
     });
 
     if (!isAlreadyOpen) {
       card.classList.add('active');
       ans.style.maxHeight = '500px';
-
-      const ind = document.getElementById(`rule-indicator-${idx}`);
-      if (ind) ind.style.display = 'inline-flex';
-
-      const rule = this._currentRules?.[idx];
-      if (rule) {
-        window.appAudioManager?.stopAll();
-        this.typewriterSpeech(`القاعدة العلمية: ${rule}`);
-      }
-    } else {
-      window.appAudioManager?.stopAll();
     }
   }
 
