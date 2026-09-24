@@ -2001,6 +2001,14 @@ body.odoo-studio-active #home-bottom-chat-pill {
   pointer-events: auto !important;
   position: relative !important;
   z-index: 10000 !important;
+.lab-session2-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  pointer-events: auto !important;
+  max-width: 96%;
+  z-index: 10000 !important;
 }
 
 .lab-pill-btn {
@@ -4781,6 +4789,11 @@ body.odoo-studio-active .lesson-avatar-speech-bubble {
     top: 6px !important;
     right: 4px !important;
     left: 4px !important;
+  }
+
+  .lab-session2-controls {
+    gap: 4px !important;
+    max-width: 100% !important;
   }
 
   .lab-pill-group {

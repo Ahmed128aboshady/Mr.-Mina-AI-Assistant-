@@ -1656,7 +1656,7 @@ class AppController {
       setTimeout(() => {
         const mount = document.getElementById('interactive-lab-mount');
         if (mount) {
-          window.interactiveLab.init(mount, targetTopic);
+          window.interactiveLab.init(mount, targetTopic, this._currentSessionNum || 1);
         }
       }, 120);
     }
@@ -2086,6 +2086,12 @@ class AppController {
       'lab_atom_He': 'ذرة الهيليوم غاز خامل ومستقر جداً، فيها 2 بروتون و 2 نيوترون، ومستوى الطاقة الأول K ممتلئ تماماً بـ 2 إلكترون!',
       'lab_atom_O': 'ذرة الأكسجين عددها الذري 8، متوزعة 2 في المستوى الأول K و 6 في المستوى التاني L، ومحتاجة 2 إلكترون عشان تستقر!',
       'lab_atom_Na': 'ذرة الصوديوم فلز نشط جداً، عددها الذري 11، متوزعة 2 في K و 8 في L وإلكترون وحيد في M بتميل لفقده في التفاعلات!',
+      'lab_atom_H1': 'البروتيوم هو الهيدروجين العادي وأبسط ذرة في الكون؛ نواته فيها بروتون واحد فقط وبدون أي نيوترونات (n=0)، كتلته 1 وعنده إلكترون واحد يدور في المستوى K!',
+      'lab_atom_H2': 'الديوتيريوم نظير هيدروجين؛ نواته فيها بروتون واحد وانضاف له نيوترون متعادل، عدده الذري 1 بس كتلته بقت 2! ونفس الخواص الكيميائية عشان مداره فيه إلكترون واحد!',
+      'lab_atom_H3': 'التريتيوم نظير هيدروجين مشع أثقل؛ نواته فيها بروتون واحد و 2 نيوترون فكتلته بقت 3! لاحظ إن التلاتة متفقين في العدد الذري 1 ومختلفين في الكتلة عشان النيوترونات!',
+      'lab_atom_Ne': 'غاز النيون عدد ذري 10، توزيعه [K=2, L=8]. مداره الخارجي مكتمل تماماً بـ 8 إلكترونات، عشان كده هو غاز خامل ومستقر كيميائياً ومش محتاج يدخل أي تفاعل!',
+      'lab_atom_Ar': 'غاز الأرجون عدده الذري 18، متوزع [K=2, L=8, M=8]. لا يتحمل المدار الخارجي لأي ذرة أكثر من 8 إلكترونات، وهو مستقر جداً ولا يتفاعل!',
+      'lab_atom_Cl': 'الكلور عدده الذري 17، توزيعه [K=2, L=8, M=7]. مداره الخارجي ناقصه إلكترون واحد عشان يكتمل لـ 8، فبيميل لاكتسابه في التفاعل، عشان كده هو لافلز نشط جداً!',
       'lab_density_wood': 'خشب كثافته 0.6 جم/سم³ أقل من كثافة الماء 1.0 عشان كده بيطفو على السطح!',
       'lab_density_oil': 'زيت البترول كثافته 0.8 جم/سم³ أقل من الماء فيطفو فوقه، وعشان كده لا تطفأ حرائق البترول بالماء!',
       'lab_density_cork': 'الفلين خفيف جداً وكثافته 0.2 جم/سم³ فيطفو بسهولة فوق سطح الماء!',
@@ -2128,9 +2134,14 @@ class AppController {
     const topicId = this._topicData?.topic || 'u1_l1_atom';
     if (topicId.includes('atom') || topicId.includes('u1_l1')) {
       const el = window.interactiveLab?.atomData?.element || 'Carbon';
-      const symbolMap = { 'Carbon': 'C', 'Hydrogen': 'H', 'Helium': 'He', 'Oxygen': 'O', 'Sodium': 'Na' };
-      const sym = symbolMap[el] || 'C';
-      this.playLabAudio(`lab_atom_${sym}`);
+      const symbolMap = {
+        'Carbon': 'C', 'Hydrogen': 'H', 'Helium': 'He', 'Oxygen': 'O', 'Sodium': 'Na',
+        'Hydrogen-1': 'H1', 'Hydrogen-2': 'H2', 'Hydrogen-3': 'H3',
+        'Neon': 'Ne', 'Argon': 'Ar', 'Chlorine': 'Cl'
+      };
+      const sym = symbolMap[el] || el || 'C';
+      const fallback = window.interactiveLab?.atomData?.text || '';
+      this.playLabAudio(`lab_atom_${sym}`, fallback);
     } else if (topicId.includes('matter') || topicId.includes('u1_l3')) {
       this.playLabAudio('lab_density_wood');
     } else if (topicId.includes('eclipse') || topicId.includes('u4_l2')) {

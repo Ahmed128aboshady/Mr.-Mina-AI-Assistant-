@@ -19,9 +19,10 @@ class InteractiveLab {
   /**
    * تهيئة وتركيب المعمل التفاعلي داخل شاشة الشرح
    */
-  init(containerEl, topicId) {
+  init(containerEl, topicId, sessionNum = 1) {
     this.destroy();
     this.currentTopic = topicId || 'u1_l1_atom';
+    this.currentSessionNum = Number(sessionNum) || (Number(window.appController?._currentSessionNum) || 1);
 
     const mountEl = document.getElementById('interactive-lab-mount') || containerEl;
     if (!mountEl) return;
@@ -32,7 +33,7 @@ class InteractiveLab {
           <canvas id="lab-3d-canvas"></canvas>
           <div class="lab-overlay-controls" id="lab-controls"></div>
 
-          <!-- 👨‍🏫 Teacher Avatar Inside 3D Lab (واقف بالكامل داخل الشاشة الغامقة) -->
+          <!-- 👨‍🏫 Teacher Avatar Inside 3D Lab (صورة مستر مينا الحقيقية متمركزة داخل شاشة المعمل) -->
           <div class="lesson-character-stage in-lab-screen" id="lesson-character-stage">
             <div class="lesson-avatar-speech-bubble" id="lesson-avatar-bubble">
               <div class="bubble-header">
@@ -47,10 +48,10 @@ class InteractiveLab {
                 </div>
               </div>
               <div class="bubble-text-content" id="bubble-text-content">
-                ${(window.appController?._currentSessionNum === 2) ? 'أهلاً بيك يا بطل في تاني حصة مع مستر مينا!' : 'أهلاً بيك يا بطل في أول حصة مع مستر مينا!'}
+                ${(this.currentSessionNum === 2) ? 'أهلاً بيك يا بطل في تاني حصة مع مستر مينا!' : 'أهلاً بيك يا بطل في أول حصة مع مستر مينا!'}
               </div>
             </div>
-            <img src="assets/mina.png?v=9.0" alt="مستر مينا" class="lesson-mina-img" id="lesson-mina-img" />
+            <img src="assets/mena_avatar_centered.png" alt="مستر مينا" class="lesson-mina-img" id="lesson-mina-img" />
           </div>
         </div>
 
@@ -139,8 +140,8 @@ class InteractiveLab {
     };
     window.addEventListener('resize', this._resizeHandler);
 
-    // 🔬 توجيه المجسم المخصص للدرس
-    this._buildSimulation(this.currentTopic);
+    // 🔬 توجيه المجسم المخصص للدرس والحصة المحددة
+    this._buildSimulation(this.currentTopic, this.currentSessionNum);
 
     // Animation Loop
     const animate = () => {
@@ -154,15 +155,20 @@ class InteractiveLab {
   }
 
   /**
-   * بناء المجسم المخصص لكل درس في المنهج (10 مجسمات فريدة)
+   * بناء المجسم المخصص لكل درس في المنهج (10 مجسمات فريدة) مع تخصيص فريد للحصة الأولى والثانية
    */
-  _buildSimulation(topicId) {
+  _buildSimulation(topicId, sessionNum = 1) {
     const controlsEl = document.getElementById('lab-controls');
     const infoEl = document.getElementById('lab-info-bar');
+    const activeSession = Number(sessionNum) || Number(this.currentSessionNum) || 1;
 
-    // 1. الدرس الأول: تركيب الذرة
+    // 1. الدرس الأول: تركيب الذرة ومستويات الطاقة والنظائر
     if (topicId.includes('u1_l1') || topicId.includes('atom')) {
-      this._buildAtomScene(controlsEl, infoEl);
+      if (activeSession === 2) {
+        this._buildAtomSceneSession2(controlsEl, infoEl);
+      } else {
+        this._buildAtomSceneSession1(controlsEl, infoEl);
+      }
     }
     // 2. الدرس الثاني: الجدول الدوري وتصنيف العناصر
     else if (topicId.includes('u1_l2') || topicId.includes('periodic')) {
@@ -174,7 +180,7 @@ class InteractiveLab {
     }
     // 4. الدرس الرابع: الروابط الكيميائية (أيونية وتساهمية)
     else if (topicId.includes('u1_l4') || topicId.includes('bonds')) {
-      this._buildBondsScene(controlsEl, infoEl);
+      this._buildBondsScene(controlsEl, infoEl, activeSession);
     }
     // 5. الدرس الخامس: القوى الكهربية والدوائر
     else if (topicId.includes('u2_l1') || topicId.includes('electric') || topicId.includes('energy')) {
@@ -206,10 +212,14 @@ class InteractiveLab {
     }
     // 12. الدرس الثاني عشر: ظواهر خسوف القمر والكسوف
     else if (topicId.includes('u4_l2') || topicId.includes('eclipse')) {
-      this._buildEclipseScene(controlsEl, infoEl);
+      this._buildEclipseScene(controlsEl, infoEl, activeSession);
     }
     else {
-      this._buildAtomScene(controlsEl, infoEl);
+      if (activeSession === 2) {
+        this._buildAtomSceneSession2(controlsEl, infoEl);
+      } else {
+        this._buildAtomSceneSession1(controlsEl, infoEl);
+      }
     }
   }
 
@@ -217,6 +227,15 @@ class InteractiveLab {
   // 1. الذرة ومستويات الطاقة (u1_l1_atom)
   // ═════════════════════════════════════════════════════════════
   _buildAtomScene(controlsEl, infoEl) {
+    if (this.currentSessionNum === 2) {
+      this._buildAtomSceneSession2(controlsEl, infoEl);
+    } else {
+      this._buildAtomSceneSession1(controlsEl, infoEl);
+    }
+  }
+
+  // 1-أ. الحصة الأولى: تركيب الذرة والنواة والتعادل الكهربي
+  _buildAtomSceneSession1(controlsEl, infoEl) {
     this.atomData = {
       element: 'Carbon',
       nameAr: 'ذرة الكربون (6C)',
@@ -224,7 +243,8 @@ class InteractiveLab {
       massNum: 12,
       protons: 6,
       neutrons: 6,
-      shells: [2, 4]
+      shells: [2, 4],
+      text: 'ذرة الكربون عددها الذري 6 وكتلتها 12، وفيها 6 بروتونات و 6 نيوترونات، والمستوى الأول K فيه 2 والتاني L فيه 4 إلكترونات!'
     };
 
     this.nucleusGroup = new THREE.Group();
@@ -239,15 +259,193 @@ class InteractiveLab {
       controlsEl.innerHTML = `
         <div class="lab-pill-group">
           <button class="lab-pill-btn active" data-symbol="C" onclick="window.interactiveLab.changeElement('C')">كربون (6C)</button>
-          <button class="lab-pill-btn" data-symbol="H" onclick="window.interactiveLab.changeElement('H')">هيدروجين (1H)</button>
-          <button class="lab-pill-btn" data-symbol="He" onclick="window.interactiveLab.changeElement('He')">هيليوم (2He)</button>
+          <button class="lab-pill-btn" data-symbol="H" onclick="window.interactiveLab.changeElement('H')">هيدروجين (1H - بلا نيوترونات)</button>
+          <button class="lab-pill-btn" data-symbol="He" onclick="window.interactiveLab.changeElement('He')">هيليوم (2He - خامل)</button>
           <button class="lab-pill-btn" data-symbol="O" onclick="window.interactiveLab.changeElement('O')">أكسجين (8O)</button>
-          <button class="lab-pill-btn" data-symbol="Na" onclick="window.interactiveLab.changeElement('Na')">صوديوم (11Na)</button>
+          <button class="lab-pill-btn" data-symbol="Na" onclick="window.interactiveLab.changeElement('Na')">صوديوم (11Na - نشط)</button>
         </div>
       `;
     }
 
     this._updateAtomInfo(infoEl);
+  }
+
+  // 1-ب. الحصة الثانية: مستويات الطاقة (2n²)، النشاط الكيميائي، ولغز النظائر (Isotopes)
+  _buildAtomSceneSession2(controlsEl, infoEl) {
+    this.atomData = {
+      element: 'Hydrogen-1',
+      nameAr: 'نظير البروتيوم (¹₁H)',
+      atomicNum: 1,
+      massNum: 1,
+      protons: 1,
+      neutrons: 0,
+      shells: [1],
+      category: 'isotope',
+      statusText: 'نظير هيدروجين عادي (أبسط ذرة في الكون بلا نيوترونات)',
+      statusColor: '#38bdf8',
+      text: 'البروتيوم هو الهيدروجين العادي وأبسط ذرة في الكون؛ نواته فيها بروتون واحد فقط وبدون أي نيوترونات (n=0)، كتلته 1 وعنده إلكترون واحد يدور في المستوى K!'
+    };
+
+    this.nucleusGroup = new THREE.Group();
+    this.scene.add(this.nucleusGroup);
+
+    this.electronsGroup = new THREE.Group();
+    this.scene.add(this.electronsGroup);
+
+    this._rebuildAtom();
+
+    if (controlsEl) {
+      controlsEl.innerHTML = `
+        <div class="lab-session2-controls" style="display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:auto;">
+          <!-- مجموعة محاكي النظائر -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+            <div style="font-size:11px; font-weight:800; color:#38bdf8; text-shadow:0 1px 4px rgba(0,0,0,0.85); background:rgba(2,132,199,0.3); padding:3px 12px; border-radius:12px; border:1px solid rgba(56,189,248,0.5);">
+              🔬 محاكي لغز النظائر (Isotopes):
+            </div>
+            <div class="lab-pill-group">
+              <button class="lab-pill-btn active" data-symbol="H1" onclick="window.interactiveLab.changeSession2Item('H1')">بروتيوم (¹₁H - 0 نيوترون)</button>
+              <button class="lab-pill-btn" data-symbol="H2" onclick="window.interactiveLab.changeSession2Item('H2')">ديوتيريوم (²₁H - 1 نيوترون)</button>
+              <button class="lab-pill-btn" data-symbol="H3" onclick="window.interactiveLab.changeSession2Item('H3')">تريتيوم (³₁H - 2 نيوترون)</button>
+            </div>
+          </div>
+          <!-- مجموعة قاعدة 2n² والنشاط الكيميائي -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+            <div style="font-size:11px; font-weight:800; color:#facc15; text-shadow:0 1px 4px rgba(0,0,0,0.85); background:rgba(234,179,8,0.25); padding:3px 12px; border-radius:12px; border:1px solid rgba(250,204,21,0.5);">
+              ⚡ قاعدة (2n²) والنشاط الكيميائي:
+            </div>
+            <div class="lab-pill-group">
+              <button class="lab-pill-btn" data-symbol="Ne" onclick="window.interactiveLab.changeSession2Item('Ne')">نيون (10Ne - غاز نبيل)</button>
+              <button class="lab-pill-btn" data-symbol="Ar" onclick="window.interactiveLab.changeSession2Item('Ar')">أرجون (18Ar - غاز نبيل)</button>
+              <button class="lab-pill-btn" data-symbol="Na" onclick="window.interactiveLab.changeSession2Item('Na')">صوديوم (11Na - نشط)</button>
+              <button class="lab-pill-btn" data-symbol="Cl" onclick="window.interactiveLab.changeSession2Item('Cl')">كلور (17Cl - نشط)</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    this._updateAtomInfoSession2(infoEl);
+  }
+
+  changeSession2Item(symbol) {
+    const presets = {
+      'H1': {
+        element: 'Hydrogen-1',
+        nameAr: 'نظير البروتيوم (¹₁H)',
+        atomicNum: 1,
+        massNum: 1,
+        protons: 1,
+        neutrons: 0,
+        shells: [1],
+        category: 'isotope',
+        statusText: 'نظير هيدروجين عادي (أبسط ذرة في الكون بلا نيوترونات)',
+        statusColor: '#38bdf8',
+        text: 'البروتيوم هو الهيدروجين العادي وأبسط ذرة في الكون؛ نواته فيها بروتون واحد فقط وبدون أي نيوترونات (n=0)، كتلته 1 وعنده إلكترون واحد يدور في المستوى K!'
+      },
+      'H2': {
+        element: 'Hydrogen-2',
+        nameAr: 'نظير الديوتيريوم (²₁H)',
+        atomicNum: 1,
+        massNum: 2,
+        protons: 1,
+        neutrons: 1,
+        shells: [1],
+        category: 'isotope',
+        statusText: 'نظير هيدروجين ثقيل (يحتوي على 1 نيوترون داخل النواة)',
+        statusColor: '#0ea5e9',
+        text: 'الديوتيريوم نظير هيدروجين؛ نواته فيها بروتون واحد وانضاف له نيوترون متعادل، عدده الذري 1 بس كتلته بقت 2! ونفس الخواص الكيميائية عشان مداره فيه إلكترون واحد!'
+      },
+      'H3': {
+        element: 'Hydrogen-3',
+        nameAr: 'نظير التريتيوم (³₁H)',
+        atomicNum: 1,
+        massNum: 3,
+        protons: 1,
+        neutrons: 2,
+        shells: [1],
+        category: 'isotope',
+        statusText: 'نظير هيدروجين مشع (يحتوي على 2 نيوترون داخل النواة)',
+        statusColor: '#6366f1',
+        text: 'التريتيوم نظير هيدروجين مشع أثقل؛ نواته فيها بروتون واحد و 2 نيوترون فكتلته بقت 3! لاحظ إن التلاتة متفقين في العدد الذري 1 ومختلفين في الكتلة عشان النيوترونات!'
+      },
+      'Ne': {
+        element: 'Neon',
+        nameAr: 'غاز النيون (10Ne - غاز نبيل)',
+        atomicNum: 10,
+        massNum: 20,
+        protons: 10,
+        neutrons: 10,
+        shells: [2, 8],
+        category: 'inert',
+        statusText: '🟢 غاز خامل مستقر (المستوى الخارجي L مكتمل بـ 8 إلكترونات)',
+        statusColor: '#10b981',
+        text: 'غاز النيون عدد ذري 10، توزيعه [K=2, L=8]. مداره الخارجي مكتمل تماماً بـ 8 إلكترونات، عشان كده هو غاز خامل ومستقر كيميائياً ومش محتاج يدخل أي تفاعل!'
+      },
+      'Ar': {
+        element: 'Argon',
+        nameAr: 'غاز الأرجون (18Ar - غاز نبيل)',
+        atomicNum: 18,
+        massNum: 40,
+        protons: 18,
+        neutrons: 22,
+        shells: [2, 8, 8],
+        category: 'inert',
+        statusText: '🟢 غاز خامل مستقر (المستوى الخارجي M مكتمل بـ 8 إلكترونات)',
+        statusColor: '#10b981',
+        text: 'غاز الأرجون عدده الذري 18، متوزع [K=2, L=8, M=8]. لا يتحمل المدار الخارجي لأي ذرة أكثر من 8 إلكترونات، وهو مستقر جداً ولا يتفاعل!'
+      },
+      'Na': {
+        element: 'Sodium',
+        nameAr: 'عنصر الصوديوم (11Na - فلز نشط)',
+        atomicNum: 11,
+        massNum: 23,
+        protons: 11,
+        neutrons: 12,
+        shells: [2, 8, 1],
+        category: 'active',
+        statusText: '🔴 عنصر فلزي نشط جداً (المستوى الخارجي به 1 إلكترون يميل لفقده)',
+        statusColor: '#ef4444',
+        text: 'الصوديوم عدده الذري 11، توزيعه [K=2, L=8, M=1]. عنده إلكترون وحيد في المستوى الخارجي فبيميل لفقده في التفاعل، عشان كده هو فلز نشط جداً!'
+      },
+      'Cl': {
+        element: 'Chlorine',
+        nameAr: 'عنصر الكلور (17Cl - لافلز نشط)',
+        atomicNum: 17,
+        massNum: 35,
+        protons: 17,
+        neutrons: 18,
+        shells: [2, 8, 7],
+        category: 'active',
+        statusText: '🔴 عنصر لافلزي نشط (المستوى الخارجي به 7 إلكترونات يميل لاكتساب إلكترون)',
+        statusColor: '#f97316',
+        text: 'الكلور عدده الذري 17، توزيعه [K=2, L=8, M=7]. مداره الخارجي ناقصه إلكترون واحد عشان يكتمل لـ 8، فبيميل لاكتسابه في التفاعل، عشان كده هو لافلز نشط جداً!'
+      }
+    };
+
+    if (presets[symbol]) {
+      this.atomData = presets[symbol];
+      this._rebuildAtom();
+      this._updateAtomInfoSession2(document.getElementById('lab-info-bar'));
+
+      document.querySelectorAll('.lab-session2-controls .lab-pill-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.symbol === symbol);
+      });
+
+      window.appController?.playLabAudio(`lab_atom_${symbol}`, presets[symbol].text);
+    }
+  }
+
+  _updateAtomInfoSession2(infoEl) {
+    if (!infoEl) return;
+    const d = this.atomData;
+    const shellsStr = d.shells.map((c, i) => `[${['K','L','M','N'][i] || i}=${c}]`).join(' - ');
+    infoEl.innerHTML = `
+      <div class="lab-stat"><span class="stat-label">المجسم:</span><span class="stat-val" style="color:#0284c7; font-weight:800;">${d.nameAr}</span></div>
+      <div class="lab-stat"><span class="stat-label">العدد (Z / A):</span><span class="stat-val" style="color:#ef4444;">ذري: ${d.atomicNum} | كتلي: ${d.massNum}</span></div>
+      <div class="lab-stat"><span class="stat-label">النيوترونات (n):</span><span class="stat-val" style="color:#38bdf8; font-weight:800;">${d.neutrons} نيوترون</span></div>
+      <div class="lab-stat"><span class="stat-label">توزيع (2n²):</span><span class="stat-val" style="color:#7c3aed; font-weight:800;">${shellsStr}</span></div>
+      <div class="lab-stat"><span class="stat-label">الحالة والنشاط:</span><span class="stat-val" style="color:${d.statusColor || '#10b981'}; font-weight:800;">${d.statusText}</span></div>
+    `;
   }
 
   changeElement(symbol) {
@@ -458,17 +656,18 @@ class InteractiveLab {
   // ═════════════════════════════════════════════════════════════
   // 4. الروابط الكيميائية (u1_l4_bonds)
   // ═════════════════════════════════════════════════════════════
-  _buildBondsScene(controlsEl, infoEl) {
+  _buildBondsScene(controlsEl, infoEl, sessionNum = 1) {
     this.bondsGroup = new THREE.Group();
     this.scene.add(this.bondsGroup);
 
-    this.setBondType('ionic');
+    const defaultBond = (Number(sessionNum) === 2) ? 'covalent' : 'ionic';
+    this.setBondType(defaultBond);
 
     if (controlsEl) {
       controlsEl.innerHTML = `
         <div class="lab-pill-group">
-          <button class="lab-pill-btn active" id="btn-bond-ionic" onclick="window.interactiveLab.setBondType('ionic')">🧂 رابطة أيونية (ملح الطعام NaCl)</button>
-          <button class="lab-pill-btn" id="btn-bond-covalent" onclick="window.interactiveLab.setBondType('covalent')">💧 رابطة تساهمية (جزيء الماء H2O)</button>
+          <button class="lab-pill-btn ${defaultBond === 'ionic' ? 'active' : ''}" id="btn-bond-ionic" onclick="window.interactiveLab.setBondType('ionic')">🧂 رابطة أيونية (ملح الطعام NaCl)</button>
+          <button class="lab-pill-btn ${defaultBond === 'covalent' ? 'active' : ''}" id="btn-bond-covalent" onclick="window.interactiveLab.setBondType('covalent')">💧 رابطة تساهمية (جزيء الماء H2O)</button>
         </div>
       `;
     }
@@ -1183,7 +1382,7 @@ class InteractiveLab {
   // ═════════════════════════════════════════════════════════════
   // 10. الكسوف والخسوف (u4_l2_eclipses)
   // ═════════════════════════════════════════════════════════════
-  _buildEclipseScene(controlsEl, infoEl) {
+  _buildEclipseScene(controlsEl, infoEl, sessionNum = 1) {
     const sunGeo = new THREE.SphereGeometry(1.8, 32, 32);
     const sunMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
     this.sun = new THREE.Mesh(sunGeo, sunMat);
@@ -1202,13 +1401,14 @@ class InteractiveLab {
     this.moon.position.set(0, 0, 0);
     this.scene.add(this.moon);
 
-    this.setEclipseMode('solar');
+    const defaultMode = (Number(sessionNum) === 1) ? 'lunar' : 'solar';
+    this.setEclipseMode(defaultMode);
 
     if (controlsEl) {
       controlsEl.innerHTML = `
         <div class="lab-pill-group">
-          <button class="lab-pill-btn active" id="btn-solar" onclick="window.interactiveLab.setEclipseMode('solar')">☀️ كسوف الشمس (القمر في المنتصف نهاراً)</button>
-          <button class="lab-pill-btn" id="btn-lunar" onclick="window.interactiveLab.setEclipseMode('lunar')">🌕 خسوف القمر (الأرض في المنتصف ليلاً)</button>
+          <button class="lab-pill-btn ${defaultMode === 'solar' ? 'active' : ''}" id="btn-solar" onclick="window.interactiveLab.setEclipseMode('solar')">☀️ كسوف الشمس (القمر في المنتصف نهاراً)</button>
+          <button class="lab-pill-btn ${defaultMode === 'lunar' ? 'active' : ''}" id="btn-lunar" onclick="window.interactiveLab.setEclipseMode('lunar')">🌕 خسوف القمر (الأرض في المنتصف ليلاً)</button>
         </div>
       `;
     }
