@@ -59,8 +59,8 @@ AUDIO_MAPPINGS = {
     # القسم الرابع (الكويزات)
     r"القسم الرابع\WhatsApp Ptt 2026-09-17 at 3.28.59 PM.ogg": ["quiz_correct_1.mp3"],
     r"القسم الرابع\WhatsApp Ptt 2026-09-17 at 3.29.07 PM.ogg": ["quiz_correct_2.mp3"],
-    r"القسم الرابع\WhatsApp Ptt 2026-09-17 at 3.29.20 PM.ogg": ["quiz_wrong_1.mp3"],
-    r"القسم الرابع\WhatsApp Ptt 2026-09-17 at 3.29.32 PM.ogg": ["quiz_wrong_2.mp3"],
+    r"القسم الرابع\WhatsApp Ptt 2026-09-17 at 3.29.20 PM.ogg": ["quiz_wrong_1.mp3", "quiz_wrong_2.mp3"],
+    r"القسم الرابع\WhatsApp Ptt 2026-09-17 at 3.29.32 PM.ogg": ["quiz_completed_perfect.mp3"],
 
     # أسئلة علل والقسم الخامس
     r"القسم الخامس\WhatsApp Ptt 2026-09-17 at 3.30.42 PM.ogg": ["why_atom_positive.mp3"],

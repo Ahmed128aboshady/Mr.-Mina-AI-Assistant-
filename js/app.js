@@ -1906,9 +1906,7 @@ class AppController {
         </div>
       `;
 
-      const wrongAudios = ['quiz_wrong_1', 'quiz_wrong_2'];
-      const chosenWrong = wrongAudios[Math.floor(Math.random() * wrongAudios.length)];
-      this.playLabAudio(chosenWrong, `ركز يا بطل! ${explanation}`);
+      this.playLabAudio('quiz_wrong_1', `ركز يا بطل! ${explanation}`);
     }
 
     // 🏆 سجّل إجابة الكويز في الداتا بيز
