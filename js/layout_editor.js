@@ -14,7 +14,7 @@ class OdooWebsiteBuilder {
 
     // Independent Isolated Layers (Exact User-Designed Layout Locked)
     this.defaultLayers = {
-      avatar: { id: 'avatar', name: 'الأفاتار (مستر مينا)', icon: '👤', selector: '#stage-center-avatar', x: 0, y: 0, scale: 1, rotY: 0, zIndex: 25, visible: true, locked: false },
+      avatar: { id: 'avatar', name: 'الأفاتار (مستر مينا)', icon: '👤', selector: '#stage-center-avatar', x: 0, y: -50, scale: 1, rotY: 0, zIndex: 25, visible: true, locked: false },
       logo: { id: 'logo', name: 'اللوجو واسم المنصة', icon: '🏷️', selector: '.header-logo-wrap', x: -30, y: 104, scale: 1.34, rotY: 0, zIndex: 50, visible: true, locked: false },
       badges: { id: 'badges', name: 'أزرار الصفوف (1, 2, 3)', icon: '🔢', selector: '.grade-badges-col', x: 122, y: 77, scale: 0.82, rotY: 0, zIndex: 50, visible: true, locked: false },
       stage1: { id: 'stage1', name: 'كارت المرحلة الأولى', icon: '📘', selector: '#stage-card-1', x: 202, y: 8, scale: 1, rotY: 0, zIndex: 30, visible: true, locked: false },
@@ -213,10 +213,15 @@ class OdooWebsiteBuilder {
         const parsed = JSON.parse(saved);
         if (parsed.layers) {
           this.layers = Object.assign({}, this.defaultLayers, parsed.layers);
-          if (this.layers.avatar && (this.layers.avatar.y < -50 || this.layers.avatar.y > 150 || Math.abs(this.layers.avatar.x) > 150 || this.layers.avatar.scale > 1.15)) {
-            this.layers.avatar.x = 0;
-            this.layers.avatar.y = 0;
-            this.layers.avatar.scale = 1;
+          if (this.layers.avatar) {
+            if (Math.abs(this.layers.avatar.y) <= 10) {
+              this.layers.avatar.y = -50;
+            }
+            if (this.layers.avatar.y < -180 || this.layers.avatar.y > 150 || Math.abs(this.layers.avatar.x) > 150 || this.layers.avatar.scale > 1.15) {
+              this.layers.avatar.x = 0;
+              this.layers.avatar.y = -50;
+              this.layers.avatar.scale = 1;
+            }
           }
           if (this.layers.lessonAvatar && (this.layers.lessonAvatar.scale > 1.25 || Math.abs(this.layers.lessonAvatar.y) > 80 || Math.abs(this.layers.lessonAvatar.x) > 150)) {
             this.layers.lessonAvatar.x = 0;
@@ -444,9 +449,9 @@ class OdooWebsiteBuilder {
     if (l.zIndex) el.style.zIndex = l.zIndex;
 
     if (key === 'avatar') {
-      if (posY < -50 || posY > 150) {
-        posY = 0;
-        l.y = 0;
+      if (posY < -180 || posY > 150) {
+        posY = -50;
+        l.y = -50;
       }
       if (Math.abs(posX) > 150) {
         posX = 0;
@@ -1203,7 +1208,7 @@ class OdooWebsiteBuilder {
 
       if (this.dragCandidate === 'avatar') {
         l.x = Math.max(-120, Math.min(120, this.initialPos.x + dx));
-        l.y = Math.max(-40, Math.min(120, this.initialPos.y - dy));
+        l.y = Math.max(-160, Math.min(120, this.initialPos.y - dy));
       } else if (this.dragCandidate === 'chat') {
         l.x = 0;
         l.y = Math.max(10, Math.min(180, this.initialPos.y - dy));
@@ -1431,10 +1436,15 @@ class OdooWebsiteBuilder {
           if (this.layers.chat.y < 0 || this.layers.chat.y > 180) this.layers.chat.y = 47;
         }
 
-        if (this.layers.avatar && (this.layers.avatar.y < -50 || this.layers.avatar.y > 150 || Math.abs(this.layers.avatar.x) > 150 || this.layers.avatar.scale > 1.15)) {
-          this.layers.avatar.x = 0;
-          this.layers.avatar.y = 0;
-          this.layers.avatar.scale = 1;
+        if (this.layers.avatar) {
+          if (Math.abs(this.layers.avatar.y) <= 10) {
+            this.layers.avatar.y = -50;
+          }
+          if (this.layers.avatar.y < -180 || this.layers.avatar.y > 150 || Math.abs(this.layers.avatar.x) > 150 || this.layers.avatar.scale > 1.15) {
+            this.layers.avatar.x = 0;
+            this.layers.avatar.y = -50;
+            this.layers.avatar.scale = 1;
+          }
         }
 
         if (this.layers.lessonAvatar && (this.layers.lessonAvatar.scale > 1.25 || Math.abs(this.layers.lessonAvatar.y) > 80 || Math.abs(this.layers.lessonAvatar.x) > 150)) {
