@@ -8,6 +8,7 @@ To:   D:\\Mina\\app\\audio_cache\\
 import os
 import re
 import sys
+import json
 import shutil
 import subprocess
 from pathlib import Path
@@ -27,9 +28,15 @@ CURRICULUM_FILE = Path(r"D:\Mina\app\js\curriculum_data.js")
 
 def normalize_filename(filename: str) -> str:
     base = filename.strip()
+    # Fix multiple consecutive dots like 'name..ogg'
     base = re.sub(r'\.+', '.', base)
     stem, ext = os.path.splitext(base)
     stem = stem.strip('. ')
+    
+    # Fix common typos like missing 'w' in 'why_'
+    if stem.startswith('hy_u') or stem.startswith('hy_'):
+        stem = 'w' + stem
+        
     return stem
 
 def convert_to_mp3(src_file: Path, dest_file: Path):
@@ -45,6 +52,53 @@ def convert_to_mp3(src_file: Path, dest_file: Path):
             return True, "Converted via ffmpeg"
         except Exception as e2:
             return False, f"Failed: {e} / {e2}"
+
+def link_audio_to_curriculum():
+    if not CURRICULUM_FILE.exists():
+        return
+    cache_files = set(f.name for f in TARGET_DIR.iterdir() if f.name.endswith('.mp3'))
+
+    with open(CURRICULUM_FILE, 'r', encoding='utf-8') as f:
+        text = f.read()
+
+    m = re.search(r'window\.CURRICULUM_GRADE_1\s*=\s*(\{.*?\});\s*(?:window|$)', text, re.DOTALL)
+    if not m:
+        return
+
+    curriculum = json.loads(m.group(1))
+    updated_count = 0
+
+    for u in curriculum.get('units', []):
+        for l in u.get('lessons', []):
+            lid = l.get('lessonId', '')
+            prefix = f"{lid.split('_')[0]}_{lid.split('_')[1]}"
+            for s in l.get('sessions', []):
+                snum = s.get('sessionNum', 1)
+                whys = s.get('whyQuestions', [])
+                for w_idx, w in enumerate(whys, 1):
+                    expected_key = f"why_{prefix}_s{snum}_q{w_idx}"
+                    expected_mp3 = f"{expected_key}.mp3"
+                    curr_audio = w.get('audio')
+
+                    if (not curr_audio or curr_audio == expected_key) and expected_mp3 in cache_files:
+                        if w.get('audio') != expected_key:
+                            w['audio'] = expected_key
+                            updated_count += 1
+                            print(f"   🔗 Linked: {expected_key} -> {w.get('q')}")
+
+    if updated_count > 0:
+        new_json = json.dumps(curriculum, ensure_ascii=False, indent=2)
+        new_text = re.sub(
+            r'window\.CURRICULUM_GRADE_1\s*=\s*\{.*?\};\s*(?:window|$)',
+            f'window.CURRICULUM_GRADE_1 = {new_json};\n',
+            text,
+            flags=re.DOTALL
+        )
+        with open(CURRICULUM_FILE, 'w', encoding='utf-8') as f:
+            f.write(new_text)
+        print(f"✨ Successfully linked {updated_count} question(s) in curriculum_data.js!")
+    else:
+        print("⚡ All existing why audios already linked in curriculum_data.js.")
 
 def sync_recordings():
     if not SOURCE_DIR.exists():
@@ -86,8 +140,8 @@ def sync_recordings():
                     updated_files.append(clean_stem)
                 else:
                     print(f"   ❌ Error: {msg}")
-            else:
-                print(f"   ⚡ '{clean_stem}.mp3' already up to date in audio_cache.")
+
+    link_audio_to_curriculum()
 
     print(f"\n✨ Summary: Found {found_count} source recording(s), synced {synced_count} file(s).")
     return updated_files
