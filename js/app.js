@@ -1993,7 +1993,7 @@ class AppController {
 
   playWelcomeVoice() {
     window.appAudioManager?.stopAll();
-    const welcomeText = 'أهلاً بيك يا دكتور أنا مستر مينا جرجس معلم العلوم مساعدك الذكي جاهز لشرح أي درس والإجابة على أي سؤال في المنهج!';
+    const welcomeText = 'أهلاً بيك يا دكتور أنا مستر مينا جرجس معلم العلوم ومساعدك الذكي! جاهز لشرح أي درس في المنهج، وتوضيح أي تجربة في المعمل، والإجابة على كل أسئلتك فوراً. يلا بينا نبدأ رحلة التفوق مع بعض!';
     this.typewriterSpeech(welcomeText);
     window.appAudioManager?.play('audio_cache/welcome_mr_mena.mp3');
   }
