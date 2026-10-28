@@ -1669,8 +1669,8 @@ class AppController {
     const sessionWord = sessionWordMap[sessionNum] || 'أول';
     const introAudio = `audio_cache/intro_session_${sessionNum}.mp3`;
     const introText = (sessionNum === 1)
-      ? 'أهلاً بيك يا بطل في أول حصة مع مستر مينا، جاهز نكتشف أسرار العلوم سوا؟'
-      : 'أهلاً بيك يا بطل في تاني حصة مع مستر مينا، يلا نكمل مغامرتنا العلمية ونقفل درجاتنا النهائية!';
+      ? 'أهلاً بيك يا بطل في الحصة الأولى! جهز كشكولك وقلمك وركز معايا في كل كلمة، هنفهم علوم أولى إعدادي بطريقة سهلة وممتعة ومبسطة جداً، يلا بينا!'
+      : 'يا مرحب بيك يا دكتور في الحصة التانية! جهز نفسك عشان هنكمل الرحلة ونحل مع بعض أفكار ومسائل الامتحانات ونطبق في المعمل التفاعلي سوا!';
 
     setTimeout(() => {
       window.appAudioManager.stopAll();
@@ -1908,7 +1908,23 @@ class AppController {
         </div>
       `;
 
-      this.playLabAudio('quiz_wrong_1', `ركز يا بطل! ${explanation}`);
+      const wrongAudios = ['quiz_wrong_1', 'quiz_wrong_2'];
+      const chosenWrong = wrongAudios[Math.floor(Math.random() * wrongAudios.length)];
+      this.playLabAudio(chosenWrong, `ركز يا بطل! ${explanation}`);
+
+      // فحص إتمام جميع أسئلة الكويز بالدرجة الكاملة
+      setTimeout(() => {
+        const allBoxes = document.querySelectorAll('.quiz-box');
+        const answeredBoxes = document.querySelectorAll('.quiz-feedback-card');
+        if (allBoxes.length > 0 && answeredBoxes.length === allBoxes.length) {
+          const wrongBoxes = document.querySelectorAll('.quiz-feedback-card.wrong');
+          if (wrongBoxes.length === 0) {
+            setTimeout(() => {
+              this.playLabAudio('quiz_completed_perfect', 'ألف مبروك يا عبقري! جبت الدرجة النهائية 100% في التحدي، أداء أسطوري وتستاهل لقب دكتور العلوم بجدارة، فخور بيك جداً يا بطل!');
+            }, 3500);
+          }
+        }
+      }, 500);
     }
 
     // 🏆 سجّل إجابة الكويز في الداتا بيز
@@ -2076,7 +2092,7 @@ class AppController {
   playLabAudio(audioId, fallbackText) {
     const labSpeechMap = {
       'lab_atom_C': 'ذرة الكربون عددها الذري 6 وكتلتها 12، وفيها 6 بروتونات و 6 نيوترونات، والمستوى الأول K فيه 2 والتاني L فيه 4 إلكترونات!',
-      'lab_atom_H': 'ذرة الهيدروجين أبسط ذرة في الكون، فيها بروتون واحد وإلكترون واحد في المستوى K، ومافيهاش نيوترونات خالص!',
+      'lab_atom_H': 'ذرة الهيدروجين H هي أبسط ذرة في الكون، نواتها فيها بروتون واحد بس وبدون أي نيوترونات، وبيدور حواليها إلكترون واحد في المستوى K!',
       'lab_atom_He': 'ذرة الهيليوم غاز خامل ومستقر جداً، فيها 2 بروتون و 2 نيوترون، ومستوى الطاقة الأول K ممتلئ تماماً بـ 2 إلكترون!',
       'lab_atom_O': 'ذرة الأكسجين عددها الذري 8، متوزعة 2 في المستوى الأول K و 6 في المستوى التاني L، ومحتاجة 2 إلكترون عشان تستقر!',
       'lab_atom_Na': 'ذرة الصوديوم فلز نشط جداً، عددها الذري 11، متوزعة 2 في K و 8 في L وإلكترون وحيد في M بتميل لفقده في التفاعلات!',
