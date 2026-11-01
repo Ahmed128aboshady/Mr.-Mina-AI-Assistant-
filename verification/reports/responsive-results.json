@@ -1,0 +1,16 @@
+{
+  "errors": [],
+  "results": [
+    "Chat lab action opens the simulation directly.",
+    "u1_l1_atom second session mounts with reduced motion and rotation controls.",
+    "u1_l4_bonds second session mounts with reduced motion and rotation controls.",
+    {
+      "canvas": 474,
+      "css": 474,
+      "dpr": 1,
+      "horizontal": 0
+    },
+    "Missing audio retains readable answer and retry.",
+    "Unavailable 3D library has readable fallback and working retry."
+  ]
+}

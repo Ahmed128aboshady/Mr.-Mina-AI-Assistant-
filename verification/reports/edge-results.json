@@ -1,0 +1,12 @@
+{
+  "results": [
+    "Wrong-password recovery and session excludes password.",
+    "84 exact why questions return their answer and correct session.",
+    "Follow-up simplification keeps chat topic while another lesson is open.",
+    "Browser Back closes sheet and restores screen.",
+    "Malformed stored progress/activity does not break lesson loading.",
+    "Logout synchronizes across tabs and locks background.",
+    "Missing production auth client cannot use demo credentials."
+  ],
+  "errors": []
+}

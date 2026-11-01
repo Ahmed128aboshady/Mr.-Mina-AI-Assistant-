@@ -1,0 +1,27 @@
+{
+  "results": [
+    {
+      "viewport": {
+        "width": 390,
+        "height": 760
+      },
+      "labRoutes": 24,
+      "quizMappings": 24,
+      "silentEntry": true,
+      "starsPersist": true,
+      "invalidLinkRecovery": true
+    },
+    {
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "labRoutes": 24,
+      "quizMappings": 24,
+      "silentEntry": true,
+      "starsPersist": true,
+      "invalidLinkRecovery": true
+    }
+  ],
+  "errors": []
+}

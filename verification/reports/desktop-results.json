@@ -1,0 +1,18 @@
+[
+  {
+    "mode": "baseline",
+    "url": "http://127.0.0.1:4320/baseline/index.html?desktop=1",
+    "mobileStyles": 0
+  },
+  {
+    "mode": "current",
+    "url": "http://127.0.0.1:4320/index.html?desktop=1",
+    "mobileStyles": 0
+  },
+  {
+    "desktopScreenshotIdentical": true
+  },
+  "Tablet entry preserves session hash.",
+  "Rotation preserves route.",
+  "Explicit desktop choice respected on tablet."
+]

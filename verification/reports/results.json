@@ -1,0 +1,124 @@
+{
+  "errors": [],
+  "results": [
+    "Existing local-demo auth flow; background inert before login.",
+    {
+      "width": 375,
+      "height": 568,
+      "vertical": 0,
+      "horizontal": 0,
+      "cards": true,
+      "small": []
+    },
+    {
+      "width": 375,
+      "height": 667,
+      "vertical": 0,
+      "horizontal": 0,
+      "cards": true,
+      "small": []
+    },
+    {
+      "width": 390,
+      "height": 760,
+      "vertical": 0,
+      "horizontal": 0,
+      "cards": true,
+      "small": []
+    },
+    {
+      "width": 390,
+      "height": 800,
+      "vertical": 0,
+      "horizontal": 0,
+      "cards": true,
+      "small": []
+    },
+    {
+      "width": 430,
+      "height": 932,
+      "vertical": 0,
+      "horizontal": 0,
+      "cards": true,
+      "small": []
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "vertical": 0,
+      "horizontal": 0,
+      "cards": true,
+      "small": []
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "vertical": 0,
+      "horizontal": 0,
+      "cards": true,
+      "small": []
+    },
+    {
+      "width": 667,
+      "height": 375,
+      "vertical": 0,
+      "horizontal": 0,
+      "cards": true,
+      "small": []
+    },
+    "All four lessons and eight sessions in unit one rendered from curriculum.",
+    "Real recorded question audio playing.",
+    "Shared curriculum engine answers with current session context.",
+    "Quiz uses all session questions; wrong-answer recovery and star count correct.",
+    {
+      "lab": "u1_l1_atom",
+      "buttons": 5
+    },
+    {
+      "lab": "u1_l2_periodic",
+      "buttons": 0
+    },
+    {
+      "lab": "u1_l3_matter",
+      "buttons": 5
+    },
+    {
+      "lab": "u1_l4_bonds",
+      "buttons": 2
+    },
+    {
+      "lab": "u2_l1_electric",
+      "buttons": 0
+    },
+    {
+      "lab": "u2_l2_magnetic",
+      "buttons": 0
+    },
+    {
+      "lab": "u2_l3_gravity",
+      "buttons": 0
+    },
+    {
+      "lab": "u3_l1_cells",
+      "buttons": 8
+    },
+    {
+      "lab": "u3_l2_traits",
+      "buttons": 2
+    },
+    {
+      "lab": "u3_l3_microbes",
+      "buttons": 8
+    },
+    {
+      "lab": "u4_l1_solar_system",
+      "buttons": 0
+    },
+    {
+      "lab": "u4_l2_eclipse",
+      "buttons": 2
+    },
+    "All lesson simulations mounted; renderer disposed on exit.",
+    "Account switch isolates progress and chat."
+  ]
+}

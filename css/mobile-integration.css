@@ -1,0 +1,46 @@
+/* Additional production states, scoped to the mobile page. */
+.mina-mobile .m-course-card{margin:12px 0;padding:16px;background:#fff;border:1px solid var(--m-line);border-radius:18px}
+.mina-mobile .m-course-card h2{font-size:17px;margin-bottom:10px}
+.mina-mobile .m-session-button{display:flex;flex-direction:column;text-align:right;width:100%;padding:12px;margin-block:8px;gap:4px;border-radius:12px;border:1px solid var(--m-line);background:#f5f8fb;font-size:15px}
+.mina-mobile .m-session-button span{font-size:13px;color:var(--m-muted);white-space:normal}
+.mina-mobile .m-rules{padding-inline-start:22px;line-height:1.9}
+.mina-mobile .m-rules li{padding:8px 0}
+.mina-mobile .m-steps button{flex:1;background:#eaf0f6;border-radius:12px;font-size:13px}
+.mina-mobile .m-steps button[aria-current]{background:var(--m-aqua);color:var(--m-primary)}
+.mina-mobile #sidebar-lessons .m-secondary{margin-block:6px}
+.mina-mobile .m-chat-extra{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px}
+.mina-mobile .m-chat-message .m-text-btn{display:block;font-size:13px;border-top:1px solid #c7dedf;width:100%;margin-top:8px;white-space:normal}
+.mina-mobile .m-chat-sheet #sheet-content{height:calc(100% - 73px)}
+.mina-mobile #mobile-lab-mount{margin-top:16px}
+.mina-mobile .m-real-lab{display:grid;gap:16px;--accent-green:#74e2b0;--accent-gold:#f6d170;--text-primary:#ecf5ff;--text-secondary:#b8c8d9;--border:#34516d}
+.mina-mobile .m-lab-visual{min-width:0}
+.mina-mobile #lab-canvas-wrap{height:clamp(240px,40dvh,360px);border-radius:18px;background:#070b14;overflow:hidden;position:relative}
+.mina-mobile #lab-3d-canvas{width:100%;height:100%;display:block}
+.mina-mobile .m-lab-tool-panel{background:#102338;color:#fff;border-radius:18px;padding:14px;min-width:0}
+.mina-mobile .m-lab-tool-panel h2{font-size:17px;margin-bottom:12px}
+.mina-mobile .lab-pill-group{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.mina-mobile .lab-pill-btn{flex:1 1 100px;min-height:48px;padding:10px;border:1px solid #6787a8;border-radius:12px;background:#1c3855;color:#fff;font-size:14px;white-space:normal;overflow-wrap:anywhere}
+.mina-mobile .lab-pill-btn.active{background:#086b86;border-color:#9fe1e5}
+.mina-mobile #lab-controls{min-width:0}
+.mina-mobile #lab-controls [role=note]{cursor:default;display:block;line-height:1.8}
+.mina-mobile #lab-info-bar .stat-val{color:#c5f3ff!important}
+.mina-mobile #lab-audio-explanation{line-height:1.9;border-top:1px solid #587189;padding-top:12px}
+.mina-mobile #lesson-content button:disabled{opacity:1;color:#516377;background:#edf1f6;cursor:default}
+.mina-mobile #lab-controls input{min-height:48px;max-width:100%;font:inherit}
+.mina-mobile #lab-info-bar{margin-top:14px;display:grid;gap:8px;font-size:14px;overflow-wrap:anywhere}
+.mina-mobile .lab-stat{display:flex;gap:6px;flex-wrap:wrap}
+.mina-mobile .stat-label{color:#c2d4e8}
+.mina-mobile .m-rotation-controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.mina-mobile .m-rotation-controls button{flex:1;background:#fff;border:1px solid var(--m-line);border-radius:12px;padding:8px;font-size:13px}
+.mina-mobile .m-motion-control{display:flex;align-items:center;gap:8px;min-height:48px;cursor:pointer}
+.mina-mobile .m-motion-control input{width:24px;height:24px;accent-color:var(--m-primary)}
+.mina-mobile .mena-auth-modal-overlay{overflow-y:auto}
+.mina-mobile .mena-auth-card{max-height:calc(100dvh - 32px);overflow-y:auto}
+.mina-mobile .mena-auth-input{font-size:16px!important}
+.mina-mobile .mena-auth-btn{color:white}
+.mina-mobile .mena-auth-modal-overlay:not(.active){visibility:hidden}
+.mina-mobile .m-answer,.mina-mobile .m-lesson-idea,.mina-mobile .m-chat-message{overflow-wrap:anywhere}
+.mina-mobile [data-screen=lesson] h1{font-size:23px}
+@media(min-width:960px){.mina-mobile .m-real-lab{grid-template-columns:minmax(0,1fr) 230px}.mina-mobile .lab-pill-btn{flex-basis:100%}}
+@media(max-height:600px){.mina-mobile .mena-auth-logo{width:48px;height:48px;margin-bottom:8px}.mina-mobile .mena-auth-header{margin-bottom:12px}.mina-mobile .mena-auth-card{padding:18px}}
+@media(max-width:767px) and (max-height:400px){.mina-mobile .m-sheet-head{margin-bottom:8px}.mina-mobile .m-chat-note{display:none}.mina-mobile .m-chat-extra{display:none}.mina-mobile .m-chat-sheet #sheet-content{height:calc(100% - 58px)}}

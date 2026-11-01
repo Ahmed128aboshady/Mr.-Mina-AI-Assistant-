@@ -48,11 +48,15 @@ window.MenaAuth = {
   },
 
   setSession(student) {
-    localStorage.setItem('mena_current_student', JSON.stringify(student));
+    const {password, ...session}=student;
+    localStorage.setItem('mena_current_student', JSON.stringify(session));
     this.updateHeaderUI();
   },
 
   logout() {
+    window.appAudioManager?.stopAll();
+    window.appController?.hideExplanation?.();
+    document.querySelectorAll('#live-chat-messages,#lesson-chat-messages').forEach(el=>el.replaceChildren());
     localStorage.removeItem('mena_current_student');
     this.updateHeaderUI();
     this.showLoginModal();
@@ -102,7 +106,6 @@ window.MenaAuth = {
       this.setSession(demoStudent);
       return { success: true, student: demoStudent };
     }
-
     const isConfigured = window.MENA_SUPABASE_CONFIG?.isConfigured();
     const supabase = window.getSupabaseClient();
 
@@ -115,14 +118,17 @@ window.MenaAuth = {
           .eq('username', username)
           .single();
 
-        if (student && !error) {
-          if (student.password !== password) {
-            return { success: false, message: 'كلمة المرور غير صحيحة، حاول مرة أخرى.' };
-          }
+        if (error || !student) {
+          return { success: false, message: 'اسم المستخدم غير مسجل، برجاء مراجعة مستر مينا.' };
+        }
 
-          if (student.is_active === false) {
-            return { success: false, message: '⚠️ هذا الحساب معطل حالياً، برجاء مراجعة مستر مينا.' };
-          }
+        if (student.password !== password) {
+          return { success: false, message: 'كلمة المرور غير صحيحة، حاول مرة أخرى.' };
+        }
+
+        if (student.is_active === false) {
+          return { success: false, message: '⚠️ هذا الحساب معطل حالياً، برجاء مراجعة مستر مينا.' };
+        }
 
         // 🔒 التحقق الصارم من قفل الجهاز الواحد (Single Device Enforcement)
         if (!student.registered_device_id) {
@@ -140,6 +146,7 @@ window.MenaAuth = {
 
           if (updateErr) {
             console.warn("Device bind error:", updateErr);
+            return {success:false,message:'تعذّر تسجيل الجهاز. حاول مرة أخرى أو راجع مستر مينا.'};
           }
 
           student.registered_device_id = currentDeviceId;
@@ -172,11 +179,15 @@ window.MenaAuth = {
           };
         }
       } catch (err) {
-        console.warn("Supabase login check skipped:", err);
+        console.error("Login request error:", err);
+        return { success: false, message: 'حدث خطأ أثناء الاتصال بقاعدة البيانات. تأكد من اتصال الإنترنت.' };
       }
     }
 
-    // ── الحالة ب: محاكاة محلية ذكية حتى يتم إدخال مفاتيح Supabase ──
+    // Demo accounts are available only through the explicit loopback preview server.
+    if (!window.MENA_SUPABASE_CONFIG?.isLocalDemo || !['localhost','127.0.0.1','[::1]'].includes(location.hostname)) {
+      return {success:false,message:'تعذّر الاتصال بخدمة تسجيل الدخول. تأكد من الإنترنت وأعد تحميل الصفحة.'};
+    }
     const mockDbKey = 'mena_mock_students_db';
     let mockStudents = [];
     try {
@@ -200,6 +211,7 @@ window.MenaAuth = {
     if (!student) {
       return { success: false, message: 'اسم المستخدم غير مسجل، برجاء مراجعة مستر مينا.' };
     }
+    if(student.is_active===false)return {success:false,message:'هذا الحساب معطل حالياً.'};
 
     // السماح لـ admin بالدخول بكلمة سر admin أو 123456
     const isAdminPass = student.username.toLowerCase() === 'admin' && (password === 'admin' || password === '123456');
@@ -252,6 +264,12 @@ window.MenaAuth = {
     if (!this.isLoggedIn()) {
       this.showLoginModal();
     }
+    window.addEventListener('storage',event=>{
+      if(event.key!=='mena_current_student'||document.body.classList.contains('mina-mobile'))return;
+      window.appAudioManager?.stopAll();window.appController?.hideExplanation?.();
+      document.querySelectorAll('#live-chat-messages,#lesson-chat-messages').forEach(el=>el.replaceChildren());
+      this.updateHeaderUI();if(this.isLoggedIn())this.hideLoginModal();else this.showLoginModal();
+    });
   },
 
   injectStyles() {
@@ -572,12 +590,14 @@ window.MenaAuth = {
     const overlay = document.getElementById('mena-auth-overlay');
     if (overlay) {
       overlay.classList.add('active');
+      overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','تسجيل الدخول');
+      [...document.body.children].forEach(el=>{if(el!==overlay&&!el.inert&&!['SCRIPT','STYLE'].includes(el.tagName)){el.inert=true;el.dataset.menaAuthInert='true';}});
       const passInput = document.getElementById('mena-auth-pass');
       if (passInput) passInput.value = '';
       const userInput = document.getElementById('mena-auth-user');
       if (userInput) {
         userInput.value = '';
-        setTimeout(() => userInput.focus(), 150);
+        setTimeout(() => {if(overlay.classList.contains('active'))userInput.focus();}, 150);
       }
       const errBox = document.getElementById('mena-auth-error-box');
       if (errBox) {
@@ -590,6 +610,18 @@ window.MenaAuth = {
   hideLoginModal() {
     const overlay = document.getElementById('mena-auth-overlay');
     if (overlay) overlay.classList.remove('active');
+    document.querySelectorAll('[data-mena-auth-inert]').forEach(el=>{el.inert=false;delete el.dataset.menaAuthInert;});
+  },
+
+  fillQuickLogin() {
+    const userEl = document.getElementById('mena-auth-user');
+    const passEl = document.getElementById('mena-auth-pass');
+    if (userEl) userEl.value = 'admin';
+    if (passEl) passEl.value = 'admin';
+    const form = document.getElementById('mena-auth-form');
+    if (form) {
+      this.handleSubmit(new Event('submit'));
+    }
   },
 
   async handleSubmit(e) {
@@ -609,7 +641,9 @@ window.MenaAuth = {
     errBox.className = 'mena-auth-error';
     errBox.textContent = '';
 
-    const res = await this.login(username, password);
+    let res;
+    try { res = await this.login(username, password); }
+    catch { res = {success:false,message:'تعذّر تسجيل الدخول. تأكد من الاتصال والسماح بالتخزين في المتصفح ثم حاول مرة أخرى.'}; }
 
     btn.disabled = false;
     btn.textContent = 'تسجيل الدخول للمنصة';
@@ -617,16 +651,11 @@ window.MenaAuth = {
     if (res.success) {
       this.hideLoginModal();
       
-      // الترحيب الصوتي لمستر مينا عند الدخول
-      if (window.appController?.playWelcomeVoice) {
-        setTimeout(() => window.appController.playWelcomeVoice(), 500);
-      } else if (window.MobileApp?.playWelcomeAudio) {
-        setTimeout(() => window.MobileApp.playWelcomeAudio(), 500);
-      }
+      // Opening the platform is silent; lesson audio starts from its controls.
 
       const toast = document.createElement('div');
       toast.textContent = `مرحباً بك يا دكتور ${res.student.full_name || username}!`;
-      toast.style.cssText = 'position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#0f274a; color:#38bdf8; border:1px solid #0284c7; padding:12px 24px; border-radius:30px; font-weight:800; font-size:1rem; z-index:9999999; box-shadow:0 8px 30px rgba(0,0,0,0.6);';
+      toast.style.cssText = 'position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#0f274a; color:#38bdf8; border:1px solid #0284c7; padding:12px 24px; border-radius:30px; font-weight:800; font-size:1rem; z-index:9999999; box-shadow:0 8px 30px rgba(0,0,0,0.6); pointer-events:none;';
       document.body.appendChild(toast);
       setTimeout(() => toast.remove(), 3500);
     } else {
@@ -655,7 +684,9 @@ window.MenaAuth = {
   },
 
   updateHeaderUI() {
-    const student = this.getCurrentStudent();
+    const current = this.getCurrentStudent();
+    const escape = value => String(value ?? '').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    const student = current ? {...current,full_name:escape(current.full_name),username:escape(current.username),grade:escape(current.grade)} : null;
     const isMobile = !!document.querySelector('.mobile-app-container') || (window.location && window.location.pathname.includes('mobile.html'));
 
     if (isMobile) {

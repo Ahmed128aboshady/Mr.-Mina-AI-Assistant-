@@ -73,23 +73,7 @@ class CharacterViewer {
       character.rotation.y = Math.PI; // دوران 180 درجة ليواجه الطالب مباشرة
       this._baseY = character.position.y;
 
-      // تطبيق خامات وألوان الصورة الأصلية فائقة النقاء (High-Res Pixar Shading)
-      const texLoader = new THREE.TextureLoader();
-      texLoader.load('assets/mr_mena_character.png', (tex) => {
-        tex.encoding = THREE.sRGBEncoding || 3001;
-        tex.anisotropy = 16;
-        character.traverse((child) => {
-          if (child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
-            if (child.material) {
-              child.material.roughness = 0.4;
-              child.material.metalness = 0.05;
-              child.material.needsUpdate = true;
-            }
-          }
-        });
-      });
+      // Keep the model's embedded materials; the former unused texture URL did not exist.
 
       this.teacherGroup = character;
       this.scene.add(character);

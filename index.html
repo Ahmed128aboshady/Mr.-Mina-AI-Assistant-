@@ -21,22 +21,21 @@
 
   <!-- Styles -->
   <link rel="stylesheet" href="css/style.css?v=791.0" />
+  <link rel="stylesheet" href="css/specialized-labs.css?v=dedicated1" />
 
-  <!-- 📱 Automatic Mobile Detection & Seamless Routing to Mobile Version -->
+  <!-- Route at entry only; preserve explicit desktop choice and lesson URLs. -->
   <script>
-    (function() {
-      var isMobileScreen = window.innerWidth <= 768;
-      var isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      var isForcedDesktop = location.search.indexOf('desktop=1') !== -1 || sessionStorage.getItem('mena_force_desktop') === '1';
-      if ((isMobileScreen || isMobileDevice) && !isForcedDesktop) {
-        window.location.replace('mobile.html' + location.search);
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var savedDesktop = false;
+      try { savedDesktop = sessionStorage.getItem('mena_force_desktop') === '1'; } catch (_) {}
+      if (params.get('desktop') === '1' || savedDesktop) return;
+      var phone = window.innerWidth <= 767;
+      var tablet = window.innerWidth <= 1366 && window.matchMedia('(pointer: coarse)').matches;
+      if (phone || tablet || params.get('mobile') === '1') {
+        window.location.replace('mobile.html' + location.search + location.hash);
       }
     })();
-    window.addEventListener('resize', function() {
-      if (window.innerWidth <= 768 && location.search.indexOf('desktop=1') === -1 && sessionStorage.getItem('mena_force_desktop') !== '1') {
-        window.location.replace('mobile.html');
-      }
-    });
   </script>
 </head>
 <body>
@@ -531,14 +530,16 @@
   <!-- Supabase Database & Student Auth -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase_config.js?v=710.0"></script>
-  <script src="js/auth.js?v=797.0"></script>
+  <script src="js/auth.js?v=qa2"></script>
 
   <!-- App Modules -->
-  <script src="js/curriculum_data.js?v=796.0"></script>
-  <script src="js/character.js?v=790.0"></script>
+  <script src="js/curriculum_data.js?v=gravity-fix1"></script>
+  <script src="js/audio-catalog.js?v=qa2"></script>
+  <script src="js/character.js?v=qa2"></script>
   <script src="js/chat.js?v=790.0"></script>
-  <script src="js/interactive_lab.js?v=790.0"></script>
-  <script src="js/app.js?v=797.0"></script>
+  <script src="js/interactive_lab.js?v=dedicated1"></script>
+  <script src="js/specialized-labs.js?v=dedicated1"></script>
+  <script src="js/app.js?v=dedicated1"></script>
   <script src="js/layout_editor.js?v=791.0"></script>
 
 </body>

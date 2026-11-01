@@ -104,7 +104,8 @@ class InteractiveLab {
     let prevMousePos = { x: 0, y: 0 };
 
     canvas.addEventListener('mousedown', (e) => { isDragging = true; prevMousePos = { x: e.clientX, y: e.clientY }; });
-    window.addEventListener('mouseup', () => { isDragging = false; });
+    this._mouseUpHandler = () => { isDragging = false; };
+    window.addEventListener('mouseup', this._mouseUpHandler);
     canvas.addEventListener('mousemove', (e) => {
       if (!isDragging || !this.scene) return;
       const deltaX = e.clientX - prevMousePos.x;
@@ -141,7 +142,8 @@ class InteractiveLab {
     window.addEventListener('resize', this._resizeHandler);
 
     // 🔬 توجيه المجسم المخصص للدرس والحصة المحددة
-    this._buildSimulation(this.currentTopic, this.currentSessionNum);
+    this.building=true;
+    try{this._buildSimulation(this.currentTopic, this.currentSessionNum);}finally{this.building=false;}
 
     // Animation Loop
     const animate = () => {
@@ -183,8 +185,8 @@ class InteractiveLab {
       this._buildBondsScene(controlsEl, infoEl, activeSession);
     }
     // 5. الدرس الخامس: القوى الكهربية والدوائر
-    else if (topicId.includes('u2_l1') || topicId.includes('electric') || topicId.includes('energy')) {
-      this._buildEnergyScene(controlsEl, infoEl);
+    else if (topicId.includes('u2_l1') || topicId.includes('electric')) {
+      this._buildElectricScene(controlsEl, infoEl, activeSession);
     }
     // 6. الدرس السادس: القوى المغناطيسية والمجال
     else if (topicId.includes('u2_l2') || topicId.includes('magnetic') || topicId.includes('magnet') || topicId.includes('forces')) {
@@ -192,7 +194,7 @@ class InteractiveLab {
     }
     // 7. الدرس السابع: قوى الجاذبية والوزن
     else if (topicId.includes('u2_l3') || topicId.includes('gravity') || topicId.includes('weight')) {
-      this._buildEnergyScene(controlsEl, infoEl);
+      this._buildGravityScene(controlsEl, infoEl, activeSession);
     }
     // 8. الدرس الثامن: الخلية وحدة بناء الكائن الحي
     else if (topicId.includes('u3_l1') || topicId.includes('cell')) {
@@ -204,7 +206,7 @@ class InteractiveLab {
     }
     // 10. الدرس العاشر: الميكروبات والكائنات الدقيقة
     else if (topicId.includes('u3_l3') || topicId.includes('microbe') || topicId.includes('bacteria')) {
-      this._buildCellScene(controlsEl, infoEl);
+      this._buildMicrobesScene(controlsEl, infoEl, activeSession);
     }
     // 11. الدرس الحادي عشر: كوكب الأرض والنظام الشمسي
     else if (topicId.includes('u4_l1') || topicId.includes('solar') || topicId.includes('earth')) {
@@ -474,8 +476,8 @@ class InteractiveLab {
   }
 
   _rebuildAtom() {
-    while (this.nucleusGroup.children.length) this.nucleusGroup.remove(this.nucleusGroup.children[0]);
-    while (this.electronsGroup.children.length) this.electronsGroup.remove(this.electronsGroup.children[0]);
+    this._clearGroup(this.nucleusGroup);
+    this._clearGroup(this.electronsGroup);
     this.electrons = [];
 
     // 🔴 البروتونات (موجبة - أحمر متوهج) والنيوترونات (متعادلة - سماوي) داخل النواة
@@ -576,7 +578,7 @@ class InteractiveLab {
     if (controlsEl) {
       controlsEl.innerHTML = `
         <div class="lab-pill-group">
-          <button class="lab-pill-btn active">📊 مصفوفة الجدول الدوري ثلاثية الأبعاد (7 دورات و 18 مجموعة)</button>
+          <span class="lab-pill-btn active" role="note">📊 نموذج توضيحي لعناصر مختارة من الجدول الدوري — دوّر العرض لاستكشافه</span>
         </div>
       `;
     }
@@ -677,7 +679,7 @@ class InteractiveLab {
   }
 
   setBondType(type) {
-    while (this.bondsGroup.children.length) this.bondsGroup.remove(this.bondsGroup.children[0]);
+    this._clearGroup(this.bondsGroup);
     const infoEl = document.getElementById('lab-info-bar');
 
     document.getElementById('btn-bond-ionic')?.classList.toggle('active', type === 'ionic');
@@ -762,7 +764,7 @@ class InteractiveLab {
     if (controlsEl) {
       controlsEl.innerHTML = `
         <div class="lab-pill-group">
-          <button class="lab-pill-btn active">⏱️ محاكاة البندول البسيط وقانون بقاء الطاقة الميكانيكية</button>
+          <span class="lab-pill-btn active" role="note">⏱️ نموذج البندول وتحولات الطاقة الميكانيكية</span>
         </div>
       `;
     }
@@ -812,7 +814,7 @@ class InteractiveLab {
     if (controlsEl) {
       controlsEl.innerHTML = `
         <div class="lab-pill-group">
-          <button class="lab-pill-btn active">🧲 المغناطيس الكهربي (يحول الطاقة الكهربية إلى طاقة مغناطيسية)</button>
+          <span class="lab-pill-btn active" role="note">🧲 نموذج توضيحي لتركيب المغناطيس الكهربي</span>
         </div>
       `;
     }
@@ -865,7 +867,7 @@ class InteractiveLab {
 
   setCellType(type) {
     this.currentCellType = type;
-    while (this.cellGroup.children.length) this.cellGroup.remove(this.cellGroup.children[0]);
+    this._clearGroup(this.cellGroup);
     this.organelleMeshes = {};
 
     document.getElementById('btn-plant')?.classList.toggle('active', type === 'plant');
@@ -1337,6 +1339,7 @@ class InteractiveLab {
     if (this.chameleonMat) {
       this.chameleonMat.color.setHex(env === 'desert' ? 0xd97706 : 0x16a34a);
     }
+    document.querySelectorAll('#lab-controls button[onclick*="setCamouflage"]').forEach(button => button.classList.toggle('active', button.getAttribute('onclick').includes(`'${env}'`)));
   }
 
   // ═════════════════════════════════════════════════════════════
@@ -1369,7 +1372,7 @@ class InteractiveLab {
     if (controlsEl) {
       controlsEl.innerHTML = `
         <div class="lab-pill-group">
-          <button class="lab-pill-btn active">🌍 كوكب الحياة (الغلاف الجوي + المائي 71% + الجاذبية)</button>
+          <span class="lab-pill-btn active" role="note">🌍 نموذج كوكب الأرض — دوّر العرض لاستكشافه</span>
         </div>
       `;
     }
@@ -1504,7 +1507,22 @@ class InteractiveLab {
     }
   }
 
+  _disposeObjects(objects) {
+    const geometries=new Set(),materials=new Set(),textures=new Set();
+    objects.forEach(root=>root?.traverse(object=>{
+      if(object.geometry)geometries.add(object.geometry);
+      for(const material of Array.isArray(object.material)?object.material:object.material?[object.material]:[]){materials.add(material);for(const value of Object.values(material))if(value?.isTexture)textures.add(value);}
+    }));
+    textures.forEach(t=>t.dispose());materials.forEach(m=>m.dispose());geometries.forEach(g=>g.dispose());
+  }
+  _clearGroup(group) {
+    if(!group)return;
+    this._disposeObjects(group.children);
+    while(group.children.length)group.remove(group.children[0]);
+  }
   destroy() {
+    this.experimentAbort?.abort();this.experimentAbort=null;
+    this.experiment=null;this.experimentReading=null;this.experimentGroup=null;
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
       this.animationId = null;
@@ -1513,14 +1531,18 @@ class InteractiveLab {
       window.removeEventListener('resize', this._resizeHandler);
       this._resizeHandler = null;
     }
+    if(this._mouseUpHandler){window.removeEventListener('mouseup',this._mouseUpHandler);this._mouseUpHandler=null;}
+    if(this.scene)this._disposeObjects([this.scene]);
     if (this.renderer) {
       this.renderer.dispose();
+      this.renderer.forceContextLoss();
       this.renderer = null;
     }
     this.scene = null;
     this.camera = null;
     this.electrons = [];
     this.densityObjects = [];
+    this.pendulumArm=null;this.periodicGroup=null;this.earthGroup=null;this.cellGroup=null;this.bondsGroup=null;this.nucleusGroup=null;this.electronsGroup=null;this.earthGlobe=null;
   }
 }
 

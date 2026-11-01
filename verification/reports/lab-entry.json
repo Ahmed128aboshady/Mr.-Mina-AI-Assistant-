@@ -1,0 +1,37 @@
+{
+  "results": [
+    {
+      "viewport": {
+        "width": 390,
+        "height": 760
+      },
+      "passed": [
+        "Lab tab opens picker before lesson selection",
+        "24 session choices",
+        "Reload preserves picker",
+        "Selection opens lab directly",
+        "Change experiment stays in lab flow",
+        "Back restores picker",
+        "Course entry still opens lesson",
+        "Selected lesson lab opens directly"
+      ]
+    },
+    {
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "passed": [
+        "Lab tab opens picker before lesson selection",
+        "24 session choices",
+        "Reload preserves picker",
+        "Selection opens lab directly",
+        "Change experiment stays in lab flow",
+        "Back restores picker",
+        "Course entry still opens lesson",
+        "Selected lesson lab opens directly"
+      ]
+    }
+  ],
+  "errors": []
+}

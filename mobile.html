@@ -1,160 +1,59 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>مستر مينا - نسخة الموبايل الذكية</title>
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
-
-  <!-- Isolated Mobile Styles -->
-  <link rel="stylesheet" href="css/mobile.css?v=20.0" />
-  <link rel="stylesheet" href="css/mobile_editor.css?v=17.0" />
-  
-  <!-- Three.js for 3D Lab -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>الخيميائي • تجربة الموبايل والتابلت</title>
+  <link rel="stylesheet" href="css/mobile-v2.css?v=1">
+  <link rel="stylesheet" href="css/mobile-integration.css?v=qa2">
+  <link rel="stylesheet" href="css/specialized-labs.css?v=dedicated1">
 </head>
-<body>
-
-  <!-- 🖥️ Top Banner on Desktop Screens to return to Desktop version -->
-  <a href="index.html?desktop=1" onclick="sessionStorage.setItem('mena_force_desktop', '1')" class="desktop-switch-banner" title="العودة لنسخة الديسكتوب الأصلية">
-    🖥️ <span>العودة لنسخة الديسكتوب الكاملة</span>
-  </a>
-
-  <!-- ══════════════════════════════════════════
-       📱 MAIN MOBILE CONTAINER (مطابق للصورة 100%)
-  ═══════════════════════════════════════════ -->
-  <div class="mobile-app-container">
-
-    <!-- ── 1. TOP RIGHT: LOGO + 1 2 3 BADGES ── -->
-    <header class="mobile-header-top-right">
-      <img src="assets/mobile/logo.png" alt="الخيميائي في العلوم - أ. مينا جرجس" class="mobile-logo-img" />
-      <div class="mobile-grades-row">
-        <button class="mobile-grade-btn active" id="mobile-grade-btn-1" onclick="MobileApp.selectGrade(1)" title="الصف الأول الإعدادي">
-          <img src="assets/1_active.png" alt="1" />
-        </button>
-        <button class="mobile-grade-btn" id="mobile-grade-btn-2" onclick="MobileApp.selectGrade(2)" title="الصف الثاني الإعدادي">
-          <img src="assets/2.png" alt="2" />
-        </button>
-        <button class="mobile-grade-btn" id="mobile-grade-btn-3" onclick="MobileApp.selectGrade(3)" title="الصف الثالث الإعدادي">
-          <img src="assets/3.png" alt="3" />
-        </button>
-      </div>
-    </header>
-
-    <!-- ── 2. LEFT COLUMN: 4 STACKED STAGE CARDS ── -->
-    <main class="mobile-left-cards-column">
-      <div class="mobile-stage-card" onclick="MobileApp.openStage(1)" title="المرحلة الأولى">
-        <img src="assets/mobile/card_1.png" alt="المرحلة الأولى" />
-      </div>
-      <div class="mobile-stage-card" onclick="MobileApp.openStage(2)" title="المرحلة الثانية">
-        <img src="assets/mobile/card_2.png" alt="المرحلة الثانية" />
-      </div>
-      <div class="mobile-stage-card" onclick="MobileApp.openStage(3)" title="المرحلة الثالثة">
-        <img src="assets/mobile/card_3.png" alt="المرحلة الثالثة" />
-      </div>
-      <div class="mobile-stage-card" onclick="MobileApp.openStage(4)" title="المرحلة الرابعة">
-        <img src="assets/mobile/card_4.png" alt="المرحلة الرابعة" />
-      </div>
+<body class="mina-mobile">
+<div class="m-app">
+  <header class="m-header">
+    <div class="m-brand"><img src="assets/logo.png" alt="الخيميائي في العلوم"><span>مع مستر مينا<span class="m-muted m-small" id="current-grade-label">الصف الأول الإعدادي</span></span></div>
+    <span class="m-score" aria-label="نجوم هذه التجربة">★ <b id="stars">0</b></span>
+  </header>
+  <div class="m-layout">
+    <aside class="m-sidebar" aria-label="الدروس"><h2>رحلتك في العلوم</h2><div id="sidebar-lessons"></div><button class="m-secondary" data-action="account">حسابي</button></aside>
+    <main id="main" class="m-content">
+      <section data-screen="home">
+        <div class="m-reference-home">
+          <h1 class="m-visually-hidden">الخيميائي — اختار المرحلة</h1>
+          <div class="m-home-brand"><img class="m-home-logo" src="assets/logo.png" alt="الخيميائي في العلوم — أ. مينا جرجس"><div class="m-grade-picker" role="group" aria-label="اختيار الصف الدراسي"><button data-grade="1" aria-label="الصف الأول الإعدادي" aria-pressed="true"><img src="assets/1_active.png" alt="1"></button><button data-grade="2" aria-label="الصف الثاني الإعدادي" aria-pressed="false"><img src="assets/2.png" alt="2"></button><button data-grade="3" aria-label="الصف الثالث الإعدادي" aria-pressed="false"><img src="assets/3.png" alt="3"></button></div></div>
+          <div class="m-stage-images" aria-label="المراحل التعليمية">
+            <button class="m-stage-image" data-unit="0" aria-label="المرحلة الأولى — المادة"><img src="assets/mobile/card_1.png" alt="المرحلة الأولى"></button>
+            <button class="m-stage-image" data-unit="1" aria-label="المرحلة الثانية — مجالات القوى"><img src="assets/mobile/card_2.png" alt="المرحلة الثانية"></button>
+            <button class="m-stage-image" data-unit="2" aria-label="المرحلة الثالثة — الكائنات الحية"><img src="assets/mobile/card_3.png" alt="المرحلة الثالثة"></button>
+            <button class="m-stage-image" data-unit="3" aria-label="المرحلة الرابعة — نظام الأرض والشمس والقمر"><img src="assets/mobile/card_4.png" alt="المرحلة الرابعة"></button>
+          </div>
+          <button id="home-account" class="m-home-account" aria-label="حساب الطالب" aria-haspopup="dialog">أ</button>
+          <img class="m-home-character" src="assets/mobile/mr_mena.png" alt="مستر مينا يرحب بك">
+        </div>
+      </section>
+      <section data-screen="courses" hidden><h1>دروسي</h1><div id="courses-content"></div></section>
+      <section data-screen="lesson" hidden><div id="lesson-content"></div></section>
+      <section data-screen="lab" hidden><div id="lab-content"></div></section>
+      <section data-screen="quiz" hidden><div id="quiz-content"></div></section>
+      <section data-screen="progress" hidden><div id="progress-content"></div></section>
     </main>
-
-    <!-- ── 3. MR MINA 3D AVATAR (RIGHT EXTENDING DOWN) ── -->
-    <div class="mobile-avatar-stage" onclick="MobileApp.playWelcomeAudio()" style="cursor:pointer;" title="اضغط لسماع ترحيب مستر مينا">
-      <img src="assets/mobile/mr_mena.png" alt="مستر مينا جرجس" class="mobile-avatar-img" />
-    </div>
-
-    <!-- ── 4. BOTTOM FLOATING CHAT BAR ── -->
-    <footer class="mobile-bottom-chat-bar">
-      <input
-        type="text"
-        id="mobile-chat-input"
-        class="mobile-chat-input"
-        placeholder="Ask me a question.."
-        onkeydown="if(event.key==='Enter') MobileApp.sendChat()"
-      />
-      <div class="mobile-chat-actions">
-        <button class="mobile-action-btn btn-mic" onclick="MobileApp.toggleMic()" title="تسجيل صوتي">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-            <line x1="12" y1="19" x2="12" y2="22"/>
-          </svg>
-        </button>
-        <button class="mobile-action-btn btn-send" onclick="MobileApp.sendChat()" title="إرسال">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-          </svg>
-        </button>
-      </div>
-    </footer>
-
-  </div><!-- /mobile-app-container -->
-
-  <!-- ══════════════════════════════════════════
-       📖 5. MOBILE LESSON DRAWER (BOTTOM SHEET)
-  ═══════════════════════════════════════════ -->
-  <div class="mobile-drawer-overlay" id="mobile-drawer-overlay" onclick="MobileApp.closeDrawer()">
-    <div class="mobile-bottom-drawer" onclick="event.stopPropagation()">
-      <div class="drawer-drag-pill"></div>
-      <div class="mobile-drawer-header">
-        <div class="mobile-drawer-title" id="mobile-drawer-title">الوحدة الأولى: المادة</div>
-        <button class="mobile-drawer-close" onclick="MobileApp.closeDrawer()">✕</button>
-      </div>
-      <div id="mobile-drawer-content">
-        <!-- Rendered dynamically -->
-      </div>
-    </div>
   </div>
-
-  <!-- ══════════════════════════════════════════
-       🧪 6. MOBILE IN-LESSON 3D LAB SCREEN
-  ═══════════════════════════════════════════ -->
-  <div class="mobile-lesson-screen" id="mobile-lesson-screen">
-    <div class="mobile-lesson-header">
-      <button class="mobile-back-btn" onclick="MobileApp.closeLessonScreen()">← رجوع</button>
-      <div class="mobile-lesson-header-title" id="mobile-lesson-header-title">الدرس الأول: تركيب الذرة</div>
-    </div>
-    <div class="mobile-lab-wrap">
-      <canvas id="mobile-lab-canvas"></canvas>
-      <div class="mobile-lab-controls" id="mobile-lab-controls">
-        <div class="mobile-pill-bar" id="mobile-pill-bar">
-          <!-- Control Buttons -->
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════
-       💬 7. MOBILE LIVE CHAT WINDOW OVERLAY
-  ═══════════════════════════════════════════ -->
-  <div class="mobile-chat-overlay" id="mobile-chat-overlay">
-    <div class="mobile-chat-window">
-      <div class="mobile-chat-window-header">
-        <div class="mobile-chat-window-title">🤖 مساعد مستر مينا الذكي</div>
-        <button class="mobile-drawer-close" onclick="MobileApp.closeChatOverlay()">✕</button>
-      </div>
-      <div class="mobile-chat-messages" id="mobile-chat-messages">
-        <div class="mobile-msg-bot">
-          أهلاً بيك يا بطل! اسألني أي سؤال في منهج العلوم وهشرحهولك خطوة بخطوة بالعامية المصرية! 🚀
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Supabase Database & Student Auth -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase_config.js?v=796.0"></script>
-  <script src="js/auth.js?v=797.0"></script>
-
-  <!-- Curriculum Database & Mobile Engine -->
-  <script src="js/curriculum_data.js?v=796.0"></script>
-  <script src="js/mobile.js?v=797.0"></script>
-  <script src="js/mobile_editor.js?v=8.0"></script>
+  <footer class="m-dock">
+    <div class="m-player" id="player" hidden><button id="audio-toggle" class="m-icon-btn" aria-label="إيقاف الصوت مؤقتاً">Ⅱ</button><div class="m-player-copy"><strong id="audio-title">شرح مستر مينا</strong><span id="audio-status" class="m-small" role="status">جاهز للاستماع</span></div><div class="m-wave" aria-hidden="true"><i></i><i></i><i></i><i></i></div><button id="audio-close" class="m-icon-btn" aria-label="إغلاق المشغّل">×</button></div>
+    <div class="m-action-row"><button id="mentor" class="m-mentor" aria-haspopup="dialog"><img src="assets/mena_avatar_centered.png" alt=""><span>مساعدة</span><small class="m-help-description">اسأل مستر مينا</small></button><button id="next-action" class="m-primary">ابدأ الحصة ←</button></div>
+    <nav class="m-nav" aria-label="التنقل الرئيسي"><button data-view="home" aria-current="page"><span aria-hidden="true">⌂</span>الرئيسية</button><button data-view="courses"><span aria-hidden="true">▤</span>دروسي</button><button data-view="lab"><span aria-hidden="true">⚗</span>المعمل</button><button data-view="progress"><span aria-hidden="true">☆</span>إنجازي</button></nav>
+  </footer>
+</div>
+<dialog id="sheet" class="m-sheet" aria-labelledby="sheet-title"><div class="m-sheet-head"><h2 id="sheet-title">معاك يا بطل</h2><button id="close-sheet" class="m-icon-btn" aria-label="إغلاق">×</button></div><div id="sheet-content"></div></dialog>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase_config.js?v=1"></script>
+<script src="js/auth.js?v=qa2"></script>
+<script src="js/curriculum_data.js?v=gravity-fix1"></script>
+<script src="js/audio-catalog.js?v=qa2"></script>
+<script src="js/app.js?v=dedicated1"></script>
+<script src="js/mobile-v2.js?v=dedicated1"></script>
 </body>
 </html>

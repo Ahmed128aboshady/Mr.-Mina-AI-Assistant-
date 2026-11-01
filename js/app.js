@@ -24,6 +24,11 @@ class GlobalAudioManager {
 
   play(audioSrc, onEndedCallback) {
     this.stopAll();
+    const audioId = audioSrc.match(/audio_cache\/([^/?]+)\.mp3/)?.[1];
+    if (audioId && window.MENA_AUDIO_IDS && !window.MENA_AUDIO_IDS.has(audioId)) {
+      if (typeof onEndedCallback === 'function') onEndedCallback();
+      return null;
+    }
 
     const audio = new Audio(audioSrc);
     this.currentAudio = audio;
@@ -141,7 +146,7 @@ class AppController {
 
   // ══ STUDENT DATABASE ════════════════════════════
   _loadStudentDB() {
-    try { return JSON.parse(localStorage.getItem('mena_student_db') || '[]'); }
+    try { const entries = JSON.parse(localStorage.getItem('mena_student_db') || '[]'); return Array.isArray(entries) ? entries.filter(e => e && typeof e === 'object') : []; }
     catch { return []; }
   }
 
@@ -180,6 +185,7 @@ class AppController {
   selectGrade(grade) {
     // Support both numeric (1,2,3) and string ('1ع','2ع','3ع')
     const gradeNum = parseInt(grade);
+    if(!window[`CURRICULUM_GRADE_${gradeNum}`]){this._showToast('منهج هذا الصف غير متاح حالياً. يمكنك متابعة الصف الأول الإعدادي.', 'info');return;}
     this.currentGrade = gradeNum;
 
     // Update active badge — swap image to active version with cyan fill and orange ring
@@ -537,7 +543,7 @@ class AppController {
     msgDiv.className = `chat-msg ${isBot ? 'bot-msg' : 'user-msg'}`;
 
     // تنسيق النص البرمجي والماركداون
-    let formattedText = text
+    let formattedText = this._escapeHTML(text)
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\n/g, '<br>');
 
@@ -579,6 +585,9 @@ class AppController {
   }
 
   /** إرسال سؤال سريع للايف شات عند الضغط على أي اقتراح */
+  _escapeHTML(value) {
+    return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
   quickAskChat(query) {
     this.toggleLiveChat(true);
     const inputEl = document.getElementById('live-chat-input');
@@ -1221,6 +1230,7 @@ class AppController {
         // 4) البحث عن مطابقة لأسئلة علل في كافة دروس المنهج
         let matchedWhy = null;
         let matchedWhyLesson = null;
+        let matchedWhySession = null;
         let bestWhyScore = 0;
 
         for (const unit of curr.units) {
@@ -1233,10 +1243,13 @@ class AppController {
                 for (const w of queryWords) {
                   if (whyNorm.includes(w)) matchCount++;
                 }
-                if (matchCount >= 2 && matchCount > bestWhyScore) {
-                  bestWhyScore = matchCount;
+                const exact = whyNorm === qNorm;
+                const score = exact ? 10000 : matchCount;
+                if ((exact || (matchCount >= 2 && matchCount >= queryWords.length * .6)) && score > bestWhyScore) {
+                  bestWhyScore = score;
                   matchedWhy = why;
                   matchedWhyLesson = lesson;
+                  matchedWhySession = sess;
                 }
               }
             }
@@ -1251,7 +1264,7 @@ class AppController {
           let ans = `سؤال ممتاز في **${matchedWhyLesson.title}**:\n\n`;
           ans += `**سؤال علل:** ${matchedWhy.q}\n\n`;
           ans += `**إجابة مستر مينا النموذجية:**\n${matchedWhy.a}\n\n`;
-          ans += `**ملخص سريع:** ${matchedWhyLesson.summary}`;
+          ans += `**ملخص سريع:** ${matchedWhySession.summary || ''}`;
 
           resolve({
             answer: ans,
@@ -1262,8 +1275,8 @@ class AppController {
             topicContent: null,
             isOutOfCurriculum: false,
             actions: [
-              { label: `فتح درس ${matchedWhyLesson.title.split(':')[1] || matchedWhyLesson.title}`, action: `window.appController.selectLessonSession('${matchedWhyLesson.lessonId}', 1)` },
-              { label: 'المعمل التفاعلي ثلاثي الأبعاد (3D)', action: `window.appController.selectLessonSession('${matchedWhyLesson.lessonId}', 1)` }
+              { label: `فتح درس ${matchedWhyLesson.title.split(':')[1] || matchedWhyLesson.title}`, action: `window.appController.selectLessonSession('${matchedWhyLesson.lessonId}', ${matchedWhySession.sessionNum})` },
+              { label: 'المعمل التفاعلي ثلاثي الأبعاد (3D)', action: `window.appController.selectLessonSession('${matchedWhyLesson.lessonId}', ${matchedWhySession.sessionNum})` }
             ]
           });
           return;
@@ -1595,6 +1608,10 @@ class AppController {
   // ══════════════════════════════════════════
   showExplanation(topicId) {
     if (!this._topicData || !this._topicData.content) return;
+    const generation=this._lessonGeneration=(this._lessonGeneration||0)+1;
+    window.appAudioManager.stopAll();
+    clearTimeout(this._quizCompleteTimer);
+    this._quizScore = 0;
 
     // 🔒 Close unit drawers automatically when entering lesson
     this.closeStageDrawers();
@@ -1608,6 +1625,7 @@ class AppController {
       this._currentLesson = window.CURRICULUM_GRADE_1.units.flatMap(u => u.lessons).find(l => l.lessonId === targetTopic);
     }
     const section  = document.getElementById('explanation-section');
+    if(section)section.inert=false;
     const titleEl  = document.getElementById('explanation-title');
     const bodyEl   = document.getElementById('explanation-content');
     const ytEl     = document.getElementById('yt-videos-container');
@@ -1654,6 +1672,7 @@ class AppController {
     // 🔬 تشغيل المعمل التفاعلي ثلاثي الأبعاد
     if (window.interactiveLab) {
       setTimeout(() => {
+        if(generation!==this._lessonGeneration)return;
         const mount = document.getElementById('interactive-lab-mount');
         if (mount) {
           window.interactiveLab.init(mount, targetTopic, this._currentSessionNum || 1);
@@ -1663,20 +1682,7 @@ class AppController {
 
     this._loadYouTubeVideos(ytEl, this._topicData.content.ytQuery);
 
-    // 💬 عند الدخول للدرس أو التبديل بين الحصص: نطق وكتابة الترحيب المخصص للحصة فقط (أول حصة / تاني حصة)
-    const sessionNum = this._currentSessionNum || 1;
-    const sessionWordMap = { 1: 'أول', 2: 'تاني', 3: 'تالت', 4: 'رابع' };
-    const sessionWord = sessionWordMap[sessionNum] || 'أول';
-    const introAudio = `audio_cache/intro_session_${sessionNum}.mp3`;
-    const introText = (sessionNum === 1)
-      ? 'أهلاً بيك يا بطل في الحصة الأولى! جهز كشكولك وقلمك وركز معايا في كل كلمة، هنفهم علوم أولى إعدادي بطريقة سهلة وممتعة ومبسطة جداً، يلا بينا!'
-      : 'يا مرحب بيك يا دكتور في الحصة التانية! جهز نفسك عشان هنكمل الرحلة ونحل مع بعض أفكار ومسائل الامتحانات ونطبق في المعمل التفاعلي سوا!';
-
-    setTimeout(() => {
-      window.appAudioManager.stopAll();
-      this.typewriterSpeech(introText);
-      window.appAudioManager.play(introAudio);
-    }, 400);
+    // Entering or switching a session is silent. The student chooses when to listen.
   }
 
   _renderContent(data, topicId) {
@@ -1849,6 +1855,7 @@ class AppController {
   }
 
   checkQuizAnswer(btn, isCorrect, choiceText, explanation) {
+    if (btn.disabled || !btn.isConnected) return;
     const parentBox = btn.closest('.quiz-box');
     const feedback = parentBox.querySelector('.quiz-feedback');
     const allBtns = parentBox.querySelectorAll('.quiz-opt-btn');
@@ -1912,19 +1919,15 @@ class AppController {
       const chosenWrong = wrongAudios[Math.floor(Math.random() * wrongAudios.length)];
       this.playLabAudio(chosenWrong, `ركز يا بطل! ${explanation}`);
 
-      // فحص إتمام جميع أسئلة الكويز بالدرجة الكاملة
-      setTimeout(() => {
-        const allBoxes = document.querySelectorAll('.quiz-box');
-        const answeredBoxes = document.querySelectorAll('.quiz-feedback-card');
-        if (allBoxes.length > 0 && answeredBoxes.length === allBoxes.length) {
-          const wrongBoxes = document.querySelectorAll('.quiz-feedback-card.wrong');
-          if (wrongBoxes.length === 0) {
-            setTimeout(() => {
-              this.playLabAudio('quiz_completed_perfect', 'ألف مبروك يا عبقري! جبت الدرجة النهائية 100% في التحدي، أداء أسطوري وتستاهل لقب دكتور العلوم بجدارة، فخور بيك جداً يا بطل!');
-            }, 3500);
-          }
+    }
+    const boxes = document.querySelectorAll('.quiz-box');
+    if (isCorrect && boxes.length && document.querySelectorAll('.quiz-feedback-card.correct').length === boxes.length) {
+      clearTimeout(this._quizCompleteTimer);
+      this._quizCompleteTimer = setTimeout(() => {
+        if (parentBox.isConnected && document.getElementById('explanation-section')?.classList.contains('visible')) {
+          this.playLabAudio('quiz_completed_perfect', 'برافو يا بطل! أجبت عن كل الأسئلة إجابة صحيحة.');
         }
-      }, 500);
+      }, 3500);
     }
 
     // 🏆 سجّل إجابة الكويز في الداتا بيز
@@ -2090,6 +2093,7 @@ class AppController {
   }
 
   playLabAudio(audioId, fallbackText) {
+    if(window.interactiveLab?.building)return;
     const labSpeechMap = {
       'lab_atom_C': 'ذرة الكربون C أساس كل الكائنات الحية، عددها الذري 6 وكتلتها 12، توزيعها 2 في المستوى K و 4 في المستوى L، وبتقدر تعمل أربع روابط تساهمية قوية!',
       'lab_atom_H': 'ذرة الهيدروجين H هي أبسط ذرة في الكون، نواتها فيها بروتون واحد بس وبدون أي نيوترونات، وبيدور حواليها إلكترون واحد في المستوى K!',
@@ -2116,7 +2120,8 @@ class AppController {
       'lab_bond_covalent': 'الرابطة التساهمية بتنشأ بين اللافلزات عن طريق مشاركة كل ذرة بعدد من الإلكترونات، في جزيء الماء H2O ذرة الأكسجين بتشارك بإلكترون مع كل ذرة هيدروجين فتعمل رابطتين تساهميتين أحاديتين!'
     };
 
-    const textToSpeak = fallbackText || labSpeechMap[audioId] || '';
+    const missingAudio = window.MENA_AUDIO_IDS && !window.MENA_AUDIO_IDS.has(audioId);
+    const textToSpeak = (fallbackText || labSpeechMap[audioId] || '') + (missingAudio ? '\nالتسجيل الصوتي لهذه الفقرة غير متاح حالياً؛ يمكنك متابعة الشرح المكتوب.' : '');
     if (textToSpeak) {
       this.typewriterSpeech(textToSpeak);
     }
@@ -2140,6 +2145,10 @@ class AppController {
 
       const prefix = (lesson.lessonId || 'u1_l1').split('_').slice(0, 2).join('_');
       const audioMp3 = `audio_cache/${prefix}_s${sessionNum}.mp3`;
+      if (window.MENA_AUDIO_IDS && !window.MENA_AUDIO_IDS.has(`${prefix}_s${sessionNum}`)) {
+        this.typewriterSpeech('التسجيل الصوتي لهذه الحصة غير متاح حالياً.\n' + (spokenText || 'يمكنك متابعة الشرح المكتوب.'));
+        return;
+      }
       window.appAudioManager.play(audioMp3);
     }
   }
@@ -2182,7 +2191,7 @@ class AppController {
     // User bubble
     const userMsg = document.createElement('div');
     userMsg.style.cssText = 'background: linear-gradient(135deg, var(--accent-blue), #2171b5); color: #fff; border-radius: 8px; padding: 8px 10px; align-self: flex-start; max-width: 90%; word-break: break-word;';
-    userMsg.innerHTML = `<strong>أنت:</strong> ${query}`;
+    userMsg.innerHTML = `<strong>أنت:</strong> ${this._escapeHTML(query)}`;
     msgContainer.appendChild(userMsg);
     inputEl.value = '';
     msgContainer.scrollTop = msgContainer.scrollHeight;
@@ -2197,7 +2206,7 @@ class AppController {
     // Resolve Answer
     try {
       const result = await this._askAI(query);
-      botMsg.innerHTML = `<strong>👨‍🏫 مستر مينا:</strong><br>${result.answer.replace(/\n/g, '<br>')}`;
+      botMsg.innerHTML = `<strong>👨‍🏫 مستر مينا:</strong><br>${this._escapeHTML(result.answer).replace(/\n/g, '<br>')}`;
       msgContainer.scrollTop = msgContainer.scrollHeight;
 
       // Speak
@@ -2205,7 +2214,7 @@ class AppController {
         this._speakAudio(result.spokenText);
       }
     } catch (e) {
-      botMsg.innerHTML = `<strong>👨‍🏫 مستر مينا:</strong><br>بص يا بطل، النقطة دي مهمة جداً وسجلتها في الدفتر عشان نراجعها سوا!`;
+      botMsg.innerHTML = `<strong>👨‍🏫 مستر مينا:</strong><br>تعذّر تجهيز الإجابة؛ حاول مرة أخرى.`;
     }
   }
 
@@ -2290,13 +2299,16 @@ class AppController {
   }
 
   hideExplanation() {
+    this._lessonGeneration=(this._lessonGeneration||0)+1;
+    clearTimeout(this._quizCompleteTimer);
     window.appAudioManager.stopAll();
     if (window.interactiveLab) {
       window.interactiveLab.destroy();
     }
     this.closeStageDrawers();
     this.toggleLiveChat(false);
-    document.getElementById('explanation-section')?.classList.remove('visible');
+    const section=document.getElementById('explanation-section');
+    if(section){section.inert=true;section.classList.remove('visible');}
 
     // 🌟 إخفاء زر اللايف شات العائم في صفحة الهوم
     const launcher = document.getElementById('live-chat-launcher');
@@ -2379,6 +2391,7 @@ class AppController {
 // ── Boot ────────────────────────────────────────
 window.appController = null;
 document.addEventListener('DOMContentLoaded', () => {
+  if (document.body.classList.contains('mina-mobile')) return;
   window.appController = new AppController();
 });
 

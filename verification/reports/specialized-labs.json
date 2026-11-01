@@ -1,0 +1,149 @@
+{
+  "results": [
+    {
+      "width": 390,
+      "kind": "electric",
+      "session": 1,
+      "interactive": true,
+      "resetMemoryStable": true,
+      "touchTargets48": true
+    },
+    {
+      "width": 390,
+      "kind": "electric",
+      "session": 2,
+      "interactive": true,
+      "resetMemoryStable": true,
+      "touchTargets48": true
+    },
+    {
+      "width": 390,
+      "kind": "gravity",
+      "session": 1,
+      "interactive": true,
+      "resetMemoryStable": true,
+      "touchTargets48": true
+    },
+    {
+      "width": 390,
+      "kind": "gravity",
+      "session": 2,
+      "interactive": true,
+      "resetMemoryStable": true,
+      "touchTargets48": true
+    },
+    {
+      "width": 390,
+      "kind": "microbes",
+      "session": 1,
+      "interactive": true,
+      "resetMemoryStable": true,
+      "touchTargets48": true
+    },
+    {
+      "width": 390,
+      "kind": "microbes",
+      "session": 2,
+      "interactive": true,
+      "resetMemoryStable": true,
+      "touchTargets48": true
+    },
+    {
+      "width": 1024,
+      "kind": "electric",
+      "session": 1,
+      "interactive": true,
+      "resetMemoryStable": true,
+      "touchTargets48": true
+    },
+    {
+      "width": 1024,
+      "kind": "electric",
+      "session": 2,
+      "interactive": true,
+      "resetMemoryStable": true,
+      "touchTargets48": true
+    },
+    {
+      "width": 1024,
+      "kind": "gravity",
+      "session": 1,
+      "interactive": true,
+      "resetMemoryStable": true,
+      "touchTargets48": true
+    },
+    {
+      "width": 1024,
+      "kind": "gravity",
+      "session": 2,
+      "interactive": true,
+      "resetMemoryStable": true,
+      "touchTargets48": true
+    },
+    {
+      "width": 1024,
+      "kind": "microbes",
+      "session": 1,
+      "interactive": true,
+      "resetMemoryStable": true,
+      "touchTargets48": true
+    },
+    {
+      "width": 1024,
+      "kind": "microbes",
+      "session": 2,
+      "interactive": true,
+      "resetMemoryStable": true,
+      "touchTargets48": true
+    },
+    {
+      "width": 1440,
+      "kind": "electric",
+      "session": 1,
+      "interactive": true,
+      "resetMemoryStable": true,
+      "touchTargets48": true
+    },
+    {
+      "width": 1440,
+      "kind": "electric",
+      "session": 2,
+      "interactive": true,
+      "resetMemoryStable": true,
+      "touchTargets48": true
+    },
+    {
+      "width": 1440,
+      "kind": "gravity",
+      "session": 1,
+      "interactive": true,
+      "resetMemoryStable": true,
+      "touchTargets48": true
+    },
+    {
+      "width": 1440,
+      "kind": "gravity",
+      "session": 2,
+      "interactive": true,
+      "resetMemoryStable": true,
+      "touchTargets48": true
+    },
+    {
+      "width": 1440,
+      "kind": "microbes",
+      "session": 1,
+      "interactive": true,
+      "resetMemoryStable": true,
+      "touchTargets48": true
+    },
+    {
+      "width": 1440,
+      "kind": "microbes",
+      "session": 2,
+      "interactive": true,
+      "resetMemoryStable": true,
+      "touchTargets48": true
+    }
+  ],
+  "errors": []
+}
