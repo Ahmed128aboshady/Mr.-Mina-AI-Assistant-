@@ -260,6 +260,50 @@
     play(id,'شرح التجربة');
   }}};
 
+  function playMessageNotification(){
+    try {
+      const chime = new Audio('audio_cache/chat_reply_chime.mp3?v=1');
+      chime.volume = 0.65;
+      const p = chime.play();
+      if(p !== undefined) {
+        p.catch(() => playWebAudioChime());
+      }
+    } catch(e) {
+      playWebAudioChime();
+    }
+  }
+  function playWebAudioChime(){
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const now = ctx.currentTime;
+      // Note 1: E5 (659.25Hz)
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(659.25, now);
+      gain1.gain.setValueAtTime(0.22, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.16);
+      // Note 2: B5 (987.77Hz)
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(987.77, now + 0.08);
+      gain2.gain.setValueAtTime(0.001, now);
+      gain2.gain.setValueAtTime(0.28, now + 0.08);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.42);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(now + 0.08);
+      osc2.stop(now + 0.42);
+    } catch(e) {}
+  }
+
   function openChat(){
     audio.pause();
     showSheet('مساعدة · اسأل مستر مينا',`<p class="m-chat-note">${state.lesson?`${escape(state.lesson.title)} · الحصة ${state.session}`:'اسأل عن أي درس في منهج العلوم'}</p><div id="chat-log" class="m-chat-log" role="log" aria-live="polite" aria-label="المحادثة"></div><form id="chat-form" class="m-chat-form"><label for="chat-input">اكتب سؤالك</label><textarea id="chat-input" placeholder="اكتب سؤالك هنا…" rows="1" maxlength="2000"></textarea><button class="m-primary" type="submit" ${state.pending?'disabled':''}>إرسال</button></form><div class="m-chat-extra"><button class="m-text-btn" data-action="microphone">🎙 إملاء صوتي</button><span id="mic-status" role="status"></span></div>`,true);
@@ -315,6 +359,7 @@
       body=body.replace(/\*\*ملخص سريع:\*\* undefined/g,'');
       state.chats.push({role:'assistant',body,actions:response.actions||[]});
       record('question',{question,topic:response.topic,lessonId:state.lesson?.lessonId,sessionNum:state.session});
+      playMessageNotification();
     }catch{
       if(generation!==state.chatGeneration||account!==owner())return;
       state.chats.push({role:'assistant',body:'تعذّر تجهيز الإجابة. سؤالك محفوظ في المحادثة؛ جرّب مرة أخرى.',retry:question});
@@ -344,7 +389,7 @@
   }
   function accountSheet(){
     const student=auth.getCurrentStudent();
-    showSheet('حسابي',`<p><strong>${escape(student?.full_name||student?.username)}</strong></p><p>${escape(student?.grade||'الصف الأول الإعدادي')}</p><button class="m-secondary" data-action="desktop">عرض الديسكتوب</button><button class="m-secondary" data-action="logout">تسجيل الخروج</button>`);
+    showSheet('حسابي',`<p><strong>${escape(student?.full_name||student?.username)}</strong></p><p>${escape(student?.grade||'الصف الأول الإعدادي')}</p><button class="m-secondary" data-action="logout">تسجيل الخروج</button>`);
   }
   $('#mentor').addEventListener('click',()=>{if(requireLogin())openChat();});
   $('#home-account').addEventListener('click',()=>{if(requireLogin())accountSheet();});

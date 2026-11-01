@@ -1,5 +1,6 @@
 // Generated from audio_cache by verification/build-audio-catalog.cjs.
 window.MENA_AUDIO_IDS = new Set([
+  "chat_reply_chime",
   "intro_session_1",
   "intro_session_2",
   "lab_atom_Ar",

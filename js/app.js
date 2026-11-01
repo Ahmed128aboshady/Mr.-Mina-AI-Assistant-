@@ -485,6 +485,50 @@ class AppController {
     }
   }
 
+  _playMessageChime() {
+    try {
+      const chime = new Audio('audio_cache/chat_reply_chime.mp3?v=1');
+      chime.volume = 0.65;
+      const p = chime.play();
+      if(p !== undefined) {
+        p.catch(() => this._playWebAudioChime());
+      }
+    } catch(e) {
+      this._playWebAudioChime();
+    }
+  }
+
+  _playWebAudioChime() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const now = ctx.currentTime;
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(659.25, now);
+      gain1.gain.setValueAtTime(0.22, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.16);
+
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(987.77, now + 0.08);
+      gain2.gain.setValueAtTime(0.001, now);
+      gain2.gain.setValueAtTime(0.28, now + 0.08);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.42);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(now + 0.08);
+      osc2.stop(now + 0.42);
+    } catch(e) {}
+  }
+
   _setLiveChatLoading(loading) {
     const typingEl = document.getElementById('live-chat-typing');
     if (typingEl) {
@@ -509,6 +553,7 @@ class AppController {
       ]);
       this._setLiveChatLoading(false);
       this.currentTopic = response.topic;
+      this._playMessageChime();
 
       // عرض رد مستر مينا مع الأزرار التفاعلية المباشرة
       this._appendLiveChatMessage(response.answer, 'bot', response.actions || []);
