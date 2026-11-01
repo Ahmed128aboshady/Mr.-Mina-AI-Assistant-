@@ -118,19 +118,47 @@
       button.textContent=!count?'ارجع للشرح ←':run.index>=count?'راجع الحصة ←':run.index===count-1?'شوف إنجازك ←':'السؤال التالي ←';
     }
   }
-  function sessionButtons(lesson,destination='lesson'){return (lesson.sessions||[]).map(s=>`<button class="m-session-button" data-lesson="${escape(lesson.lessonId)}" data-session="${s.sessionNum}" data-destination="${destination}"><strong>${destination==='lab'?'افتح المعمل · ':''}الحصة ${s.sessionNum}</strong><span>${escape(s.title)}</span></button>`).join('');}
+  function sessionButtons(lesson,destination='lesson'){
+    return (lesson.sessions||[]).map(s=>{
+      let desc=(s.title||'').trim();
+      desc=desc.replace(/^الحصة\s*\d+\s*[:\-]\s*/,'');
+      return `<button class="m-session-button" data-lesson="${escape(lesson.lessonId)}" data-session="${s.sessionNum}" data-destination="${destination}"><strong>${destination==='lab'?'افتح المعمل · ':''}الحصة ${s.sessionNum}</strong><span>${escape(desc||s.title)}</span></button>`;
+    }).join('');
+  }
+  function renderLessonCard(lesson, lIdx, destination='lesson'){
+    const rawTitle = (lesson.title || '').trim();
+    const colonIdx = rawTitle.indexOf(':');
+    let badgeText = '';
+    let mainTitle = rawTitle;
+    if (colonIdx !== -1) {
+      badgeText = rawTitle.slice(0, colonIdx).trim();
+      mainTitle = rawTitle.slice(colonIdx + 1).trim();
+    } else {
+      badgeText = `الدرس ${lIdx + 1}`;
+    }
+    const themeIdx = lIdx % 6;
+    return `<article class="m-course-card m-theme-${themeIdx}" data-lesson-idx="${lIdx}">
+      <div class="m-card-header">
+        <span class="m-lesson-badge">${escape(badgeText)}</span>
+        <h2 class="m-card-title">${escape(mainTitle)}</h2>
+      </div>
+      <div class="m-session-list">
+        ${sessionButtons(lesson, destination)}
+      </div>
+    </article>`;
+  }
   function renderLabPicker(){
-    $('#lab-content').innerHTML='<h1>اختار تجربة المعمل</h1><p class="m-muted">اختار الدرس والحصة، وهتدخل المعمل مباشرة.</p>'+(available()?.units||[]).map(unit=>`<div class="m-section-title"><h2>${escape(unit.unitName)}</h2></div>${unit.lessons.map(l=>`<article class="m-course-card"><h2>${escape(l.title)}</h2><div class="m-session-list">${sessionButtons(l,'lab')}</div></article>`).join('')}`).join('');
+    $('#lab-content').innerHTML='<h1>اختار تجربة المعمل</h1><p class="m-muted">اختار الدرس والحصة، وهتدخل المعمل مباشرة.</p>'+(available()?.units||[]).map(unit=>`<div class="m-section-title"><h2>${escape(unit.unitName)}</h2></div>${unit.lessons.map((l,lIdx)=>renderLessonCard(l,lIdx,'lab')).join('')}`).join('');
   }
   function renderCourses(){
-    $('#courses-content').innerHTML=(available()?.units||[]).map((unit,i)=>`<div class="m-section-title"><h2>${escape(unit.unitName)}</h2></div>${unit.lessons.map(l=>`<article class="m-course-card"><h2>${escape(l.title)}</h2><div class="m-session-list">${sessionButtons(l)}</div></article>`).join('')}`).join('')||'<p>لا يتوفر منهج لهذا الصف حالياً.</p>';
+    $('#courses-content').innerHTML=(available()?.units||[]).map((unit,i)=>`<div class="m-section-title"><h2>${escape(unit.unitName)}</h2></div>${unit.lessons.map((l,lIdx)=>renderLessonCard(l,lIdx)).join('')}`).join('')||'<p>لا يتوفر منهج لهذا الصف حالياً.</p>';
   }
   function renderSidebar(){
     $('#sidebar-lessons').innerHTML=(available()?.units||[]).map((unit,i)=>`<button class="m-side-link" data-unit="${i}">${escape(unit.unitName)}</button>`).join('')+(state.lesson?`<p class="m-muted">${escape(state.lesson.title)} · الحصة ${state.session}</p><button class="m-secondary" data-view="lesson">الشرح وعلل</button><button class="m-secondary" data-view="lab">المعمل</button><button class="m-secondary" data-view="quiz">التحدّي</button>`:'');
   }
   function openUnit(index){
     const unit=available()?.units?.[index];if(!unit)return;
-    showSheet(unit.unitName,unit.lessons.map(l=>`<article class="m-course-card"><h2>${escape(l.title)}</h2>${sessionButtons(l)}</article>`).join(''));
+    showSheet(unit.unitName,unit.lessons.map((l,lIdx)=>renderLessonCard(l,lIdx)).join(''));
   }
   function launch(id,num,destination='lesson'){
     const lesson=lessons().find(l=>l.lessonId===id);if(!lesson?.sessions?.some(s=>Number(s.sessionNum)===num))return;
@@ -250,7 +278,21 @@
       if(message.retry){const button=document.createElement('button');button.className='m-text-btn';button.textContent='إعادة المحاولة';button.addEventListener('click',()=>sendChat(message.retry,false));bubble.append(button);}
       log.append(bubble);
     });
-    if(state.pending){const status=document.createElement('p');status.textContent='جارٍ تجهيز الإجابة…';log.append(status);}
+    if(state.pending){
+      const typingBubble=document.createElement('div');
+      typingBubble.className='m-chat-message m-typing-bubble';
+      typingBubble.setAttribute('role','status');
+      typingBubble.setAttribute('aria-label','مستر مينا يكتب الآن');
+      const name=document.createElement('small');
+      name.className='m-typing-author';
+      name.textContent='مستر مينا يكتب الآن…';
+      typingBubble.append(name);
+      const dotsWrap=document.createElement('div');
+      dotsWrap.className='m-typing-dots';
+      dotsWrap.innerHTML='<span></span><span></span><span></span>';
+      typingBubble.append(dotsWrap);
+      log.append(typingBubble);
+    }
     log.scrollTop=log.scrollHeight;
     const send=$('#chat-form button');if(send)send.disabled=state.pending;
   }
@@ -260,7 +302,12 @@
     if(append)state.chats.push({role:'user',body:question});
     state.pending=true;if($('#chat-input'))$('#chat-input').value='';renderMessages();
     try{
-      setContext(false);const response=await engine._askAI(question);
+      setContext(false);
+      const delayPromise = new Promise(resolve => setTimeout(resolve, 750));
+      const [response] = await Promise.all([
+        engine._askAI(question),
+        delayPromise
+      ]);
       if(generation!==state.chatGeneration||account!==owner())return;
       let body=response.answer;
       if(response.isOutOfCurriculum){body='السؤال ده خارج محتوى العلوم المتاح عندي. جرّب تختار موضوعاً من المنهج أو راجع مستر مينا.';}

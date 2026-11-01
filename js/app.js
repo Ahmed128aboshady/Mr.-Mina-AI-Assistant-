@@ -503,7 +503,10 @@ class AppController {
     this._setLiveChatLoading(true);
 
     try {
-      const response = await this._askAI(question);
+      const [response] = await Promise.all([
+        this._askAI(question),
+        new Promise(resolve => setTimeout(resolve, 750))
+      ]);
       this._setLiveChatLoading(false);
       this.currentTopic = response.topic;
 

@@ -1,8 +1,271 @@
 /* Additional production states, scoped to the mobile page. */
-.mina-mobile .m-course-card{margin:12px 0;padding:16px;background:#fff;border:1px solid var(--m-line);border-radius:18px}
-.mina-mobile .m-course-card h2{font-size:17px;margin-bottom:10px}
-.mina-mobile .m-session-button{display:flex;flex-direction:column;text-align:right;width:100%;padding:12px;margin-block:8px;gap:4px;border-radius:12px;border:1px solid var(--m-line);background:#f5f8fb;font-size:15px}
-.mina-mobile .m-session-button span{font-size:13px;color:var(--m-muted);white-space:normal}
+.mina-mobile .m-course-card{
+  margin: 16px 0;
+  padding: 16px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 3px 12px rgba(15, 34, 58, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.mina-mobile .m-card-header{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.mina-mobile .m-lesson-badge{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+.mina-mobile .m-course-card h2,
+.mina-mobile .m-card-title{
+  font-size: 16px;
+  font-weight: 800;
+  color: #173457;
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* 🎨 ثيمات الدروس الهادئة والمريحة للعين (Eye-Friendly Pastel Themes) */
+/* 1. الدرس الأول: أزرق سماوي هادئ */
+.mina-mobile .m-course-card.m-theme-0,
+.mina-mobile .m-course-card:nth-of-type(6n+1){
+  background: linear-gradient(150deg, #f0f9ff 0%, #ffffff 65%);
+  border: 1.5px solid #bae6fd;
+  border-right: 5px solid #0284c7;
+}
+.mina-mobile .m-course-card.m-theme-0 .m-lesson-badge,
+.mina-mobile .m-course-card:nth-of-type(6n+1) .m-lesson-badge{
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+.mina-mobile .m-course-card.m-theme-0 .m-session-button strong,
+.mina-mobile .m-course-card:nth-of-type(6n+1) .m-session-button strong{
+  color: #0284c7;
+}
+.mina-mobile .m-course-card.m-theme-0 .m-session-button:hover,
+.mina-mobile .m-course-card:nth-of-type(6n+1) .m-session-button:hover{
+  border-color: #38bdf8;
+  background: #f0f9ff;
+}
+
+/* 2. الدرس الثاني: زمردي / تيل هادئ ومنعش */
+.mina-mobile .m-course-card.m-theme-1,
+.mina-mobile .m-course-card:nth-of-type(6n+2){
+  background: linear-gradient(150deg, #f0fdfa 0%, #ffffff 65%);
+  border: 1.5px solid #99f6e4;
+  border-right: 5px solid #0d9488;
+}
+.mina-mobile .m-course-card.m-theme-1 .m-lesson-badge,
+.mina-mobile .m-course-card:nth-of-type(6n+2) .m-lesson-badge{
+  background: #ccfbf1;
+  color: #0f766e;
+  border: 1px solid #99f6e4;
+}
+.mina-mobile .m-course-card.m-theme-1 .m-session-button strong,
+.mina-mobile .m-course-card:nth-of-type(6n+2) .m-session-button strong{
+  color: #0d9488;
+}
+.mina-mobile .m-course-card.m-theme-1 .m-session-button:hover,
+.mina-mobile .m-course-card:nth-of-type(6n+2) .m-session-button:hover{
+  border-color: #2dd4bf;
+  background: #f0fdfa;
+}
+
+/* 3. الدرس الثالث: لافندر بنفسجي راقي وناعم */
+.mina-mobile .m-course-card.m-theme-2,
+.mina-mobile .m-course-card:nth-of-type(6n+3){
+  background: linear-gradient(150deg, #faf5ff 0%, #ffffff 65%);
+  border: 1.5px solid #e9d5ff;
+  border-right: 5px solid #7c3aed;
+}
+.mina-mobile .m-course-card.m-theme-2 .m-lesson-badge,
+.mina-mobile .m-course-card:nth-of-type(6n+3) .m-lesson-badge{
+  background: #f3e8ff;
+  color: #6b21a8;
+  border: 1px solid #e9d5ff;
+}
+.mina-mobile .m-course-card.m-theme-2 .m-session-button strong,
+.mina-mobile .m-course-card:nth-of-type(6n+3) .m-session-button strong{
+  color: #7c3aed;
+}
+.mina-mobile .m-course-card.m-theme-2 .m-session-button:hover,
+.mina-mobile .m-course-card:nth-of-type(6n+3) .m-session-button:hover{
+  border-color: #c084fc;
+  background: #faf5ff;
+}
+
+/* 4. الدرس الرابع: كهرماني دافئ ومريح */
+.mina-mobile .m-course-card.m-theme-3,
+.mina-mobile .m-course-card:nth-of-type(6n+4){
+  background: linear-gradient(150deg, #fffbeb 0%, #ffffff 65%);
+  border: 1.5px solid #fde68a;
+  border-right: 5px solid #d97706;
+}
+.mina-mobile .m-course-card.m-theme-3 .m-lesson-badge,
+.mina-mobile .m-course-card:nth-of-type(6n+4) .m-lesson-badge{
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+.mina-mobile .m-course-card.m-theme-3 .m-session-button strong,
+.mina-mobile .m-course-card:nth-of-type(6n+4) .m-session-button strong{
+  color: #d97706;
+}
+.mina-mobile .m-course-card.m-theme-3 .m-session-button:hover,
+.mina-mobile .m-course-card:nth-of-type(6n+4) .m-session-button:hover{
+  border-color: #fbbf24;
+  background: #fffbeb;
+}
+
+/* 5. الدرس الخامس: نيلي هادئ ملكي */
+.mina-mobile .m-course-card.m-theme-4,
+.mina-mobile .m-course-card:nth-of-type(6n+5){
+  background: linear-gradient(150deg, #eef2ff 0%, #ffffff 65%);
+  border: 1.5px solid #c7d2fe;
+  border-right: 5px solid #4f46e5;
+}
+.mina-mobile .m-course-card.m-theme-4 .m-lesson-badge,
+.mina-mobile .m-course-card:nth-of-type(6n+5) .m-lesson-badge{
+  background: #e0e7ff;
+  color: #3730a3;
+  border: 1px solid #c7d2fe;
+}
+.mina-mobile .m-course-card.m-theme-4 .m-session-button strong,
+.mina-mobile .m-course-card:nth-of-type(6n+5) .m-session-button strong{
+  color: #4f46e5;
+}
+.mina-mobile .m-course-card.m-theme-4 .m-session-button:hover,
+.mina-mobile .m-course-card:nth-of-type(6n+5) .m-session-button:hover{
+  border-color: #818cf8;
+  background: #eef2ff;
+}
+
+/* 6. الدرس السادس: مرجاني وردي ناعم غير صارخ */
+.mina-mobile .m-course-card.m-theme-5,
+.mina-mobile .m-course-card:nth-of-type(6n+6){
+  background: linear-gradient(150deg, #fff1f2 0%, #ffffff 65%);
+  border: 1.5px solid #fecdd3;
+  border-right: 5px solid #e11d48;
+}
+.mina-mobile .m-course-card.m-theme-5 .m-lesson-badge,
+.mina-mobile .m-course-card:nth-of-type(6n+6) .m-lesson-badge{
+  background: #ffe4e6;
+  color: #9f1239;
+  border: 1px solid #fecdd3;
+}
+.mina-mobile .m-course-card.m-theme-5 .m-session-button strong,
+.mina-mobile .m-course-card:nth-of-type(6n+6) .m-session-button strong{
+  color: #e11d48;
+}
+.mina-mobile .m-course-card.m-theme-5 .m-session-button:hover,
+.mina-mobile .m-course-card:nth-of-type(6n+6) .m-session-button:hover{
+  border-color: #fb7185;
+  background: #fff1f2;
+}
+
+/* تحسين شكل أزرار الحصص */
+.mina-mobile .m-session-button{
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  width: 100%;
+  padding: 12px 14px;
+  margin-block: 8px;
+  gap: 4px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  font-size: 15px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+.mina-mobile .m-session-button:active{
+  transform: scale(0.985);
+}
+.mina-mobile .m-session-button strong{
+  font-size: 14px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.mina-mobile .m-session-button span{
+  font-size: 12.5px;
+  color: #56677c;
+  line-height: 1.5;
+  white-space: normal;
+}
+
+/* 💬 Typing Indicator مثل شات جي بي تي وواتساب (3 نقاط متحركة مع فقاعة الشات) */
+.mina-mobile .m-typing-bubble{
+  background: #e3f5f5;
+  border-radius: 18px 18px 4px 18px;
+  padding: 10px 14px;
+  align-self: flex-start;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 85%;
+  border: 1px solid #c2e8e8;
+  box-shadow: 0 2px 10px rgba(8, 107, 134, 0.07);
+  animation: mBubbleFadeIn 0.2s ease-out;
+}
+.mina-mobile .m-typing-author{
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  color: #086b86;
+}
+.mina-mobile .m-typing-dots{
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 2px;
+}
+.mina-mobile .m-typing-dots span{
+  width: 8px;
+  height: 8px;
+  background: #086b86;
+  border-radius: 50%;
+  display: inline-block;
+  opacity: 0.35;
+  animation: mTypingBounce 1.25s infinite ease-in-out both;
+}
+.mina-mobile .m-typing-dots span:nth-child(1){
+  animation-delay: 0s;
+}
+.mina-mobile .m-typing-dots span:nth-child(2){
+  animation-delay: 0.18s;
+}
+.mina-mobile .m-typing-dots span:nth-child(3){
+  animation-delay: 0.36s;
+}
+@keyframes mTypingBounce{
+  0%, 80%, 100%{
+    transform: translateY(0) scale(0.8);
+    opacity: 0.35;
+  }
+  40%{
+    transform: translateY(-7px) scale(1.15);
+    opacity: 1;
+  }
+}
+@keyframes mBubbleFadeIn{
+  from{ opacity: 0; transform: translateY(6px); }
+  to{ opacity: 1; transform: translateY(0); }
+}
 .mina-mobile .m-rules{padding-inline-start:22px;line-height:1.9}
 .mina-mobile .m-rules li{padding:8px 0}
 .mina-mobile .m-steps button{flex:1;background:#eaf0f6;border-radius:12px;font-size:13px}
