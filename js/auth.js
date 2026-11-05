@@ -94,11 +94,11 @@ window.MenaAuth = {
       return { success: true, student: adminStudent };
     }
 
-    if ((lowerUser === 'student1' || lowerUser === 'mena' || lowerUser === 'mena_demo') && (password === '123456' || password === 'admin')) {
+    if (lowerUser === 'mena_demo' && (password === '123456' || password === 'admin')) {
       const demoStudent = {
         id: 'student_demo_1',
         username: lowerUser,
-        full_name: 'طالب متفوق (تجريبي)',
+        full_name: 'طالب تجريبي',
         grade: 'الصف الأول الإعدادي',
         registered_device_id: null,
         is_active: true
@@ -106,19 +106,50 @@ window.MenaAuth = {
       this.setSession(demoStudent);
       return { success: true, student: demoStudent };
     }
+
+    // تجهيز صيغ مختلفة لاسم المستخدم (بالفراغ وبدونه وأحرف كبيرة وصغيرة مثل Student 1 و student1)
+    const cleanUser = username.trim();
+    const noSpaceUser = cleanUser.replace(/\s+/g, '');
+    const spaceMatch = cleanUser.match(/^student\s*(\d+)$/i);
+    let variants = [cleanUser, noSpaceUser];
+    if (spaceMatch) {
+      const num = spaceMatch[1];
+      variants.push(`Student ${num}`);
+      variants.push(`student ${num}`);
+      variants.push(`Student${num}`);
+      variants.push(`student${num}`);
+    }
+    variants = [...new Set(variants.filter(Boolean))];
+
     const isConfigured = window.MENA_SUPABASE_CONFIG?.isConfigured();
     const supabase = window.getSupabaseClient();
 
     // ── الحالة أ: Supabase متصل بالإنترنت ──
     if (isConfigured && supabase) {
       try {
-        const { data: student, error } = await supabase
+        let student = null;
+        const orFilter = variants.map(v => `username.ilike."${v}"`).join(',');
+        const { data: studentsList, error } = await supabase
           .from('students')
           .select('*')
-          .eq('username', username)
-          .single();
+          .or(orFilter)
+          .limit(1);
 
-        if (error || !student) {
+        if (!error && studentsList && studentsList.length > 0) {
+          student = studentsList[0];
+        } else {
+          // محاولة بديلة دقيقة
+          const { data: fallbackList } = await supabase
+            .from('students')
+            .select('*')
+            .ilike('username', cleanUser)
+            .limit(1);
+          if (fallbackList && fallbackList.length > 0) {
+            student = fallbackList[0];
+          }
+        }
+
+        if (!student) {
           return { success: false, message: 'اسم المستخدم غير مسجل، برجاء مراجعة مستر مينا.' };
         }
 
@@ -152,7 +183,7 @@ window.MenaAuth = {
           student.registered_device_id = currentDeviceId;
           student.registered_device_name = currentDeviceName;
           this.setSession(student);
-          this.logActivity(student.id, username, 'login_first_device', { device: currentDeviceName });
+          this.logActivity(student.id, student.username || username, 'login_first_device', { device: currentDeviceName });
           return { success: true, student, firstDevice: true };
         } else if (student.registered_device_id === currentDeviceId) {
           // نفس الجهاز المعتمد
@@ -163,11 +194,11 @@ window.MenaAuth = {
             .eq('id', student.id);
 
           this.setSession(student);
-          this.logActivity(student.id, username, 'login_success', { device: currentDeviceName });
+          this.logActivity(student.id, student.username || username, 'login_success', { device: currentDeviceName });
           return { success: true, student };
         } else {
           // 🚫 جهاز مختلف! محاولة دخول من جهاز ثاني مرفوضة تماماً
-          this.logActivity(student.id, username, 'login_blocked_multidevice', {
+          this.logActivity(student.id, student.username || username, 'login_blocked_multidevice', {
             attemptedDevice: currentDeviceName,
             registeredDevice: student.registered_device_name
           });
@@ -194,24 +225,40 @@ window.MenaAuth = {
       mockStudents = JSON.parse(localStorage.getItem(mockDbKey) || '[]');
     } catch(e) {}
 
-    if (mockStudents.length === 0) {
-      mockStudents = [
-        { id: '1', username: 'student1', password: '123456', full_name: 'أحمد محمد علي', grade: 'الصف الأول الإعدادي', registered_device_id: null, is_active: true },
-        { id: '2', username: 'student2', password: '123456', full_name: 'مريم جرجس حنا', grade: 'الصف الأول الإعدادي', registered_device_id: null, is_active: true },
-        { id: '3', username: 'mena_demo', password: '123456', full_name: 'طالب تجريبي (مستر مينا)', grade: 'الصف الأول الإعدادي', registered_device_id: null, is_active: true },
-        { id: '4', username: 'admin', password: 'admin', full_name: 'أ. مينا جرجس (المدير)', grade: 'الإدارة العامة', registered_device_id: null, is_active: true }
+    const buildDefaultStudents = () => {
+      const arr = [
+        { id: 'admin_root', username: 'admin', password: 'admin', full_name: 'أ. مينا جرجس (المدير)', grade: 'الإدارة العامة', registered_device_id: null, is_active: true },
+        { id: 'demo_1', username: 'mena_demo', password: '123456', full_name: 'طالب تجريبي (مستر مينا)', grade: 'الصف الأول الإعدادي', registered_device_id: null, is_active: true }
       ];
-      localStorage.setItem(mockDbKey, JSON.stringify(mockStudents));
-    } else if (!mockStudents.some(s => s.username.toLowerCase() === 'admin')) {
-      mockStudents.push({ id: '4', username: 'admin', password: 'admin', full_name: 'أ. مينا جرجس (المدير)', grade: 'الإدارة العامة', registered_device_id: null, is_active: true });
+      for (let i = 1; i <= 50; i++) {
+        arr.push({
+          id: `student_${i}`,
+          username: `Student ${i}`,
+          password: `mina${2000 + i}`,
+          full_name: `طالب ${i}`,
+          grade: 'الصف الأول الإعدادي',
+          registered_device_id: null,
+          is_active: true
+        });
+      }
+      return arr;
+    };
+
+    if (mockStudents.length < 50) {
+      mockStudents = buildDefaultStudents();
       localStorage.setItem(mockDbKey, JSON.stringify(mockStudents));
     }
 
-    const student = mockStudents.find(s => s.username.toLowerCase() === username.toLowerCase());
+    const student = mockStudents.find(s => {
+      const sClean = s.username.toLowerCase().replace(/\s+/g, '');
+      const uClean = username.toLowerCase().replace(/\s+/g, '');
+      return sClean === uClean || s.username.toLowerCase() === username.toLowerCase();
+    });
+
     if (!student) {
       return { success: false, message: 'اسم المستخدم غير مسجل، برجاء مراجعة مستر مينا.' };
     }
-    if(student.is_active===false)return {success:false,message:'هذا الحساب معطل حالياً.'};
+    if (student.is_active === false) return { success: false, message: 'هذا الحساب معطل حالياً.' };
 
     // السماح لـ admin بالدخول بكلمة سر admin أو 123456
     const isAdminPass = student.username.toLowerCase() === 'admin' && (password === 'admin' || password === '123456');
@@ -552,7 +599,7 @@ window.MenaAuth = {
         <form id="mena-auth-form" onsubmit="MenaAuth.handleSubmit(event)">
           <div class="mena-auth-form-group">
             <label class="mena-auth-label">اسم المستخدم (المسلم من مستر مينا)</label>
-            <input type="text" id="mena-auth-user" class="mena-auth-input" placeholder="مثال: student1" required autofocus />
+            <input type="text" id="mena-auth-user" class="mena-auth-input" placeholder="مثال: Student 1 أو student1" required autofocus />
           </div>
 
           <div class="mena-auth-form-group">
