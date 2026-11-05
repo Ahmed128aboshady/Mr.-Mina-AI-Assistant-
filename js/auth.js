@@ -614,11 +614,8 @@ window.MenaAuth = {
           <div id="mena-auth-error-box" class="mena-auth-error"></div>
         </form>
 
-        <div class="mena-auth-footer-links" style="justify-content: center; text-align: center; display: flex; flex-direction: column; gap: 10px; margin-top: 14px;">
-          <button type="button" onclick="MenaAuth.fillQuickLogin()" style="width: 100%; padding: 11px; background: rgba(56, 189, 248, 0.12); border: 1.5px solid #38bdf8; color: #38bdf8; border-radius: 12px; font-weight: 800; font-size: 0.92rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; transition: all 0.2s;">
-            <span>⚡ تجربة فورية بحساب مستر مينا (دخول بنقرة واحدة)</span>
-          </button>
-          <span style="font-size: 0.78rem; color: #64748b;">نسيت بياناتك؟ راجع مستر مينا</span>
+        <div class="mena-auth-footer-links" style="justify-content: center; text-align: center; margin-top: 14px;">
+          <span style="font-size: 0.82rem; color: #64748b;">نسيت بياناتك أو كلمة المرور؟ برجاء مراجعة مستر مينا جرجس</span>
         </div>
       </div>
     `;
