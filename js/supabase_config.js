@@ -6,18 +6,20 @@
 window.MENA_SUPABASE_CONFIG = {
   // 🔑 بيانات مشروع Supabase الخاص بمستر مينا:
   // يمكن كتابتها هنا مباشرة، أو حفظها عبر واجهة الإعدادات السريعة في المتصفح
-  DEFAULT_URL: 'https://omsutcvoukueqxcxleah.supabase.co', // رابط مشروع مستر مينا من Supabase
-  DEFAULT_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tc3V0Y3ZvdWt1ZXF4Y3hsZWFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMzU0NTEsImV4cCI6MjEwNTgxMTQ1MX0.YjZuR6-WLhhPO1W5bEn-Xs6hOLsdpgCt4fWrIWZ82zg',
+  DEFAULT_URL: 'https://irqlsvfiyvrgpkteusrm.supabase.co', // رابط مشروع مستر مينا الجديد من Supabase
+  DEFAULT_ANON_KEY: 'sb_publishable_Aubi7eTS6B2tM_RUClKW9w_egnTAB74',
 
   getUrl() {
     const stored = localStorage.getItem('mena_supabase_url');
-    if (stored && stored.includes('supabase.co') && !stored.includes('vugmrmvjtwphvymzoxlh')) return stored;
+    if (stored && stored.includes('supabase.co') && !stored.includes('vugmrmvjtwphvymzoxlh') && !stored.includes('omsutcvoukueqxcxleah')) {
+      return stored.replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '');
+    }
     return this.DEFAULT_URL;
   },
 
   getAnonKey() {
     const stored = localStorage.getItem('mena_supabase_anon_key');
-    if (stored && !stored.includes('dummy_anon_key')) return stored;
+    if (stored && !stored.includes('dummy_anon_key') && !stored.includes('omsutcvoukueqxcxleah') && !stored.includes('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tc3V0Y3ZvdWt1ZXF4Y3hsZWFo')) return stored;
     return this.DEFAULT_ANON_KEY;
   },
 
