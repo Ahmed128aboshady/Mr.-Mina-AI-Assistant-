@@ -53,10 +53,38 @@ window.MenaAuth = {
     this.updateHeaderUI();
   },
 
-  logout() {
+  async logout() {
     window.appAudioManager?.stopAll();
     window.appController?.hideExplanation?.();
     document.querySelectorAll('#live-chat-messages,#lesson-chat-messages').forEach(el=>el.replaceChildren());
+
+    const student = this.getCurrentStudent();
+    if (student && student.id && !student.is_admin) {
+      // تحرير الجلسة في Supabase ليتمكن الطالب من الدخول من جهاز آخر عند تسجيل الخروج
+      const supabase = window.getSupabaseClient();
+      if (supabase && window.MENA_SUPABASE_CONFIG?.isConfigured()) {
+        try {
+          await supabase
+            .from('students')
+            .update({ registered_device_id: null, registered_device_name: null })
+            .eq('id', student.id);
+        } catch (e) {
+          console.warn('Session release on logout error:', e);
+        }
+      }
+      // تحرير الجلسة في التخزين المحلي الاحتياطي
+      const mockDbKey = 'mena_mock_students_db';
+      try {
+        const mockList = JSON.parse(localStorage.getItem(mockDbKey) || '[]');
+        const idx = mockList.findIndex(s => s.id === student.id || s.username === student.username);
+        if (idx !== -1) {
+          mockList[idx].registered_device_id = null;
+          mockList[idx].registered_device_name = null;
+          localStorage.setItem(mockDbKey, JSON.stringify(mockList));
+        }
+      } catch (e) {}
+    }
+
     localStorage.removeItem('mena_current_student');
     this.updateHeaderUI();
     this.showLoginModal();
@@ -206,7 +234,7 @@ window.MenaAuth = {
           return {
             success: false,
             deviceLocked: true,
-            message: `⚠️ تنبيه أمني مشدد: هذا الحساب مسجل ومربوط بالفعل بجهاز آخر (${student.registered_device_name || 'جهاز معتمد سابق'}) ولا يمكن استخدامه إلا على جهاز واحد فقط. برجاء التواصل مع مستر مينا جرجس لإعادة ضبط جهازك.`
+            message: `⚠️ تنبيه: هذا الحساب مفتوح حالياً في جلسة نشطة على جهاز آخر (${student.registered_device_name || 'جهاز آخر'}). يجب تسجيل الخروج من الجهاز الآخر أولاً لتتمكن من فتحه هنا.`
           };
         }
       } catch (err) {
@@ -283,7 +311,7 @@ window.MenaAuth = {
       return {
         success: false,
         deviceLocked: true,
-        message: `⚠️ تنبيه أمني مشدد: هذا الحساب مسجل ومربوط بالفعل بجهاز آخر (${student.registered_device_name || 'جهاز مسجل'}) ولا يمكن فتحه إلا على جهاز واحد فقط. برجاء التواصل مع مستر مينا لإعادة ضبط الجهاز.`
+        message: `⚠️ تنبيه: هذا الحساب مفتوح حالياً في جلسة نشطة على جهاز آخر (${student.registered_device_name || 'جهاز آخر'}). يجب تسجيل الخروج من الجهاز الآخر أولاً لتتمكن من فتحه هنا.`
       };
     }
   },
