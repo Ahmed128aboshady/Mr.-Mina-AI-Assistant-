@@ -626,7 +626,7 @@ window.MenaAuth = {
 
         <form id="mena-auth-form" onsubmit="MenaAuth.handleSubmit(event)">
           <div class="mena-auth-form-group">
-            <label class="mena-auth-label">اسم المستخدم (المسلم من مستر مينا)</label>
+            <label class="mena-auth-label">اسم المستخدم</label>
             <input type="text" id="mena-auth-user" class="mena-auth-input" placeholder="مثال: Student 1 أو student1" required autofocus />
           </div>
 
